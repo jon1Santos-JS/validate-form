@@ -1,0 +1,5 @@
+.c-form {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--app-base-measure) * 2);
+}

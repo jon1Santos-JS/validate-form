@@ -1,0 +1,6 @@
+dist
+src/styles/sass/index.scss
+src/styles/sass/base/_asset.scss
+src/styles/sass/base/_box-sizing.scss
+src/styles/sass/base/_globals.scss
+src/styles/sass/base/_normalize.vendor.scss

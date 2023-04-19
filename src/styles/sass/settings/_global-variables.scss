@@ -1,0 +1,28 @@
+:root {
+    // COLORS
+
+    --primary-color: #21c94d;
+    --secondary-color: #fff;
+    --thirty-color: #e7e7e7;
+
+    // MEASURES
+
+    --app-base-measure: 8px;
+    --app-base-font-size: clamp(
+        0.5vw + var(--app-base-measure),
+        var(--app-base-measure) * 1.6,
+        1.5vw + var(--app-base-measure)
+    );
+
+    // SHADOW-EFFECT
+
+    --small-box-shadow: 0px 5px 10px -5px #000;
+    --medium-box-shadow: 0px 5px 10px 0px #000;
+
+    // Z-INDEX DEEPER VALUES
+
+    --modal-index: 999;
+    --navigation-index: 800;
+    --component-index: 2;
+    --background-index: -5;
+}
