@@ -8,13 +8,16 @@ interface FormProps {
 }
 
 const Form: React.FC<FormProps> = ({ children, validate }) => {
-    const [showError, setShowError] = useState(false);
+    // const [hasError, onSetError] = useState(false);
     const timerUpMessage = useRef<NodeJS.Timeout>();
+    const error = useRef<string>('Invalid form');
+    const [hasError, setHasError] = useState(true);
+    const [showMessage, setShowMessage] = useState(false);
     const router = useRouter();
 
-    const timer = (setting: (value: React.SetStateAction<boolean>) => void) => {
+    const timer = () => {
         timerUpMessage.current = setTimeout(() => {
-            setting(false);
+            setShowMessage(false);
         }, 2500);
     };
 
@@ -27,46 +30,46 @@ const Form: React.FC<FormProps> = ({ children, validate }) => {
         return children;
     };
 
-    const clearValidateArray = (key: ValidateObjectKeyTypes) => {
-        if (!validate) return;
-        while (validate[key].length > 0) {
-            validate[key].pop();
-        }
-    };
-
     const onClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        let isValid = true;
         e.preventDefault();
+        setHasError(true);
 
         clearTimeout(timerUpMessage.current);
 
         for (const field in validate) {
-            if (validate[field as ValidateObjectKeyTypes].length > 0) {
-                isValid = false;
+            if (validate[field as ValidateObjectKeyTypes].errors.length < 1) {
+                setHasError(false);
             }
         }
 
-        if (isValid) {
-            setShowError(false);
-            router.reload();
+        if (hasError) {
+            setShowMessage(true);
+            timer();
             return;
         }
 
-        setShowError(true);
-        timer(setShowError);
+        if (!hasError) {
+            setShowMessage(false);
+            console.log('passou');
+            // router.reload();
+            return;
+        }
     };
 
     return (
         <form className="c-form">
             {renderChildren()}
-            {showError && (
-                <div className="notification is-danger">Invalid Form</div>
-            )}
+            {renderError()}
             <button className="button is-primary" onClick={(e) => onClick(e)}>
                 Submit
             </button>
         </form>
     );
+
+    function renderError() {
+        if (!showMessage) return;
+        return <div className="notification is-danger">{error.current}</div>;
+    }
 };
 
 export default Form;

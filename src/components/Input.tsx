@@ -8,18 +8,18 @@ interface InputProps {
 
 const Input: React.FC<InputProps> = ({ label, typeInput, validation }) => {
     const [input, setInput] = useState('');
-    const [errors, setErrors] = useState<string[]>();
+    const [errors, setErrors] = useState<string[] | null | undefined>();
     const typingTimer = useRef<NodeJS.Timeout>();
+    const inputFirstState = useRef(input);
 
     useEffect(() => {
-        if (validation) {
-            typingTimer.current = setTimeout(() => {
-                if (input !== '') setErrors(validation(input));
-            }, 650);
-        }
+        typingTimer.current = setTimeout(() => {
+            setErrorsList();
+        }, 650);
 
         return () => clearTimeout(typingTimer.current);
-    }, [input, validation, errors]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [input]);
 
     return (
         <div className="field">
@@ -30,15 +30,25 @@ const Input: React.FC<InputProps> = ({ label, typeInput, validation }) => {
                 value={input}
                 type={typeInput}
             />
-            {input &&
-                errors &&
-                errors.map((err) => (
-                    <div className="has-text-danger" key={err}>
-                        {err}
-                    </div>
-                ))}
+            {renderErrors()}
         </div>
     );
+
+    function setErrorsList() {
+        if (inputFirstState.current !== input)
+            setErrors(validation && validation(input));
+        if (errors && errors.length < 1) setErrors(null);
+    }
+
+    function renderErrors() {
+        if (!errors) return;
+
+        return errors.map((err) => (
+            <div className="has-text-danger" key={err}>
+                {err}
+            </div>
+        ));
+    }
 };
 
 export default Input;
