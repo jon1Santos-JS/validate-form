@@ -1,18 +1,20 @@
-import { Validate, ValidateObjectKeyTypes } from '@/hooks/useValidate';
 import { useRouter } from 'next/router';
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
+
+export interface FormInputTypesToValidate {
+    [key: string]: { input: string; errors: string[]; isEmpty: boolean };
+}
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    validate?: Validate;
+    fields?: FormInputTypesToValidate;
 }
 
-const Form: React.FC<FormProps> = ({ children, validate }) => {
-    // const [hasError, onSetError] = useState(false);
+const Form: React.FC<FormProps> = ({ children, fields }) => {
     const timerUpMessage = useRef<NodeJS.Timeout>();
     const error = useRef<string>('Invalid form');
-    const [hasError, setHasError] = useState(true);
-    const [showMessage, setShowMessage] = useState(false);
+    const hasError = useRef<boolean>();
+    const [showMessage, setShowMessage] = useState<boolean>(false);
     const router = useRouter();
 
     const timer = () => {
@@ -30,37 +32,50 @@ const Form: React.FC<FormProps> = ({ children, validate }) => {
         return children;
     };
 
-    const onClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const handleClick = (
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    ) => {
         e.preventDefault();
-        setHasError(true);
+        hasError.current = false;
 
         clearTimeout(timerUpMessage.current);
 
-        for (const field in validate) {
-            if (validate[field as ValidateObjectKeyTypes].errors.length < 1) {
-                setHasError(false);
+        const isValid = onCheckInputFields();
+
+        if (isValid) hasError.current = true;
+
+        if (!hasError.current) {
+            setShowMessage(false);
+            router.reload();
+            return;
+        }
+
+        setShowMessage(true);
+        timer();
+        return;
+    };
+
+    function onCheckInputFields() {
+        const verificationArray: number[] = [];
+
+        for (const field in fields) {
+            if (fields[field].errors.length >= 1 || fields[field].isEmpty) {
+                verificationArray.push(1);
+            } else {
+                verificationArray.push(0);
             }
         }
-
-        if (hasError) {
-            setShowMessage(true);
-            timer();
-            return;
-        }
-
-        if (!hasError) {
-            setShowMessage(false);
-            console.log('passou');
-            // router.reload();
-            return;
-        }
-    };
+        return verificationArray.find((value) => value === 1);
+    }
 
     return (
         <form className="c-form">
             {renderChildren()}
             {renderError()}
-            <button className="button is-primary" onClick={(e) => onClick(e)}>
+            <button
+                className="button is-primary"
+                onClick={(e) => handleClick(e)}
+            >
                 Submit
             </button>
         </form>

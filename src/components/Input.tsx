@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 interface InputProps {
     label: string;
     typeInput: string;
-    validation?: (e: string) => string[];
+    validation?: (e: string) => string[] | undefined;
 }
 
 const Input: React.FC<InputProps> = ({ label, typeInput, validation }) => {

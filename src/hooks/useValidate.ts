@@ -1,7 +1,7 @@
 export interface Validate {
-    username: { input: string; errors: string[] };
-    password: { input: string; errors: string[] };
-    confirmPassword: { input: string; errors: string[] };
+    username?: { input: string; errors: string[]; isEmpty: boolean };
+    password?: { input: string; errors: string[]; isEmpty: boolean };
+    confirmPassword?: { input: string; errors: string[]; isEmpty: boolean };
 }
 
 export type ValidateObjectKeyTypes =
@@ -9,78 +9,89 @@ export type ValidateObjectKeyTypes =
     | 'password'
     | 'confirmPassword';
 
-enum Fields {
+export enum Fields {
     USERNAME = 'username',
     PASSWORD = 'password',
     CONFIRM_PASSWORD = 'confirmPassword',
 }
 
-export default function useValidate() {
-    const validate: Validate = {
-        username: { input: '', errors: ['This field is empty'] },
-        password: { input: '', errors: ['This field is empty'] },
-        confirmPassword: { input: '', errors: ['This field is empty'] },
-    };
-
+export default function useValidate(field: Validate) {
     const validateUsername = (currentInput: string) => {
-        validate[Fields.USERNAME].input = currentInput;
-        const error: string[] = [];
+        if (!field[Fields.USERNAME]) return;
+        field[Fields.USERNAME].input = currentInput;
+        field[Fields.USERNAME].isEmpty = false;
 
-        clearValidate(Fields.USERNAME);
+        while (field[Fields.USERNAME].errors.length > 0) {
+            field[Fields.USERNAME].errors.pop();
+        }
+
+        const error: string[] = [];
 
         if (!currentInput.match(/.{6,}/)) {
             error.push('Username must has 6 characters at least');
         }
 
-        if (error.length === 0) clearValidate(Fields.USERNAME);
-        else validate[Fields.USERNAME].errors.push(...error);
+        if (error.length === 0) {
+            while (field[Fields.USERNAME].errors.length > 0) {
+                field[Fields.USERNAME].errors.pop();
+            }
+        } else field[Fields.USERNAME].errors.push(...error);
 
-        return validate[Fields.USERNAME].errors;
+        return field[Fields.USERNAME].errors;
     };
 
     const validatePassword = (currentInput: string) => {
-        validate[Fields.PASSWORD].input = currentInput;
+        if (!field[Fields.PASSWORD]) return;
+        field[Fields.PASSWORD].input = currentInput;
+        field[Fields.PASSWORD].isEmpty = false;
+
         const error = [];
 
-        clearValidate(Fields.PASSWORD);
+        while (field[Fields.PASSWORD].errors.length > 0) {
+            field[Fields.PASSWORD].errors.pop();
+        }
 
         if (!currentInput.match(/.{6,}/)) {
             error.push('Password must has 6 characters at least');
         }
 
-        if (error.length === 0) clearValidate(Fields.PASSWORD);
-        else validate[Fields.PASSWORD].errors.push(...error);
+        if (error.length === 0) {
+            while (field[Fields.PASSWORD].errors.length > 0) {
+                field[Fields.PASSWORD].errors.pop();
+            }
+        } else field[Fields.PASSWORD].errors.push(...error);
 
-        return validate[Fields.PASSWORD].errors;
+        return field[Fields.PASSWORD].errors;
     };
 
     const cofirmPassword = (currentInput: string) => {
-        validate[Fields.CONFIRM_PASSWORD].input = currentInput;
+        if (!field[Fields.CONFIRM_PASSWORD]) return;
+        field[Fields.CONFIRM_PASSWORD].input = currentInput;
+        field[Fields.CONFIRM_PASSWORD].isEmpty = false;
+
         const error = [];
 
-        clearValidate(Fields.CONFIRM_PASSWORD);
+        while (field[Fields.CONFIRM_PASSWORD].errors.length > 0) {
+            field[Fields.CONFIRM_PASSWORD].errors.pop();
+        }
 
-        if (currentInput !== validate[Fields.PASSWORD].input) {
+        if (!field[Fields.PASSWORD]) return;
+        if (currentInput !== field[Fields.PASSWORD].input) {
             error.push('This field has to be equal to the password');
         }
 
-        if (error.length === 0) clearValidate(Fields.CONFIRM_PASSWORD);
-        else validate[Fields.CONFIRM_PASSWORD].errors.push(...error);
+        if (error.length === 0) {
+            while (field[Fields.CONFIRM_PASSWORD].errors.length > 0) {
+                field[Fields.CONFIRM_PASSWORD].errors.pop();
+            }
+        } else field[Fields.CONFIRM_PASSWORD].errors.push(...error);
 
-        return validate[Fields.CONFIRM_PASSWORD].errors;
-    };
-
-    const clearValidate = (KeyToCheck: ValidateObjectKeyTypes) => {
-        while (validate[KeyToCheck].errors.length > 0) {
-            validate[KeyToCheck].errors.pop();
-        }
+        return field[Fields.CONFIRM_PASSWORD].errors;
     };
 
     return {
         validateUsername,
         validatePassword,
-        clearValidate,
         cofirmPassword,
-        validate,
     };
 }
