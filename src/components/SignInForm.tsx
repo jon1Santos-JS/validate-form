@@ -13,7 +13,13 @@ export default function SignInForm() {
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
-                <Form inputs={inputs} validateAll={validateAll}>
+                <Form
+                    inputs={inputs}
+                    validateAll={validateAll}
+                    method="POST"
+                    action="/api/hello"
+                    legend="SignIn"
+                >
                     <Input
                         label="Username"
                         inputType="text"

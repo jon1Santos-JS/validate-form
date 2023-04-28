@@ -15,7 +15,13 @@ export default function SignUpForm() {
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
-                <Form inputs={inputs} validateAll={validateAll} legend="SignUp">
+                <Form
+                    inputs={inputs}
+                    validateAll={validateAll}
+                    method="POST"
+                    action="/api/hello"
+                    legend="SignUp"
+                >
                     <Input
                         label="Username"
                         inputType="text"

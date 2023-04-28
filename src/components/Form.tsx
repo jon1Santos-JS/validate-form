@@ -1,4 +1,5 @@
 import FormContext from '@/context/FormContext';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 export interface FormInputTypesToValidate {
@@ -8,6 +9,8 @@ export interface FormInputTypesToValidate {
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
     validateAll: () => void;
+    method: 'POST' | 'GET';
+    action: string;
     inputs?: FormInputTypesToValidate;
     legend?: string;
 }
@@ -15,11 +18,14 @@ interface FormProps {
 const Form: React.FC<FormProps> = ({
     children,
     validateAll,
+    method,
+    action,
     inputs,
     legend,
 }) => {
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showInputErrors, setshowInputErrors] = useState(false);
+    const nextRouter = useRouter();
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
@@ -31,11 +37,7 @@ const Form: React.FC<FormProps> = ({
     }, [showInputErrors]);
 
     return (
-        <form
-            className="c-form"
-            method="post"
-            action="http://localhost:3000/api/hello"
-        >
+        <form className="c-form">
             <fieldset>
                 <legend>{legend}</legend>
                 {renderInputs()}
@@ -78,15 +80,17 @@ const Form: React.FC<FormProps> = ({
     }
 
     function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
         validateAll();
         setShowMessage(true);
         setshowInputErrors(true);
         if (!onCheckInputFields()) {
             setshowInputErrors(false);
             setShowMessage(false);
+            onSendInputs();
+            nextRouter.reload();
             return;
         }
-        e.preventDefault();
     }
 
     function onCheckInputFields() {
@@ -99,6 +103,16 @@ const Form: React.FC<FormProps> = ({
             }
         }
         return verificationArray.find((value) => value === 1);
+    }
+
+    function onSendInputs() {
+        fetch(action, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(inputs),
+        });
     }
 };
 
