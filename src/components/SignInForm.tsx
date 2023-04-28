@@ -2,17 +2,18 @@ import useValidate from '@/hooks/useValidate';
 import Form, { FormInputTypesToValidate } from './Form';
 import Input from './Input';
 
-const fields: FormInputTypesToValidate = {
+const inputs: FormInputTypesToValidate = {
     username: { errors: [], isEmpty: true },
     password: { errors: [], isEmpty: true },
 };
 
 export default function SignInForm() {
-    const { validateUsername, validatePassword } = useValidate(fields);
+    const { validateUsername, validatePassword, validateAll } =
+        useValidate(inputs);
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
-                <Form fields={fields}>
+                <Form inputs={inputs} validateAll={validateAll}>
                     <Input
                         label="Username"
                         inputType="text"

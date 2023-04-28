@@ -1,33 +1,22 @@
-export interface Validate {
-    username?: InputType;
-    password?: InputType;
-    confirmPassword?: InputType;
-}
-
-export interface InputType {
-    value: string;
-    errors: string[];
-    isEmpty: boolean;
-    validations: Validation[];
-}
-
-export interface Validation {
-    coditional: boolean | RegExpMatchArray | null;
-    message: string;
-}
-
-export type ValidateObjectKeyTypes =
-    | 'username'
-    | 'password'
-    | 'confirmPassword';
-
-export enum InputKey {
+enum InputKey {
     USERNAME = 'username',
     PASSWORD = 'password',
     CONFIRM_PASSWORD = 'confirmPassword',
 }
 
 export default function useValidate(inputs: Validate) {
+    const validateAll = () => {
+        if (
+            inputs[InputKey.USERNAME] &&
+            inputs[InputKey.PASSWORD] &&
+            inputs[InputKey.CONFIRM_PASSWORD]
+        ) {
+            validateUsername(inputs[InputKey.USERNAME].value);
+            validatePassword(inputs[InputKey.PASSWORD].value);
+            cofirmPassword(inputs[InputKey.CONFIRM_PASSWORD].value);
+        }
+    };
+
     const validateUsername = (currentInputValue: string) => {
         if (!inputs[InputKey.USERNAME]) return;
         if (!currentInputValue) {
@@ -46,7 +35,7 @@ export default function useValidate(inputs: Validate) {
             },
         ];
 
-        return validate(inputs[InputKey.USERNAME]);
+        return validate(inputs[InputKey.USERNAME], currentInputValue);
     };
 
     const validatePassword = (currentInputValue: string) => {
@@ -55,7 +44,7 @@ export default function useValidate(inputs: Validate) {
             inputs[InputKey.PASSWORD].isEmpty = true;
             return;
         }
-        inputs[InputKey.PASSWORD].value = currentInputValue;
+
         inputs[InputKey.PASSWORD].validations = [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
@@ -63,7 +52,7 @@ export default function useValidate(inputs: Validate) {
             },
         ];
 
-        return validate(inputs[InputKey.PASSWORD]);
+        return validate(inputs[InputKey.PASSWORD], currentInputValue);
     };
 
     const cofirmPassword = (currentInputValue: string) => {
@@ -82,19 +71,20 @@ export default function useValidate(inputs: Validate) {
             },
         ];
 
-        return validate(inputs[InputKey.CONFIRM_PASSWORD]);
+        return validate(inputs[InputKey.CONFIRM_PASSWORD], currentInputValue);
     };
 
     return {
         validateUsername,
         validatePassword,
         cofirmPassword,
+        validateAll,
     };
 
-    function validate(input: InputType) {
+    function validate(input: InputType, currentInputValue: string) {
         const error: string[] = [];
         clearErrorList(input.errors);
-
+        input.value = currentInputValue;
         input.validations.map((validation) => {
             if (validation.coditional) error.push(validation.message);
         });

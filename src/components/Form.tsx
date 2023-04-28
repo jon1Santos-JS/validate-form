@@ -1,5 +1,4 @@
 import FormContext from '@/context/FormContext';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 export interface FormInputTypesToValidate {
@@ -8,13 +7,19 @@ export interface FormInputTypesToValidate {
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    fields?: FormInputTypesToValidate;
+    validateAll: () => void;
+    inputs?: FormInputTypesToValidate;
+    legend?: string;
 }
 
-const Form: React.FC<FormProps> = ({ children, fields }) => {
+const Form: React.FC<FormProps> = ({
+    children,
+    validateAll,
+    inputs,
+    legend,
+}) => {
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showInputErrors, setshowInputErrors] = useState(false);
-    const router = useRouter();
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
@@ -26,15 +31,22 @@ const Form: React.FC<FormProps> = ({ children, fields }) => {
     }, [showInputErrors]);
 
     return (
-        <form className="c-form">
-            {renderInputs()}
-            {renderError()}
-            <button
-                className="button is-primary"
-                onClick={(e) => handleClick(e)}
-            >
-                Submit
-            </button>
+        <form
+            className="c-form"
+            method="post"
+            action="http://localhost:3000/api/hello"
+        >
+            <fieldset>
+                <legend>{legend}</legend>
+                {renderInputs()}
+                {renderError()}
+                <button
+                    className="button is-primary"
+                    onClick={(e) => handleClick(e)}
+                >
+                    Submit
+                </button>
+            </fieldset>
         </form>
     );
 
@@ -66,25 +78,21 @@ const Form: React.FC<FormProps> = ({ children, fields }) => {
     }
 
     function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        e.preventDefault();
-        HandleInputs();
-    }
-
-    function HandleInputs() {
+        validateAll();
         setShowMessage(true);
         setshowInputErrors(true);
         if (!onCheckInputFields()) {
             setshowInputErrors(false);
             setShowMessage(false);
-            router.reload();
             return;
         }
+        e.preventDefault();
     }
 
     function onCheckInputFields() {
         const verificationArray = [];
-        for (const index in fields) {
-            if (fields[index].errors.length >= 1 || fields[index].isEmpty) {
+        for (const index in inputs) {
+            if (inputs[index].errors.length >= 1 || inputs[index].isEmpty) {
                 verificationArray.push(1);
             } else {
                 verificationArray.push(0);
