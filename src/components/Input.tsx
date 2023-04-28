@@ -1,25 +1,40 @@
-import React, { useState, useEffect, useRef } from 'react';
+import FormContext from '@/context/FormContext';
+import React, { useState, useEffect, useContext } from 'react';
 
 interface InputProps {
     label: string;
-    typeInput: string;
-    validation?: (e: string) => string[] | undefined;
+    inputType: string;
+    validation?: (inputValue: string) => string[] | undefined;
 }
 
-const Input: React.FC<InputProps> = ({ label, typeInput, validation }) => {
+const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
+    const formContext = useContext(FormContext);
     const [input, setInput] = useState('');
-    const [errors, setErrors] = useState<string[] | null | undefined>();
-    const typingTimer = useRef<NodeJS.Timeout>();
-    const inputFirstState = useRef(input);
+    const [showMessage, setShowMessage] = useState<boolean>(false);
+    const [errorList, setErrorList] = useState<string[] | null | undefined>(
+        null,
+    );
 
     useEffect(() => {
-        typingTimer.current = setTimeout(() => {
-            setErrorsList();
-        }, 650);
+        setErrorList(validation && validation(input));
+    }, [input, setErrorList, validation]);
 
-        return () => clearTimeout(typingTimer.current);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [input]);
+    useEffect(() => {
+        if (errorList && errorList?.length >= 1) {
+            const currentTimer = onShowMessage(true, 650);
+            return () => clearTimeout(currentTimer);
+        }
+        setShowMessage(false);
+    }, [errorList, input]);
+
+    useEffect(() => {
+        const currentTimer = onShowMessage(false, 2550);
+        return () => clearTimeout(currentTimer);
+    }, [showMessage, formContext]);
+
+    useEffect(() => {
+        if (!showMessage) setShowMessage(formContext.showInputErrorsByForm);
+    }, [formContext.showInputErrorsByForm, showMessage]);
 
     return (
         <div className="field">
@@ -28,26 +43,27 @@ const Input: React.FC<InputProps> = ({ label, typeInput, validation }) => {
                 className="input"
                 onChange={(e) => setInput(e.target.value)}
                 value={input}
-                type={typeInput}
+                type={inputType}
             />
             {renderErrors()}
         </div>
     );
 
-    function setErrorsList() {
-        if (inputFirstState.current !== input)
-            setErrors(validation && validation(input));
-        if (errors && errors.length < 1) setErrors(null);
-    }
-
     function renderErrors() {
-        if (!errors) return;
+        if (!errorList || !showMessage) return;
 
-        return errors.map((err) => (
+        return errorList.map((err) => (
             <div className="has-text-danger" key={err}>
                 {err}
             </div>
         ));
+    }
+
+    function onShowMessage(value: boolean, time: number) {
+        const currentTimer = setTimeout(() => {
+            setShowMessage(value);
+        }, time);
+        return currentTimer;
     }
 };
 

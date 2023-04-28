@@ -3,8 +3,8 @@ import Form, { FormInputTypesToValidate } from './Form';
 import Input from './Input';
 
 const fields: FormInputTypesToValidate = {
-    username: { input: '', errors: [], isEmpty: true },
-    password: { input: '', errors: [], isEmpty: true },
+    username: { errors: [], isEmpty: true },
+    password: { errors: [], isEmpty: true },
 };
 
 export default function SignInForm() {
@@ -15,12 +15,12 @@ export default function SignInForm() {
                 <Form fields={fields}>
                     <Input
                         label="Username"
-                        typeInput="text"
+                        inputType="text"
                         validation={validateUsername}
                     />
                     <Input
                         label="Password"
-                        typeInput="password"
+                        inputType="password"
                         validation={validatePassword}
                     />
                 </Form>

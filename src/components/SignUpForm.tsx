@@ -3,9 +3,9 @@ import Form, { FormInputTypesToValidate } from './Form';
 import Input from './Input';
 
 const fields: FormInputTypesToValidate = {
-    username: { input: '', errors: [], isEmpty: true },
-    password: { input: '', errors: [], isEmpty: true },
-    confirmPassword: { input: '', errors: [], isEmpty: true },
+    username: { errors: [], isEmpty: true },
+    password: { errors: [], isEmpty: true },
+    confirmPassword: { errors: [], isEmpty: true },
 };
 
 export default function SignUpForm() {
@@ -17,17 +17,17 @@ export default function SignUpForm() {
                 <Form fields={fields}>
                     <Input
                         label="Username"
-                        typeInput="text"
+                        inputType="text"
                         validation={validateUsername}
                     />
                     <Input
                         label="Password"
-                        typeInput="password"
+                        inputType="password"
                         validation={validatePassword}
                     />
                     <Input
                         label="Confirm Password"
-                        typeInput="password"
+                        inputType="password"
                         validation={cofirmPassword}
                     />
                 </Form>

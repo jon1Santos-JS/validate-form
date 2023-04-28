@@ -1,8 +1,9 @@
+import FormContext from '@/context/FormContext';
 import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface FormInputTypesToValidate {
-    [key: string]: { input: string; errors: string[]; isEmpty: boolean };
+    [key: string]: { errors: string[]; isEmpty: boolean };
 }
 
 interface FormProps {
@@ -11,66 +12,22 @@ interface FormProps {
 }
 
 const Form: React.FC<FormProps> = ({ children, fields }) => {
-    const timerUpMessage = useRef<NodeJS.Timeout>();
-    const error = useRef<string>('Invalid form');
-    const hasError = useRef<boolean>();
     const [showMessage, setShowMessage] = useState<boolean>(false);
+    const [showInputErrors, setshowInputErrors] = useState(false);
     const router = useRouter();
 
-    const timer = () => {
-        timerUpMessage.current = setTimeout(() => {
+    useEffect(() => {
+        const timerDownMessage = setTimeout(() => {
+            setshowInputErrors(false);
             setShowMessage(false);
-        }, 2500);
-    };
+        }, 2550);
 
-    const renderChildren = () => {
-        const Elements = children as JSX.Element[];
-        if (Elements?.length > 1)
-            return Elements.map((child) => (
-                <div key={child.props.label}>{child}</div>
-            ));
-        return children;
-    };
-
-    const handleClick = (
-        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    ) => {
-        e.preventDefault();
-        hasError.current = false;
-
-        clearTimeout(timerUpMessage.current);
-
-        const isValid = onCheckInputFields();
-
-        if (isValid) hasError.current = true;
-
-        if (!hasError.current) {
-            setShowMessage(false);
-            router.reload();
-            return;
-        }
-
-        setShowMessage(true);
-        timer();
-        return;
-    };
-
-    function onCheckInputFields() {
-        const verificationArray: number[] = [];
-
-        for (const field in fields) {
-            if (fields[field].errors.length >= 1 || fields[field].isEmpty) {
-                verificationArray.push(1);
-            } else {
-                verificationArray.push(0);
-            }
-        }
-        return verificationArray.find((value) => value === 1);
-    }
+        return () => clearTimeout(timerDownMessage);
+    }, [showInputErrors]);
 
     return (
         <form className="c-form">
-            {renderChildren()}
+            {renderInputs()}
             {renderError()}
             <button
                 className="button is-primary"
@@ -81,9 +38,59 @@ const Form: React.FC<FormProps> = ({ children, fields }) => {
         </form>
     );
 
+    function renderInputs() {
+        const inputs = children as JSX.Element[];
+        if (inputs?.length > 1) {
+            return (
+                <FormContext.Provider
+                    value={{ showInputErrorsByForm: showInputErrors }}
+                >
+                    {inputs.map((child) => (
+                        <div key={child.props.label}>{child}</div>
+                    ))}
+                </FormContext.Provider>
+            );
+        }
+        return (
+            <FormContext.Provider
+                value={{ showInputErrorsByForm: showInputErrors }}
+            >
+                {children}
+            </FormContext.Provider>
+        );
+    }
+
     function renderError() {
-        if (!showMessage) return;
-        return <div className="notification is-danger">{error.current}</div>;
+        if (!showMessage) return null;
+        return <div className="notification is-danger">{'Invalid form'}</div>;
+    }
+
+    function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        HandleInputs();
+    }
+
+    function HandleInputs() {
+        setShowMessage(true);
+        setshowInputErrors(true);
+        if (!onCheckInputFields()) {
+            setshowInputErrors(false);
+            setShowMessage(false);
+            router.reload();
+            return;
+        }
+    }
+
+    function onCheckInputFields() {
+        const verificationArray = [];
+        for (const index in fields) {
+            if (fields[index].errors.length >= 1 || fields[index].isEmpty) {
+                verificationArray.push(1);
+            } else {
+                verificationArray.push(0);
+            }
+        }
+        return verificationArray.find((value) => value === 1);
     }
 };
 
