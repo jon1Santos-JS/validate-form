@@ -1,8 +1,8 @@
 import useValidate from '@/hooks/useValidate';
-import Form, { FormInputTypesToValidate } from './Form';
+import Form from './Form';
 import Input from './Input';
 
-const inputs: FormInputTypesToValidate = {
+const inputs: InputsType = {
     username: { errors: [], isEmpty: true },
     password: { errors: [], isEmpty: true },
 };
@@ -17,7 +17,7 @@ export default function SignInForm() {
                     inputs={inputs}
                     validateAll={validateAll}
                     method="POST"
-                    action="/api/hello"
+                    action={process.env.NEXT_PUBLIC_SERVER_LINK as string}
                     legend="SignIn"
                 >
                     <Input

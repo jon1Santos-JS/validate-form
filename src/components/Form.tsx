@@ -1,9 +1,14 @@
 import FormContext from '@/context/FormContext';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import _ from 'lodash';
 
 export interface FormInputTypesToValidate {
     [key: string]: { errors: string[]; isEmpty: boolean };
+}
+
+interface GetUniqueProp {
+    [key: string]: { errors?: string[]; isEmpty?: boolean };
 }
 
 interface FormProps {
@@ -11,7 +16,7 @@ interface FormProps {
     validateAll: () => void;
     method: 'POST' | 'GET';
     action: string;
-    inputs?: FormInputTypesToValidate;
+    inputs: FormInputTypesToValidate;
     legend?: string;
 }
 
@@ -87,7 +92,7 @@ const Form: React.FC<FormProps> = ({
         if (!onCheckInputFields()) {
             setshowInputErrors(false);
             setShowMessage(false);
-            onSendInputs();
+            onSubmitInputs();
             nextRouter.reload();
             return;
         }
@@ -95,8 +100,8 @@ const Form: React.FC<FormProps> = ({
 
     function onCheckInputFields() {
         const verificationArray = [];
-        for (const index in inputs) {
-            if (inputs[index].errors.length >= 1 || inputs[index].isEmpty) {
+        for (const i in inputs) {
+            if (inputs[i].errors?.length >= 1 || inputs[i].isEmpty) {
                 verificationArray.push(1);
             } else {
                 verificationArray.push(0);
@@ -105,14 +110,23 @@ const Form: React.FC<FormProps> = ({
         return verificationArray.find((value) => value === 1);
     }
 
-    function onSendInputs() {
+    function onSubmitInputs() {
+        const objWithAuniqueProp = returnObjectWithAuniqueProp(inputs, 'value');
         fetch(action, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(inputs),
+            body: JSON.stringify(objWithAuniqueProp),
         });
+    }
+
+    function returnObjectWithAuniqueProp(obj: GetUniqueProp, prop: string) {
+        const newObj = { ...obj };
+        for (const i in newObj) {
+            newObj[i] = _.pick(newObj[i], prop);
+        }
+        return newObj;
     }
 };
 

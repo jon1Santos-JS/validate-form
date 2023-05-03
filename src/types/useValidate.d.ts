@@ -3,17 +3,15 @@ declare type ValidateObjectKeyTypes =
     | 'password'
     | 'confirmPassword';
 
-declare interface Validate {
-    username?: InputType;
-    password?: InputType;
-    confirmPassword?: InputType;
+declare interface InputsType {
+    [key: string]: InputPropsType;
 }
 
-declare interface InputType {
-    value: string;
+declare interface InputPropsType {
     isEmpty: boolean;
     errors: string[];
-    validations: Validation[];
+    value?: string;
+    validations?: Validation[];
 }
 
 declare interface Validation {

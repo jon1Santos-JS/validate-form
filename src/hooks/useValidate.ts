@@ -4,16 +4,16 @@ enum InputKey {
     CONFIRM_PASSWORD = 'confirmPassword',
 }
 
-export default function useValidate(inputs: Validate) {
+export default function useValidate(inputs: InputsType) {
     const validateAll = () => {
         if (
             inputs[InputKey.USERNAME] &&
             inputs[InputKey.PASSWORD] &&
             inputs[InputKey.CONFIRM_PASSWORD]
         ) {
-            validateUsername(inputs[InputKey.USERNAME].value);
-            validatePassword(inputs[InputKey.PASSWORD].value);
-            cofirmPassword(inputs[InputKey.CONFIRM_PASSWORD].value);
+            validateUsername(inputs[InputKey.USERNAME].value as string);
+            validatePassword(inputs[InputKey.PASSWORD].value as string);
+            cofirmPassword(inputs[InputKey.CONFIRM_PASSWORD].value as string);
         }
     };
 
@@ -81,11 +81,11 @@ export default function useValidate(inputs: Validate) {
         validateAll,
     };
 
-    function validate(input: InputType, currentInputValue: string) {
+    function validate(input: InputPropsType, currentInputValue: string) {
         const error: string[] = [];
         clearErrorList(input.errors);
         input.value = currentInputValue;
-        input.validations.map((validation) => {
+        input.validations?.map((validation) => {
             if (validation.coditional) error.push(validation.message);
         });
 
