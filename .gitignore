@@ -2,7 +2,7 @@
 
 # database
 
-miniDB.json
+/miniDB
 
 # dependencies
 /node_modules
