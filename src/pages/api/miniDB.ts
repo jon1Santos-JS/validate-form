@@ -1,7 +1,7 @@
-import { readFileSync, unlink, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
-const initialState = { accounts: [], limit: 20 };
-const miniDbFileName = 'miniDBFile.json';
+const INITIAL_STATE = { accounts: [], limit: 20 };
+const MINI_DB_FILE_NAME = 'miniDBFile.json';
 
 export interface MiniDBType {
     accounts: InputDataBaseType[];
@@ -14,7 +14,7 @@ export interface InputDataBaseType {
     timeStamp?: string;
 }
 
-let DataBase: MiniDBType = initialState;
+let DataBase: MiniDBType = INITIAL_STATE;
 
 export class MiniDB {
     async init() {
@@ -22,14 +22,18 @@ export class MiniDB {
     }
 
     async createAccount(userAccount: InputDataBaseType) {
+        if (DataBase.limit === DataBase.accounts.length) return false;
+        if (this.#authAccount(userAccount)) return;
+        DataBase.accounts.push(createTimeStamp(userAccount));
+        await this.#createAndRefreshDB('createAccount');
+    }
+
+    logIn(userAccount: InputDataBaseType) {
         if (!this.#authAccount(userAccount)) return;
-        await this.#accessDB();
-        DataBase.accounts.push(userAccount);
-        await this.#createAndRefreshDB();
+        console.log('user have been logged!');
     }
 
     #authAccount(userAccount: InputDataBaseType) {
-        if (DataBase.limit === DataBase.accounts.length) return false;
         const account = DataBase.accounts.find((value) => {
             if (
                 value.password.value === userAccount.password.value &&
@@ -38,32 +42,43 @@ export class MiniDB {
                 return value;
             return undefined;
         });
-        if (!account) return true;
-        return false;
+        if (!account) return false;
+        return true;
     }
 
     async #accessDB() {
         try {
-            const data = await readFileSync(miniDbFileName, 'utf8');
+            const data = await readFileSync(MINI_DB_FILE_NAME, 'utf8');
             DataBase = JSON.parse(data);
         } catch {
-            DataBase = initialState;
-            await this.#createAndRefreshDB();
+            DataBase = INITIAL_STATE;
+            await this.#createAndRefreshDB('accessDB');
         }
     }
 
-    async #createAndRefreshDB() {
+    async #createAndRefreshDB(caller?: string) {
         const json = JSON.stringify(DataBase, undefined, 2);
         try {
-            await writeFileSync(miniDbFileName, json);
+            await writeFileSync(MINI_DB_FILE_NAME, json);
         } catch {
-            console.log('failed to refresh file');
+            console.log(
+                'failed to create or refresh file by: ',
+                caller && caller,
+            );
         }
     }
+}
 
-    async #deleteDB() {
-        unlink(miniDbFileName, (err) => {
-            if (err) return;
-        });
-    }
+function createTimeStamp(userAccount: InputDataBaseType) {
+    const todaysDate = new Date();
+    const todaysDateFormated = todaysDate
+        .toLocaleString()
+        .split(', ')
+        .join('-');
+    const accountWithTimeStamp = {
+        ...userAccount,
+        timeStamp: todaysDateFormated,
+    };
+
+    return accountWithTimeStamp;
 }

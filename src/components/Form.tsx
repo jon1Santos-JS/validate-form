@@ -4,11 +4,11 @@ import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 
 export interface FormInputTypesToValidate {
-    [key: string]: { errors: string[]; isEmpty: boolean };
+    [key: string]: { errors: string[]; isEmpty: boolean; value: string };
 }
 
-interface GetUniqueProp {
-    [key: string]: { errors?: string[]; isEmpty?: boolean };
+interface FormInputTypeWithAuniqueProp {
+    [key: string]: { value?: string };
 }
 
 interface FormProps {
@@ -116,22 +116,36 @@ const Form: React.FC<FormProps> = ({
     }
 
     function onSubmitInputs() {
-        const objWithAuniqueProp = returnObjectWithAuniqueProp(inputs, 'value');
+        const formatedInputs = onHandleInputs();
         fetch(action, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(objWithAuniqueProp),
+            body: JSON.stringify(formatedInputs),
         });
     }
 
-    function returnObjectWithAuniqueProp(obj: GetUniqueProp, prop: string) {
-        const newObj = { ...obj };
-        for (const i in newObj) {
-            newObj[i] = _.pick(newObj[i], prop);
+    function onHandleInputs() {
+        const inputKeys = Object.keys(inputs).filter((key) =>
+            key.includes('confirm'),
+        );
+        const inputWithoutConfirmFields = onOmitProp(inputs, [...inputKeys]);
+        for (const i in inputWithoutConfirmFields) {
+            inputWithoutConfirmFields[i] = onOmitProp(
+                inputWithoutConfirmFields[i] as FormInputTypesToValidate,
+                ['isEmpty', 'errors', 'validations'],
+            );
         }
-        return newObj;
+        return inputWithoutConfirmFields;
+    }
+
+    function onOmitProp(
+        inputs: FormInputTypesToValidate,
+        prop: string | string[],
+    ): FormInputTypesToValidate | FormInputTypeWithAuniqueProp {
+        const newInputs = _.omit(inputs, prop);
+        return newInputs;
     }
 };
 
