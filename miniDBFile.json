@@ -2,13 +2,13 @@
   "accounts": [
     {
       "username": {
-        "value": "asdf123"
+        "value": "asd123"
       },
       "password": {
-        "value": "asdf123"
+        "value": "asd123"
       },
       "confirmPassword": {
-        "value": "asdf123"
+        "value": "asd123"
       }
     }
   ],
