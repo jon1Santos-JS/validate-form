@@ -21,6 +21,17 @@
       "confirmPassword": {
         "value": "asd321"
       }
+    },
+    {
+      "username": {
+        "value": "asd456"
+      },
+      "password": {
+        "value": "asd456"
+      },
+      "confirmPassword": {
+        "value": "asd456"
+      }
     }
   ],
   "limit": 20
