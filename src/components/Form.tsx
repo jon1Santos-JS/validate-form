@@ -28,18 +28,19 @@ const Form: React.FC<FormProps> = ({
     inputs,
     legend,
 }) => {
-    const [showMessage, setShowMessage] = useState<boolean>(false);
-    const [showInputErrors, setshowInputErrors] = useState(false);
+    const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
+    const [showInputErrorsMessages, setshowInputErrorsMessages] =
+        useState(false);
     const nextRouter = useRouter();
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
-            setshowInputErrors(false);
-            setShowMessage(false);
+            setshowInputErrorsMessages(false);
+            setShowErrorMessage(false);
         }, 2550);
 
         return () => clearTimeout(timerDownMessage);
-    }, [showInputErrors]);
+    }, [showInputErrorsMessages]);
 
     return (
         <form className="c-form">
@@ -62,7 +63,9 @@ const Form: React.FC<FormProps> = ({
         if (inputs?.length > 1) {
             return (
                 <FormContext.Provider
-                    value={{ showInputErrorsByForm: showInputErrors }}
+                    value={{
+                        showInputErrorsMessagesByForm: showInputErrorsMessages,
+                    }}
                 >
                     {inputs.map((child) => (
                         <div key={child.props.label}>{child}</div>
@@ -72,7 +75,9 @@ const Form: React.FC<FormProps> = ({
         }
         return (
             <FormContext.Provider
-                value={{ showInputErrorsByForm: showInputErrors }}
+                value={{
+                    showInputErrorsMessagesByForm: showInputErrorsMessages,
+                }}
             >
                 {children}
             </FormContext.Provider>
@@ -80,25 +85,25 @@ const Form: React.FC<FormProps> = ({
     }
 
     function renderError() {
-        if (!showMessage) return null;
+        if (!showErrorMessage) return null;
         return <div className="notification is-danger">{'Invalid form'}</div>;
     }
 
     function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         validateAll();
-        setShowMessage(true);
-        setshowInputErrors(true);
-        if (!onCheckInputFields()) {
-            setshowInputErrors(false);
-            setShowMessage(false);
+        setShowErrorMessage(true);
+        setshowInputErrorsMessages(true);
+        if (!onCheckInputs()) {
+            setshowInputErrorsMessages(false);
+            setShowErrorMessage(false);
             onSubmitInputs();
             nextRouter.reload();
             return;
         }
     }
 
-    function onCheckInputFields() {
+    function onCheckInputs() {
         const verificationArray = [];
         for (const i in inputs) {
             if (inputs[i].errors?.length >= 1 || inputs[i].isEmpty) {

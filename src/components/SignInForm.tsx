@@ -17,7 +17,7 @@ export default function SignInForm() {
                     inputs={inputs}
                     validateAll={validateAll}
                     method="POST"
-                    action={process.env.NEXT_PUBLIC_SERVER_LINK as string}
+                    action="/"
                     legend="SignIn"
                 >
                     <Input

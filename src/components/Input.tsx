@@ -10,7 +10,7 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     const formContext = useContext(FormContext);
     const [input, setInput] = useState('');
-    const [showMessage, setShowMessage] = useState<boolean>(false);
+    const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
     const [errorList, setErrorList] = useState<string[] | null | undefined>(
         null,
     );
@@ -24,17 +24,18 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
             const currentTimer = onShowMessage(true, 650);
             return () => clearTimeout(currentTimer);
         }
-        setShowMessage(false);
+        setShowErrorMessage(false);
     }, [errorList, input]);
 
     useEffect(() => {
         const currentTimer = onShowMessage(false, 2550);
         return () => clearTimeout(currentTimer);
-    }, [showMessage, formContext]);
+    }, [showErrorMessage, formContext]);
 
     useEffect(() => {
-        if (!showMessage) setShowMessage(formContext.showInputErrorsByForm);
-    }, [formContext.showInputErrorsByForm, showMessage]);
+        if (!showErrorMessage)
+            setShowErrorMessage(formContext.showInputErrorsMessagesByForm);
+    }, [formContext.showInputErrorsMessagesByForm, showErrorMessage]);
 
     return (
         <div className="field">
@@ -50,7 +51,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     );
 
     function renderErrors() {
-        if (!errorList || !showMessage) return;
+        if (!errorList || !showErrorMessage) return;
 
         return errorList.map((err) => (
             <div className="has-text-danger" key={err}>
@@ -61,7 +62,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
 
     function onShowMessage(value: boolean, time: number) {
         const currentTimer = setTimeout(() => {
-            setShowMessage(value);
+            setShowErrorMessage(value);
         }, time);
         return currentTimer;
     }

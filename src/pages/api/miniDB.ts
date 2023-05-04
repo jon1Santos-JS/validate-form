@@ -1,4 +1,6 @@
-import { readFile, unlink, writeFile } from 'fs';
+import { readFileSync, unlink, writeFileSync } from 'fs';
+
+const initialState = { accounts: [], limit: 20 };
 
 export interface MiniDBType {
     accounts: InputDataBaseType[];
@@ -11,7 +13,7 @@ export interface InputDataBaseType {
     timeStamp?: string;
 }
 
-let DataBase: MiniDBType = { accounts: [], limit: 20 };
+let DataBase: MiniDBType = initialState;
 
 export class MiniDB {
     async init() {
@@ -19,24 +21,15 @@ export class MiniDB {
     }
 
     async createAccount(userAccount: InputDataBaseType) {
-        console.log('createAccount called');
-        // if (!this.#checkDB(userAccount)) return;
+        if (!this.#authAccount(userAccount)) return;
         await this.#accessDB();
-        console.log(DataBase.accounts);
         DataBase.accounts.push(userAccount);
-        await this.#refreshDB();
+        await this.#createAndRefreshDB();
     }
 
-    #checkDB(userAccount: InputDataBaseType) {
-        if (!DataBase) return;
+    #authAccount(userAccount: InputDataBaseType) {
         if (DataBase.limit === DataBase.accounts.length) return false;
-        if (!this.#checkAccount(userAccount)) return false;
-        return true;
-    }
-
-    #checkAccount(userAccount: InputDataBaseType) {
-        if (!DataBase) return;
-        const isThereAccount = DataBase.accounts.find((value) => {
+        const account = DataBase.accounts.find((value) => {
             if (
                 value.password.value === userAccount.password.value &&
                 value.username.value === userAccount.username.value
@@ -44,25 +37,28 @@ export class MiniDB {
                 return value;
             return undefined;
         });
-        if (!isThereAccount) return true;
+        if (!account) return true;
         return false;
     }
 
     async #accessDB() {
-        readFile('miniDB.json', 'utf8', async (err, data) => {
-            if (err) {
-                await this.#refreshDB();
-                return;
-            }
-            if (data.length > 2) DataBase = JSON.parse(data);
-        });
+        let data: string | null = null;
+        try {
+            data = await readFileSync('miniDB.json', 'utf8');
+            DataBase = JSON.parse(data);
+        } catch {
+            DataBase = initialState;
+            await this.#createAndRefreshDB();
+        }
     }
 
-    async #refreshDB() {
+    async #createAndRefreshDB() {
         const json = JSON.stringify(DataBase, undefined, 2);
-        writeFile('miniDB.json', json, async (err) => {
-            if (err) return;
-        });
+        try {
+            await writeFileSync('miniDB.json', json);
+        } catch {
+            console.log('failed to refresh file');
+        }
     }
 
     async #deleteDB() {

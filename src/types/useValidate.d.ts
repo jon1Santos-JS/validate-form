@@ -1,8 +1,3 @@
-declare type ValidateObjectKeyTypes =
-    | 'username'
-    | 'password'
-    | 'confirmPassword';
-
 declare interface InputsType {
     [key: string]: InputPropsType;
 }

@@ -10,7 +10,6 @@ async function handleDB(req: NextApiRequest) {
     const miniDB = new MiniDB();
     await miniDB.init();
     await miniDB.createAccount(req.body);
-    console.log('----------------------------');
 }
 
 export const config = {

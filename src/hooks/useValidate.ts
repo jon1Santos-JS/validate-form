@@ -18,7 +18,6 @@ export default function useValidate(inputs: InputsType) {
     };
 
     const validateUsername = (currentInputValue: string) => {
-        if (!inputs[InputKey.USERNAME]) return;
         if (!currentInputValue) {
             inputs[InputKey.USERNAME].isEmpty = true;
             return;
@@ -39,7 +38,6 @@ export default function useValidate(inputs: InputsType) {
     };
 
     const validatePassword = (currentInputValue: string) => {
-        if (!inputs[InputKey.PASSWORD]) return;
         if (!currentInputValue) {
             inputs[InputKey.PASSWORD].isEmpty = true;
             return;
@@ -56,8 +54,6 @@ export default function useValidate(inputs: InputsType) {
     };
 
     const cofirmPassword = (currentInputValue: string) => {
-        if (!inputs[InputKey.CONFIRM_PASSWORD] || !inputs[InputKey.PASSWORD])
-            return;
         if (!currentInputValue) {
             inputs[InputKey.CONFIRM_PASSWORD].isEmpty = true;
             return;

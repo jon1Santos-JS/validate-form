@@ -19,7 +19,7 @@ export default function SignUpForm() {
                     inputs={inputs}
                     validateAll={validateAll}
                     method="POST"
-                    action={process.env.NEXT_PUBLIC_SERVER_LINK as string}
+                    action={process.env.NEXT_PUBLIC_SIGN_UP_LINK as string}
                     legend="SignUp"
                 >
                     <Input
