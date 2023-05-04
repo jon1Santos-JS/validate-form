@@ -1,0 +1,16 @@
+{
+  "accounts": [
+    {
+      "username": {
+        "value": "asd123"
+      },
+      "password": {
+        "value": "asd123"
+      },
+      "confirmPassword": {
+        "value": "asd123"
+      }
+    }
+  ],
+  "limit": 20
+}

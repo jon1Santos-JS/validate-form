@@ -1,6 +1,7 @@
 import { readFileSync, unlink, writeFileSync } from 'fs';
 
 const initialState = { accounts: [], limit: 20 };
+const miniDbFileName = 'miniDBFile.json';
 
 export interface MiniDBType {
     accounts: InputDataBaseType[];
@@ -44,7 +45,7 @@ export class MiniDB {
     async #accessDB() {
         let data: string | null = null;
         try {
-            data = await readFileSync('miniDB.json', 'utf8');
+            data = await readFileSync(miniDbFileName, 'utf8');
             DataBase = JSON.parse(data);
         } catch {
             DataBase = initialState;
@@ -55,14 +56,14 @@ export class MiniDB {
     async #createAndRefreshDB() {
         const json = JSON.stringify(DataBase, undefined, 2);
         try {
-            await writeFileSync('miniDB.json', json);
+            await writeFileSync(miniDbFileName, json);
         } catch {
             console.log('failed to refresh file');
         }
     }
 
     async #deleteDB() {
-        unlink('miniDB.json', (err) => {
+        unlink(miniDbFileName, (err) => {
             if (err) return;
         });
     }
