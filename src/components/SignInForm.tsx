@@ -2,7 +2,7 @@ import useValidate from '@/hooks/useValidate';
 import Form from './Form';
 import Input from './Input';
 
-const inputs: InputsType = {
+const inputs: FormInputsType = {
     username: { errors: [], isEmpty: true },
     password: { errors: [], isEmpty: true },
 };

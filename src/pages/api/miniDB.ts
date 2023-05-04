@@ -43,9 +43,8 @@ export class MiniDB {
     }
 
     async #accessDB() {
-        let data: string | null = null;
         try {
-            data = await readFileSync(miniDbFileName, 'utf8');
+            const data = await readFileSync(miniDbFileName, 'utf8');
             DataBase = JSON.parse(data);
         } catch {
             DataBase = initialState;

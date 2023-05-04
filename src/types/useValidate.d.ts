@@ -1,8 +1,8 @@
-declare interface InputsType {
+declare interface FormInputsType {
     [key: string]: InputPropsType;
 }
 
-declare interface InputPropsType {
+declare interface FormInputPropsType {
     isEmpty: boolean;
     errors: string[];
     value?: string;

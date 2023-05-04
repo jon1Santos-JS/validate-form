@@ -4,26 +4,28 @@ enum InputKey {
     CONFIRM_PASSWORD = 'confirmPassword',
 }
 
-export default function useValidate(inputs: InputsType) {
+export default function useValidate(formInputs: FormInputsType) {
     const validateAll = () => {
         if (
-            inputs[InputKey.USERNAME] &&
-            inputs[InputKey.PASSWORD] &&
-            inputs[InputKey.CONFIRM_PASSWORD]
+            formInputs[InputKey.USERNAME] &&
+            formInputs[InputKey.PASSWORD] &&
+            formInputs[InputKey.CONFIRM_PASSWORD]
         ) {
-            validateUsername(inputs[InputKey.USERNAME].value as string);
-            validatePassword(inputs[InputKey.PASSWORD].value as string);
-            cofirmPassword(inputs[InputKey.CONFIRM_PASSWORD].value as string);
+            validateUsername(formInputs[InputKey.USERNAME].value as string);
+            validatePassword(formInputs[InputKey.PASSWORD].value as string);
+            cofirmPassword(
+                formInputs[InputKey.CONFIRM_PASSWORD].value as string,
+            );
         }
     };
 
     const validateUsername = (currentInputValue: string) => {
         if (!currentInputValue) {
-            inputs[InputKey.USERNAME].isEmpty = true;
+            formInputs[InputKey.USERNAME].isEmpty = true;
             return;
         }
 
-        inputs[InputKey.USERNAME].validations = [
+        formInputs[InputKey.USERNAME].validations = [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Username must has 6 characters at least',
@@ -34,40 +36,43 @@ export default function useValidate(inputs: InputsType) {
             },
         ];
 
-        return validate(inputs[InputKey.USERNAME], currentInputValue);
+        return validate(formInputs[InputKey.USERNAME], currentInputValue);
     };
 
     const validatePassword = (currentInputValue: string) => {
         if (!currentInputValue) {
-            inputs[InputKey.PASSWORD].isEmpty = true;
+            formInputs[InputKey.PASSWORD].isEmpty = true;
             return;
         }
 
-        inputs[InputKey.PASSWORD].validations = [
+        formInputs[InputKey.PASSWORD].validations = [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password must has 6 characters at least',
             },
         ];
 
-        return validate(inputs[InputKey.PASSWORD], currentInputValue);
+        return validate(formInputs[InputKey.PASSWORD], currentInputValue);
     };
 
     const cofirmPassword = (currentInputValue: string) => {
         if (!currentInputValue) {
-            inputs[InputKey.CONFIRM_PASSWORD].isEmpty = true;
+            formInputs[InputKey.CONFIRM_PASSWORD].isEmpty = true;
             return;
         }
 
-        inputs[InputKey.CONFIRM_PASSWORD].validations = [
+        formInputs[InputKey.CONFIRM_PASSWORD].validations = [
             {
                 coditional:
-                    currentInputValue !== inputs[InputKey.PASSWORD].value,
+                    currentInputValue !== formInputs[InputKey.PASSWORD].value,
                 message: 'This field has to be equal to the password',
             },
         ];
 
-        return validate(inputs[InputKey.CONFIRM_PASSWORD], currentInputValue);
+        return validate(
+            formInputs[InputKey.CONFIRM_PASSWORD],
+            currentInputValue,
+        );
     };
 
     return {
@@ -77,7 +82,7 @@ export default function useValidate(inputs: InputsType) {
         validateAll,
     };
 
-    function validate(input: InputPropsType, currentInputValue: string) {
+    function validate(input: FormInputPropsType, currentInputValue: string) {
         const error: string[] = [];
         clearErrorList(input.errors);
         input.value = currentInputValue;
