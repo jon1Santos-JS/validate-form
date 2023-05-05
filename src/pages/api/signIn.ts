@@ -3,14 +3,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { MiniDB } from './miniDB';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    handleDB(req, res);
-    res.status(200).send('ok');
+    res.status(200).send(handleDB(req));
 }
-async function handleDB(req: NextApiRequest, res: NextApiResponse) {
+async function handleDB(req: NextApiRequest) {
     const miniDB = new MiniDB();
     await miniDB.init();
     const acc = miniDB.logIn(req.body);
-    res.send(JSON.stringify(acc));
+    return JSON.stringify(acc);
 }
 
 export const config = {
