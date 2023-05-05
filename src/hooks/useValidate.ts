@@ -5,7 +5,7 @@ enum InputKey {
 }
 
 export default function useValidate(formInputs: FormInputsType) {
-    const validateAll = () => {
+    const validateAllInputs = () => {
         if (
             formInputs[InputKey.USERNAME] &&
             formInputs[InputKey.PASSWORD] &&
@@ -79,7 +79,7 @@ export default function useValidate(formInputs: FormInputsType) {
         validateUsername,
         validatePassword,
         cofirmPassword,
-        validateAll,
+        validateAllInputs,
     };
 
     function validate(input: FormInputPropsType, currentInputValue: string) {

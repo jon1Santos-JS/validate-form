@@ -13,7 +13,7 @@ interface FormInputTypeWithAuniqueProp {
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    validateAll: () => void;
+    validateAllInputs: () => void;
     method: 'POST' | 'GET';
     action: string;
     inputs: FormInputTypesToValidate;
@@ -22,7 +22,7 @@ interface FormProps {
 
 const Form: React.FC<FormProps> = ({
     children,
-    validateAll,
+    validateAllInputs,
     method,
     action,
     inputs,
@@ -92,7 +92,7 @@ const Form: React.FC<FormProps> = ({
 
     function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        validateAll();
+        validateAllInputs();
         setShowErrorMessage(true);
         setshowInputErrorsMessages(true);
         if (!onCheckInputs()) {

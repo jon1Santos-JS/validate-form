@@ -8,14 +8,18 @@ const inputs: FormInputsType = {
 };
 
 export default function SignInForm() {
-    const { validateUsername, validatePassword, validateAll } =
-        useValidate(inputs);
+    const {
+        validateUsername,
+        validatePassword,
+
+        validateAllInputs,
+    } = useValidate(inputs);
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
                 <Form
                     inputs={inputs}
-                    validateAll={validateAll}
+                    validateAllInputs={validateAllInputs}
                     method="POST"
                     action={process.env.NEXT_PUBLIC_SIGN_IN_LINK as string}
                     legend="SignIn"
@@ -34,14 +38,25 @@ export default function SignInForm() {
             </div>
             <button
                 className="button is-primary"
-                onClick={() =>
-                    fetch('api/getDB', {
-                        method: 'GET',
-                    })
-                }
+                onClick={() => onFetchDBApi('GET')}
             >
                 GETDB
             </button>
+            <button
+                className="button is-primary"
+                onClick={() => onFetchDBApi('DELETE')}
+            >
+                DELETEDB
+            </button>
         </div>
     );
+}
+
+function onFetchDBApi(method: 'DELETE' | 'GET' | 'POST') {
+    return fetch(process.env.NEXT_PUBLIC_HANDLE_DB_LINK as string, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
 }

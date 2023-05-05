@@ -9,15 +9,19 @@ const inputs: FormInputsType = {
 };
 
 export default function SignUpForm() {
-    const { validateUsername, validatePassword, cofirmPassword, validateAll } =
-        useValidate(inputs);
+    const {
+        validateUsername,
+        validatePassword,
+        cofirmPassword,
+        validateAllInputs,
+    } = useValidate(inputs);
 
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
                 <Form
                     inputs={inputs}
-                    validateAll={validateAll}
+                    validateAllInputs={validateAllInputs}
                     method="POST"
                     action={process.env.NEXT_PUBLIC_SIGN_UP_LINK as string}
                     legend="SignUp"
