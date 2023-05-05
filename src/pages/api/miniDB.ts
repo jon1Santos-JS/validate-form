@@ -38,7 +38,6 @@ export class MiniDB {
                 return value;
             return undefined;
         });
-
         return account;
     }
 
