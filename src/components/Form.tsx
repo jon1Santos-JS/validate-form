@@ -99,7 +99,7 @@ const Form: React.FC<FormProps> = ({
             setshowInputErrorsMessages(false);
             setShowErrorMessage(false);
             onSubmitInputs();
-            nextRouter.reload();
+            // nextRouter.reload();
             return;
         }
     }

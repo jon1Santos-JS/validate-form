@@ -30,7 +30,16 @@ export class MiniDB {
 
     logIn(userAccount: InputDataBaseType) {
         if (!this.#authAccount(userAccount)) return;
-        console.log('user have been logged!');
+        const account = DataBase.accounts.find((value) => {
+            if (
+                value.password.value === userAccount.password.value &&
+                value.username.value === userAccount.username.value
+            )
+                return value;
+            return undefined;
+        });
+
+        return account;
     }
 
     #authAccount(userAccount: InputDataBaseType) {
