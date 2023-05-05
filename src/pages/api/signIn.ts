@@ -12,7 +12,7 @@ async function handleDB(req: NextApiRequest) {
     const miniDB = new MiniDB();
     await miniDB.init();
     const response = miniDB.logIn(req.body);
-    if (!response) return 'account doesnt exist';
+    if (!response) return 'account doesnt found';
     return response;
 }
 
