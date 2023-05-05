@@ -6,14 +6,14 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    res.status(200).send(await handleDB(req));
+    res.status(200).send(await handleDB());
 }
-async function handleDB(req: NextApiRequest) {
+async function handleDB() {
     const miniDB = new MiniDB();
     await miniDB.init();
-    const response = miniDB.logIn(req.body);
-    if (!response) return 'account doesnt exist';
-    return response;
+    const DB = await miniDB.returnDB();
+    console.log(DB);
+    return JSON.stringify(DB, undefined, 2);
 }
 
 export const config = {

@@ -32,6 +32,16 @@ export default function SignInForm() {
                     />
                 </Form>
             </div>
+            <button
+                className="button is-primary"
+                onClick={() =>
+                    fetch('api/getDB', {
+                        method: 'GET',
+                    })
+                }
+            >
+                GETDB
+            </button>
         </div>
     );
 }

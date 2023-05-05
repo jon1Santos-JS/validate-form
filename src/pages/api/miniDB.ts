@@ -26,6 +26,7 @@ export class MiniDB {
         if (this.#authAccount(userAccount)) return 'account already exist';
         DataBase.accounts.push(createTimeStamp(userAccount));
         await this.#createAndRefreshDB('createAccount');
+        return 'account has been created';
     }
 
     logIn(userAccount: InputDataBaseType) {
@@ -38,7 +39,7 @@ export class MiniDB {
                 return value;
             return undefined;
         });
-        return account;
+        return JSON.stringify(account, undefined, 2);
     }
 
     #authAccount(userAccount: InputDataBaseType) {
@@ -62,6 +63,11 @@ export class MiniDB {
             DataBase = INITIAL_STATE;
             await this.#createAndRefreshDB('accessDB');
         }
+    }
+
+    async returnDB() {
+        await this.#accessDB();
+        return DataBase;
     }
 
     async #createAndRefreshDB(caller?: string) {
