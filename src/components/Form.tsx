@@ -1,7 +1,7 @@
 import FormContext from '@/context/FormContext';
+import useObjecthandler from '@/hooks/useObjectHandler';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import _ from 'lodash';
 
 export interface FormInputTypesToValidate {
     [key: string]: { errors: string[]; isEmpty: boolean; value: string };
@@ -31,6 +31,7 @@ const Form: React.FC<FormProps> = ({
     const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
     const [showInputErrorsMessages, setshowInputErrorsMessages] =
         useState(false);
+    const { onOmitProp } = useObjecthandler();
     const nextRouter = useRouter();
 
     useEffect(() => {
@@ -130,22 +131,23 @@ const Form: React.FC<FormProps> = ({
         const inputKeys = Object.keys(inputs).filter((key) =>
             key.includes('confirm'),
         );
-        const inputWithoutConfirmFields = onOmitProp(inputs, [...inputKeys]);
-        for (const i in inputWithoutConfirmFields) {
-            inputWithoutConfirmFields[i] = onOmitProp(
-                inputWithoutConfirmFields[i] as FormInputTypesToValidate,
-                ['isEmpty', 'errors', 'validations'],
-            );
-        }
-        return inputWithoutConfirmFields;
-    }
+        const inputsWithoutConfirmFields = onOmitProp<
+            FormInputTypesToValidate,
+            FormInputTypeWithAuniqueProp
+        >(inputs, [...inputKeys]);
 
-    function onOmitProp(
-        inputs: FormInputTypesToValidate,
-        prop: string | string[],
-    ): FormInputTypesToValidate | FormInputTypeWithAuniqueProp {
-        const newInputs = _.omit(inputs, prop);
-        return newInputs;
+        for (const i in inputsWithoutConfirmFields) {
+            inputsWithoutConfirmFields[i] = onOmitProp<
+                FormInputTypeWithAuniqueProp,
+                FormInputTypeWithAuniqueProp
+            >(inputsWithoutConfirmFields[i] as FormInputTypeWithAuniqueProp, [
+                'isEmpty',
+                'errors',
+                'validations',
+            ]);
+        }
+
+        return inputsWithoutConfirmFields;
     }
 };
 
