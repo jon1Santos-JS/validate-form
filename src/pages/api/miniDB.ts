@@ -23,7 +23,7 @@ export class MiniDB {
 
     async createAccount(userAccount: InputDataBaseType) {
         if (DataBase.limit === DataBase.accounts.length) return false;
-        if (this.#authAccount(userAccount)) return;
+        if (this.#authAccount(userAccount)) return 'account already exist';
         DataBase.accounts.push(createTimeStamp(userAccount));
         await this.#createAndRefreshDB('createAccount');
     }

@@ -2,14 +2,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { MiniDB } from './miniDB';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    handleDB(req);
-    res.status(200).send('ok');
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse,
+) {
+    res.status(200).send(await handleDB(req));
 }
 async function handleDB(req: NextApiRequest) {
     const miniDB = new MiniDB();
     await miniDB.init();
-    await miniDB.createAccount(req.body);
+    return await miniDB.createAccount(req.body);
 }
 
 export const config = {
