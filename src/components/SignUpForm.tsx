@@ -12,8 +12,8 @@ export default function SignUpForm() {
     const {
         validateUsername,
         validatePassword,
-        cofirmPassword,
         validateAllInputs,
+        cofirmPassword,
     } = useValidate(inputs);
 
     return (

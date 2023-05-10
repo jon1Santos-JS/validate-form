@@ -8,12 +8,8 @@ const inputs: FormInputsType = {
 };
 
 export default function SignInForm() {
-    const {
-        validateUsername,
-        validatePassword,
-
-        validateAllInputs,
-    } = useValidate(inputs);
+    const { validateUsername, validatePassword, validateAllInputs } =
+        useValidate(inputs);
     return (
         <div className="o-sign-in-form">
             <div className="c-container">

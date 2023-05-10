@@ -8,7 +8,7 @@ export let DataBase: MiniDBType = INITIAL_STATE;
 export class MiniDB {
     async init() {
         await this.#accessDB();
-        if (!this.#checkDB()) return 'internal server error';
+        if (!this.#checkDBState()) return 'internal server error';
     }
 
     async handleDB(comand: HandleDBComandType, caller?: string) {
@@ -46,7 +46,7 @@ export class MiniDB {
     }
 
     async #createAndRefreshDB(caller?: string) {
-        if (!this.#checkDB()) return 'internal server error';
+        if (!this.#checkDBState()) return 'internal server error';
         const json = JSON.stringify(DataBase, undefined, 2);
         try {
             await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
@@ -60,7 +60,7 @@ export class MiniDB {
         }
     }
 
-    #checkDB() {
+    #checkDBState() {
         if (DataBase.limit === DataBase.accounts.length) {
             console.log('database limit account reached');
             return false;

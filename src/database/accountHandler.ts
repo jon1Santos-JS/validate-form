@@ -10,7 +10,8 @@ export class MiniDBAccountHandler {
             console.log('account was not found');
             return 'account was not found';
         }
-        return JSON.stringify(account, undefined, 2);
+        console.log(JSON.stringify(account, undefined, 2));
+        return `user: ${userAccount.username.value} has been logged`;
     }
 
     async signUp(userAccount: InputDataBaseType) {
@@ -46,10 +47,11 @@ export class MiniDBAccountHandler {
 
     async #createAccount(userAccount: InputDataBaseType) {
         DataBase.accounts.push(createTimeStamp(userAccount));
-        await this.#DB.handleDB(
+        const response = await this.#DB.handleDB(
             'refresh',
             'MiniDBAccountsHandler - createAccount',
         );
+        if (response) return response;
         return 'account has been created';
     }
 }

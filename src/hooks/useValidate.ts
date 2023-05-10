@@ -78,8 +78,8 @@ export default function useValidate(formInputs: FormInputsType) {
     return {
         validateUsername,
         validatePassword,
-        cofirmPassword,
         validateAllInputs,
+        cofirmPassword,
     };
 
     function validate(input: FormInputPropsType, currentInputValue: string) {
