@@ -1,7 +1,8 @@
-import { DataBase, MiniDB } from './miniDB';
+import { DataBase } from './miniDB';
+import { MiniDBHandler } from './miniDBHandler';
 
 export class MiniDBAccountHandler {
-    #DB = new MiniDB();
+    #DB = new MiniDBHandler();
 
     async signIn(userAccount: InputDataBaseType) {
         if (!(await this.#onInitDB())) return 'internal server error';
@@ -33,7 +34,7 @@ export class MiniDBAccountHandler {
     }
 
     #authAccount(userAccount: InputDataBaseType) {
-        const account = DataBase.accounts.find((value) => {
+        const account = DataBase.state.accounts.find((value) => {
             if (
                 value.password.value === userAccount.password.value &&
                 value.username.value === userAccount.username.value
@@ -46,7 +47,7 @@ export class MiniDBAccountHandler {
     }
 
     async #createAccount(userAccount: InputDataBaseType) {
-        DataBase.accounts.push(createTimeStamp(userAccount));
+        DataBase.state.accounts.push(createConstraint(userAccount));
         const response = await this.#DB.handleDB(
             'refresh',
             'MiniDBAccountsHandler - createAccount',
@@ -68,4 +69,17 @@ function createTimeStamp(userAccount: InputDataBaseType) {
     };
 
     return accountWithTimeStamp;
+}
+
+function createID(userAccount: InputDataBaseType) {
+    const inputWithID = {
+        ID: DataBase.state.accounts.length + 1,
+        ...userAccount,
+    };
+    return createTimeStamp(inputWithID);
+}
+
+function createConstraint(userAccount: InputDataBaseType) {
+    const userWithConstraint = { constraint: 'user', ...userAccount };
+    return createID(userWithConstraint);
 }

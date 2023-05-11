@@ -20,6 +20,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     }, [input, setErrorList, validation]);
 
     useEffect(() => {
+        // UP MESSAGE
         if (errorList && errorList?.length >= 1) {
             const currentTimer = onShowMessage(true, 650);
             return () => clearTimeout(currentTimer);
@@ -28,6 +29,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     }, [errorList, input]);
 
     useEffect(() => {
+        // DOWN MESSAGE
         const currentTimer = onShowMessage(false, 2550);
         return () => clearTimeout(currentTimer);
     }, [showErrorMessage, formContext]);

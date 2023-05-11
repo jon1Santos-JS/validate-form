@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { MiniDBHandler } from '@/database/miniDBHandler';
 import type { NextApiResponse, NextApiRequest } from 'next';
-import { MiniDB } from '../../database/miniDB';
 
 export default async function handler(
     req: NextApiRequest,
@@ -12,7 +12,7 @@ export default async function handler(
 }
 
 async function onHandleDB(comand: HandleDBComandType) {
-    const miniDB = new MiniDB();
+    const miniDB = new MiniDBHandler();
     const dbResponse = await miniDB.handleDB(comand);
     return dbResponse;
 }

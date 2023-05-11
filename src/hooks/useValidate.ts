@@ -6,17 +6,9 @@ enum InputKey {
 
 export default function useValidate(formInputs: FormInputsType) {
     const validateAllInputs = () => {
-        if (
-            formInputs[InputKey.USERNAME] &&
-            formInputs[InputKey.PASSWORD] &&
-            formInputs[InputKey.CONFIRM_PASSWORD]
-        ) {
-            validateUsername(formInputs[InputKey.USERNAME].value as string);
-            validatePassword(formInputs[InputKey.PASSWORD].value as string);
-            cofirmPassword(
-                formInputs[InputKey.CONFIRM_PASSWORD].value as string,
-            );
-        }
+        validateUsername(formInputs[InputKey.USERNAME].value as string);
+        validatePassword(formInputs[InputKey.PASSWORD].value as string);
+        cofirmPassword(formInputs[InputKey.CONFIRM_PASSWORD].value as string);
     };
 
     const validateUsername = (currentInputValue: string) => {
@@ -81,23 +73,23 @@ export default function useValidate(formInputs: FormInputsType) {
         validateAllInputs,
         cofirmPassword,
     };
+}
 
-    function validate(input: FormInputPropsType, currentInputValue: string) {
-        const error: string[] = [];
-        clearErrorList(input.errors);
-        input.value = currentInputValue;
-        input.validations?.map((validation) => {
-            if (validation.coditional) error.push(validation.message);
-        });
+function validate(input: FormInputPropsType, currentInputValue: string) {
+    const error: string[] = [];
+    clearErrorList(input.errors);
+    input.value = currentInputValue;
+    input.validations?.map((validation) => {
+        if (validation.coditional) error.push(validation.message);
+    });
 
-        if (error.length >= 1) input.errors.push(...error);
-        input.isEmpty = false;
-        return input.errors;
-    }
+    if (error.length >= 1) input.errors.push(...error);
+    input.isEmpty = false;
+    return input.errors;
+}
 
-    function clearErrorList(list: string[]) {
-        while (list.length > 0) {
-            list.pop();
-        }
+function clearErrorList(list: string[]) {
+    while (list.length > 0) {
+        list.pop();
     }
 }

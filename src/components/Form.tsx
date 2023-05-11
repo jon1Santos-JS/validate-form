@@ -35,6 +35,7 @@ const Form: React.FC<FormProps> = ({
     const nextRouter = useRouter();
 
     useEffect(() => {
+        // DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
             setshowInputErrorsMessages(false);
             setShowErrorMessage(false);
@@ -99,7 +100,7 @@ const Form: React.FC<FormProps> = ({
             setshowInputErrorsMessages(false);
             setShowErrorMessage(false);
             onSubmitInputs();
-            // nextRouter.reload();
+            nextRouter.reload();
             return;
         }
     }
