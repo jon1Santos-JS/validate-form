@@ -3,20 +3,12 @@ import useObjecthandler from '@/hooks/useObjectHandler';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
-export interface FormInputTypesToValidate {
-    [key: string]: { errors: string[]; isEmpty: boolean; value: string };
-}
-
-interface FormInputTypeWithAuniqueProp {
-    [key: string]: { value?: string };
-}
-
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
     validateAllInputs: () => void;
     method: 'POST' | 'GET';
     action: string;
-    inputs: FormInputTypesToValidate;
+    inputs: FormInputsType;
     legend?: string;
 }
 
@@ -133,7 +125,7 @@ const Form: React.FC<FormProps> = ({
             key.includes('confirm'),
         );
         const inputsWithoutConfirmFields = onOmitProp<
-            FormInputTypesToValidate,
+            FormInputsType,
             FormInputTypeWithAuniqueProp
         >(inputs, [...inputKeys]);
 

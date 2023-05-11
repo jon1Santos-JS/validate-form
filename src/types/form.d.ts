@@ -1,5 +1,9 @@
 declare interface FormInputsType {
-    [key: string]: InputPropsType;
+    [key: string]: FormInputPropsType;
+}
+
+declare interface FormInputTypeWithAuniqueProp {
+    [key: string]: { value?: string };
 }
 
 declare interface FormInputPropsType {
