@@ -83,7 +83,9 @@ const Form: React.FC<FormProps> = ({
         return <div className="notification is-danger">{'Invalid form'}</div>;
     }
 
-    function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    async function handleClick(
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    ) {
         e.preventDefault();
         validateAllInputs();
         setShowErrorMessage(true);
@@ -91,7 +93,8 @@ const Form: React.FC<FormProps> = ({
         if (!onCheckInputs()) {
             setshowInputErrorsMessages(false);
             setShowErrorMessage(false);
-            onSubmitInputs();
+            await onSubmitInputs();
+            onCleanInputs();
             nextRouter.reload();
             return;
         }
@@ -109,15 +112,24 @@ const Form: React.FC<FormProps> = ({
         return verificationArray.find((value) => value === 1);
     }
 
-    function onSubmitInputs() {
+    async function onSubmitInputs() {
         const formatedInputs = onHandleInputs();
-        fetch(action, {
+        const response = await fetch(action, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(formatedInputs),
         });
+        const parsedResponse = await response.json();
+        console.log(parsedResponse);
+    }
+
+    function onCleanInputs() {
+        for (const i in inputs) {
+            inputs[i].isEmpty = true;
+            inputs[i].value = '';
+        }
     }
 
     function onHandleInputs() {

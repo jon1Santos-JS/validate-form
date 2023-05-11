@@ -10,8 +10,10 @@ export default async function handler(
 }
 async function onHandleDB(req: NextApiRequest) {
     const accountsHandler = new MiniDBAccountHandler();
-    const response = await accountsHandler.signUp(req.body);
-    return response;
+    const response = await accountsHandler.signUp(
+        req.body as InputDataBaseType,
+    );
+    return JSON.stringify(response);
 }
 
 export const config = {

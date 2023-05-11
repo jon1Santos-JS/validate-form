@@ -13,7 +13,7 @@ export default function SignUpForm() {
         validateUsername,
         validatePassword,
         validateAllInputs,
-        cofirmPassword,
+        validateCofirmPassword,
     } = useValidate(inputs);
 
     return (
@@ -39,7 +39,7 @@ export default function SignUpForm() {
                     <Input
                         label="Confirm Password"
                         inputType="password"
-                        validation={cofirmPassword}
+                        validation={validateCofirmPassword}
                     />
                 </Form>
             </div>

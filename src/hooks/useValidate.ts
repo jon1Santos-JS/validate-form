@@ -6,9 +6,14 @@ enum InputKey {
 
 export default function useValidate(formInputs: FormInputsType) {
     const validateAllInputs = () => {
-        validateUsername(formInputs[InputKey.USERNAME].value as string);
-        validatePassword(formInputs[InputKey.PASSWORD].value as string);
-        cofirmPassword(formInputs[InputKey.CONFIRM_PASSWORD].value as string);
+        if (formInputs[InputKey.USERNAME])
+            validateUsername(formInputs[InputKey.USERNAME].value ?? '');
+        if (formInputs[InputKey.PASSWORD])
+            validatePassword(formInputs[InputKey.PASSWORD].value ?? '');
+        if (formInputs[InputKey.CONFIRM_PASSWORD])
+            validateCofirmPassword(
+                formInputs[InputKey.CONFIRM_PASSWORD].value ?? '',
+            );
     };
 
     const validateUsername = (currentInputValue: string) => {
@@ -47,7 +52,7 @@ export default function useValidate(formInputs: FormInputsType) {
         return validate(formInputs[InputKey.PASSWORD], currentInputValue);
     };
 
-    const cofirmPassword = (currentInputValue: string) => {
+    const validateCofirmPassword = (currentInputValue: string) => {
         if (!currentInputValue) {
             formInputs[InputKey.CONFIRM_PASSWORD].isEmpty = true;
             return;
@@ -71,7 +76,7 @@ export default function useValidate(formInputs: FormInputsType) {
         validateUsername,
         validatePassword,
         validateAllInputs,
-        cofirmPassword,
+        validateCofirmPassword,
     };
 }
 

@@ -11,7 +11,7 @@ export default async function handler(
 async function onHandleDB(req: NextApiRequest) {
     const accountsHandler = new MiniDBAccountHandler();
     const response = await accountsHandler.signIn(req.body);
-    return response;
+    return JSON.stringify(response);
 }
 
 export const config = {
