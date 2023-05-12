@@ -7,10 +7,13 @@ declare interface FormInputTypeWithAuniqueProp {
 }
 
 declare interface FormInputPropsType {
-    isEmpty: boolean;
+    validations?: (
+        currentInput: string,
+        formInputs: FormInputsType,
+    ) => Validation[];
     errors: string[];
+    isEmpty: boolean;
     value?: string;
-    validations?: Validation[];
 }
 
 declare interface Validation {

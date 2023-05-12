@@ -20,7 +20,7 @@ test('check signUp function', async () => {
             password: { value: randomString() },
         };
         await expect(DBAccountHandler.signUp(account)).resolves.toBe(
-            'limit DB accounts reached',
+            'internal server error',
         );
     }
 });

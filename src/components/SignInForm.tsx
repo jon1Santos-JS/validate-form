@@ -3,8 +3,30 @@ import Form from './Form';
 import Input from './Input';
 
 const inputs: FormInputsType = {
-    username: { errors: [], isEmpty: true },
-    password: { errors: [], isEmpty: true },
+    username: {
+        validations: (currentInputValue: string) => [
+            {
+                coditional: !currentInputValue.match(/.{6,}/),
+                message: 'Username must has 6 characters at least',
+            },
+            {
+                coditional: !currentInputValue.match(/\D/),
+                message: 'Only strings',
+            },
+        ],
+        errors: [],
+        isEmpty: true,
+    },
+    password: {
+        validations: (currentInputValue) => [
+            {
+                coditional: !currentInputValue.match(/.{6,}/),
+                message: 'Password must has 6 characters at least',
+            },
+        ],
+        errors: [],
+        isEmpty: true,
+    },
 };
 
 export default function SignInForm() {

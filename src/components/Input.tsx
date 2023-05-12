@@ -41,8 +41,11 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
 
     return (
         <div className="field">
-            <label className="label">{label}: </label>
+            <label htmlFor={label} className="label">
+                {label}
+            </label>
             <input
+                id={label}
                 className="input"
                 onChange={(e) => setInput(e.target.value)}
                 value={input}

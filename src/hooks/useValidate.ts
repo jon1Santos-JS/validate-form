@@ -6,69 +6,37 @@ enum InputKey {
 
 export default function useValidate(formInputs: FormInputsType) {
     const validateAllInputs = () => {
-        if (formInputs[InputKey.USERNAME])
-            validateUsername(formInputs[InputKey.USERNAME].value ?? '');
-        if (formInputs[InputKey.PASSWORD])
-            validatePassword(formInputs[InputKey.PASSWORD].value ?? '');
-        if (formInputs[InputKey.CONFIRM_PASSWORD])
-            validateCofirmPassword(
-                formInputs[InputKey.CONFIRM_PASSWORD].value ?? '',
+        Object.keys(formInputs).map((key) => {
+            [validateUsername, validatePassword, validateCofirmPassword].map(
+                (validationFunc) => {
+                    if (validationFunc.name.includes(key))
+                        validationFunc(formInputs[key].value);
+                },
             );
+        });
     };
 
-    const validateUsername = (currentInputValue: string) => {
-        if (!currentInputValue) {
-            formInputs[InputKey.USERNAME].isEmpty = true;
-            return;
-        }
-
-        formInputs[InputKey.USERNAME].validations = [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Username must has 6 characters at least',
-            },
-            {
-                coditional: !currentInputValue.match(/\D/),
-                message: 'Only strings',
-            },
-        ];
-
-        return validate(formInputs[InputKey.USERNAME], currentInputValue);
+    const validateUsername = (currentInputValue = '') => {
+        return preValidate(
+            formInputs[InputKey.USERNAME],
+            currentInputValue,
+            formInputs,
+        );
     };
 
-    const validatePassword = (currentInputValue: string) => {
-        if (!currentInputValue) {
-            formInputs[InputKey.PASSWORD].isEmpty = true;
-            return;
-        }
-
-        formInputs[InputKey.PASSWORD].validations = [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Password must has 6 characters at least',
-            },
-        ];
-
-        return validate(formInputs[InputKey.PASSWORD], currentInputValue);
+    const validatePassword = (currentInputValue = '') => {
+        return preValidate(
+            formInputs[InputKey.PASSWORD],
+            currentInputValue,
+            formInputs,
+        );
     };
 
-    const validateCofirmPassword = (currentInputValue: string) => {
-        if (!currentInputValue) {
-            formInputs[InputKey.CONFIRM_PASSWORD].isEmpty = true;
-            return;
-        }
-
-        formInputs[InputKey.CONFIRM_PASSWORD].validations = [
-            {
-                coditional:
-                    currentInputValue !== formInputs[InputKey.PASSWORD].value,
-                message: 'This field has to be equal to the password',
-            },
-        ];
-
-        return validate(
+    const validateCofirmPassword = (currentInputValue = '') => {
+        return preValidate(
             formInputs[InputKey.CONFIRM_PASSWORD],
             currentInputValue,
+            formInputs,
         );
     };
 
@@ -80,21 +48,41 @@ export default function useValidate(formInputs: FormInputsType) {
     };
 }
 
-function validate(input: FormInputPropsType, currentInputValue: string) {
-    const error: string[] = [];
-    clearErrorList(input.errors);
-    input.value = currentInputValue;
-    input.validations?.map((validation) => {
-        if (validation.coditional) error.push(validation.message);
-    });
-
-    if (error.length >= 1) input.errors.push(...error);
-    input.isEmpty = false;
-    return input.errors;
+function preValidate(
+    input: FormInputPropsType,
+    currentInputValue: string,
+    formInputs: FormInputsType,
+) {
+    setAndResetInput(input, currentInputValue);
+    return validate(input, currentInputValue, formInputs);
 }
 
-function clearErrorList(list: string[]) {
-    while (list.length > 0) {
-        list.pop();
+function setAndResetInput(
+    input: FormInputPropsType,
+    currentInputValue: string,
+) {
+    input.isEmpty = false;
+    while (input.errors.length > 0) {
+        input.errors.pop();
     }
+    input.value = currentInputValue;
+}
+
+function validate(
+    input: FormInputPropsType,
+    currentInputValue: string,
+    formInputs: FormInputsType,
+) {
+    if (!input.validations) return;
+    if (!currentInputValue) {
+        input.isEmpty = true;
+        return;
+    }
+    const validations = input.validations(currentInputValue, formInputs);
+    validations.map((validation) => {
+        if (validation.coditional) input.errors.push(validation.message);
+    });
+
+    if (input.errors.length < 1) return;
+    return input.errors;
 }

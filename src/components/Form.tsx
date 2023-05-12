@@ -1,6 +1,5 @@
 import FormContext from '@/context/FormContext';
 import useObjecthandler from '@/hooks/useObjectHandler';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 interface FormProps {
@@ -24,7 +23,6 @@ const Form: React.FC<FormProps> = ({
     const [showInputErrorsMessages, setshowInputErrorsMessages] =
         useState(false);
     const { onOmitProp } = useObjecthandler();
-    const nextRouter = useRouter();
 
     useEffect(() => {
         // DOWN MESSAGE
@@ -94,8 +92,6 @@ const Form: React.FC<FormProps> = ({
             setshowInputErrorsMessages(false);
             setShowErrorMessage(false);
             await onSubmitInputs();
-            onCleanInputs();
-            nextRouter.reload();
             return;
         }
     }
@@ -123,13 +119,6 @@ const Form: React.FC<FormProps> = ({
         });
         const parsedResponse = await response.json();
         console.log(parsedResponse);
-    }
-
-    function onCleanInputs() {
-        for (const i in inputs) {
-            inputs[i].isEmpty = true;
-            inputs[i].value = '';
-        }
     }
 
     function onHandleInputs() {
