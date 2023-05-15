@@ -20,3 +20,5 @@ declare interface Validation {
     coditional: boolean | RegExpMatchArray | null;
     message: string;
 }
+
+declare type DBResponseForm = null | string | { username: string };

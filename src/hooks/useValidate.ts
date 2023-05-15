@@ -1,9 +1,3 @@
-enum InputKey {
-    USERNAME = 'username',
-    PASSWORD = 'password',
-    CONFIRM_PASSWORD = 'confirmPassword',
-}
-
 export default function useValidate(formInputs: FormInputsType) {
     const validateAllInputs = () => {
         Object.keys(formInputs).map((key) => {
@@ -18,7 +12,7 @@ export default function useValidate(formInputs: FormInputsType) {
 
     const validateUsername = (currentInputValue = '') => {
         return preValidate(
-            formInputs[InputKey.USERNAME],
+            formInputs['username'],
             currentInputValue,
             formInputs,
         );
@@ -26,7 +20,7 @@ export default function useValidate(formInputs: FormInputsType) {
 
     const validatePassword = (currentInputValue = '') => {
         return preValidate(
-            formInputs[InputKey.PASSWORD],
+            formInputs['password'],
             currentInputValue,
             formInputs,
         );
@@ -34,7 +28,7 @@ export default function useValidate(formInputs: FormInputsType) {
 
     const validateCofirmPassword = (currentInputValue = '') => {
         return preValidate(
-            formInputs[InputKey.CONFIRM_PASSWORD],
+            formInputs['confirmPassword'],
             currentInputValue,
             formInputs,
         );

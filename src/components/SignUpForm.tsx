@@ -2,43 +2,6 @@ import useValidate from '@/hooks/useValidate';
 import Form from './Form';
 import Input from './Input';
 
-const inputs: FormInputsType = {
-    username: {
-        validations: (currentInputValue: string) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Username must has 6 characters at least',
-            },
-            {
-                coditional: !currentInputValue.match(/\D/),
-                message: 'Only strings',
-            },
-        ],
-        errors: [],
-        isEmpty: true,
-    },
-    password: {
-        validations: (currentInputValue) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Password must has 6 characters at least',
-            },
-        ],
-        errors: [],
-        isEmpty: true,
-    },
-    confirmPassword: {
-        validations: (currentInputValue, formInputs) => [
-            {
-                coditional: currentInputValue !== formInputs['password'].value,
-                message: 'This field has to be equal to the password',
-            },
-        ],
-        errors: [],
-        isEmpty: true,
-    },
-};
-
 export default function SignUpForm() {
     const {
         validateUsername,
@@ -77,3 +40,40 @@ export default function SignUpForm() {
         </div>
     );
 }
+
+const inputs: FormInputsType = {
+    username: {
+        validations: (currentInputValue: string) => [
+            {
+                coditional: !currentInputValue.match(/.{6,}/),
+                message: 'Username must has 6 characters at least',
+            },
+            {
+                coditional: !currentInputValue.match(/\D/),
+                message: 'Only strings',
+            },
+        ],
+        errors: [],
+        isEmpty: true,
+    },
+    password: {
+        validations: (currentInputValue) => [
+            {
+                coditional: !currentInputValue.match(/.{6,}/),
+                message: 'Password must has 6 characters at least',
+            },
+        ],
+        errors: [],
+        isEmpty: true,
+    },
+    confirmPassword: {
+        validations: (currentInputValue, formInputs) => [
+            {
+                coditional: currentInputValue !== formInputs['password'].value,
+                message: 'This field has to be equal to the password',
+            },
+        ],
+        errors: [],
+        isEmpty: true,
+    },
+};

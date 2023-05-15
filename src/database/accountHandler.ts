@@ -12,7 +12,7 @@ export class MiniDBAccountHandler {
             return 'account was not found';
         }
         console.log(JSON.stringify(account, undefined, 2));
-        return `user: ${userAccount.username.value} has been logged`;
+        return { username: userAccount.username.value };
     }
 
     async signUp(userAccount: InputDataBaseType) {

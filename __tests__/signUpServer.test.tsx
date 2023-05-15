@@ -4,6 +4,7 @@ const AMOUNT_OF_ACCOUNTS = 6;
 
 test('check signUp function', async () => {
     const DBAccountHandler = new MiniDBAccountHandler();
+
     try {
         for (let i = 1; i <= AMOUNT_OF_ACCOUNTS; i++) {
             const account = {
