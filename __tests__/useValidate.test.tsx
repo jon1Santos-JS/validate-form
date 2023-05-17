@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import useValidate from '@/hooks/useValidate';
+import '@testing-library/jest-dom';
 
 const inputs: FormInputsType = {
     username: {

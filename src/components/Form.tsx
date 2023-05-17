@@ -9,7 +9,7 @@ interface FormProps {
     action: string;
     inputs: FormInputsType;
     legend?: string;
-    getUser?: (data: DBResponseForm) => void;
+    setUser?: (data: LogInResponseForm) => void;
 }
 
 const Form: React.FC<FormProps> = ({
@@ -19,7 +19,7 @@ const Form: React.FC<FormProps> = ({
     action,
     inputs,
     legend,
-    getUser,
+    setUser,
 }) => {
     const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
     const [showInputErrorsMessages, setshowInputErrorsMessages] =
@@ -120,7 +120,7 @@ const Form: React.FC<FormProps> = ({
             body: JSON.stringify(formatedInputs),
         });
         const parsedResponse = await response.json();
-        getUser && getUser(parsedResponse);
+        setUser && setUser(parsedResponse);
     }
 
     function onHandleInputs() {

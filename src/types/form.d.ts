@@ -21,4 +21,6 @@ declare interface Validation {
     message: string;
 }
 
-declare type DBResponseForm = null | string | { username: string };
+declare type LogInResponseForm = null | LoggedInUser;
+
+declare type LoggedInUser = { username: string };

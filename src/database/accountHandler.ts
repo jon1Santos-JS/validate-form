@@ -5,11 +5,11 @@ export class MiniDBAccountHandler {
     #DB = new MiniDBHandler();
 
     async signIn(userAccount: InputDataBaseType) {
-        if (!(await this.#onInitDB())) return 'internal server error';
+        if (!(await this.#onInitDB())) return null;
         const account = this.#authAccount(userAccount);
         if (!account) {
             console.log('account was not found');
-            return 'account was not found';
+            return null;
         }
         console.log(JSON.stringify(account, undefined, 2));
         return { username: userAccount.username.value };

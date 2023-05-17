@@ -14,5 +14,5 @@ export default async function handler(
 async function onHandleDB(comand: HandleDBComandType) {
     const miniDB = new MiniDBHandler();
     const dbResponse = await miniDB.handleDB(comand);
-    return JSON.stringify(dbResponse);
+    return dbResponse;
 }

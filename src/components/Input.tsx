@@ -1,3 +1,5 @@
+'use client';
+
 import FormContext from '@/context/FormContext';
 import React, { useState, useEffect, useContext } from 'react';
 
@@ -10,7 +12,9 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     const formContext = useContext(FormContext);
     const [input, setInput] = useState('');
-    const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
+    const [showErrorMessage, setShowErrorMessage] = useState<
+        boolean | undefined
+    >(false);
     const [errorList, setErrorList] = useState<string[] | null | undefined>(
         null,
     );

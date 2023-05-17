@@ -1,12 +1,14 @@
 import useValidate from '@/hooks/useValidate';
 import Form from './Form';
 import Input from './Input';
-import { useState } from 'react';
 
-export default function SignInForm() {
+interface SignInFormProps {
+    setUser: (user: LogInResponseForm) => void;
+}
+
+export default function SignInForm({ setUser }: SignInFormProps) {
     const { validateUsername, validatePassword, validateAllInputs } =
         useValidate(inputs);
-    const [dbData, setDbData] = useState<DBResponseForm>(null);
 
     return (
         <div className="o-sign-in-form">
@@ -17,7 +19,7 @@ export default function SignInForm() {
                     method="POST"
                     action={process.env.NEXT_PUBLIC_SIGN_IN_LINK as string}
                     legend="SignIn"
-                    getUser={(data) => setDbData(data)}
+                    setUser={(data) => setUser(data)}
                 >
                     <Input
                         label="Username"
@@ -33,10 +35,7 @@ export default function SignInForm() {
             </div>
             <button
                 className="button is-primary"
-                onClick={() => {
-                    if (typeof dbData !== 'string' && dbData !== null)
-                        console.log(dbData);
-                }}
+                onClick={() => onFetchDBApi('GET')}
             >
                 GETDB
             </button>

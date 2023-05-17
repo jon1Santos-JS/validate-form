@@ -1,11 +1,15 @@
 .o-navigation-bar {
-    align-items: center;
-    background-color: #fff;
-    display: flex;
-    height: calc(var(--app-base-measure) * 6);
-    justify-content: space-between;
-    padding: calc(var(--app-base-measure) * 2) calc(var(--app-base-measure) * 4);
     position: fixed;
     top: 0;
     width: 100%;
+
+    .navigation-container {
+        align-items: center;
+        background-color: #fff;
+        display: flex;
+        height: calc(var(--app-base-measure) * 6);
+        justify-content: space-between;
+        padding: calc(var(--app-base-measure) * 2)
+            calc(var(--app-base-measure) * 4);
+    }
 }
