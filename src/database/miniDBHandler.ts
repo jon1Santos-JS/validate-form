@@ -11,6 +11,12 @@ export class MiniDBHandler {
         if (comand === 'reset') return this.#resetDB();
         if (comand === 'get') return this.#returnDB();
         if (comand === 'refresh') return this.#createAndRefreshDB(caller);
+        if (comand === 'getUsers') return this.#getUsers();
+    }
+
+    async #getUsers() {
+        await this.#accessDB();
+        return DataBase.state.accounts;
     }
 
     async #accessDB() {

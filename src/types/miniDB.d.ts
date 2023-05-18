@@ -26,4 +26,9 @@ declare interface InputDataBaseTypeWithTimeStamp
     timeStamp: string;
 }
 
-declare type HandleDBComandType = 'reset' | 'get' | 'create' | 'refresh';
+declare type HandleDBComandType =
+    | 'reset'
+    | 'get'
+    | 'create'
+    | 'refresh'
+    | 'getUsers';

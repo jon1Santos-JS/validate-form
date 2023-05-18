@@ -9,7 +9,9 @@ interface FormProps {
     action: string;
     inputs: FormInputsType;
     legend?: string;
-    setUser?: (data: LogInResponseForm) => void;
+    setUser?: (data: boolean) => void;
+    hasUser?: () => boolean;
+    pushRoute?: string;
 }
 
 const Form: React.FC<FormProps> = ({
@@ -20,6 +22,8 @@ const Form: React.FC<FormProps> = ({
     inputs,
     legend,
     setUser,
+    hasUser,
+    pushRoute = '/',
 }) => {
     const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
     const [showInputErrorsMessages, setshowInputErrorsMessages] =
@@ -119,8 +123,10 @@ const Form: React.FC<FormProps> = ({
             },
             body: JSON.stringify(formatedInputs),
         });
-        const parsedResponse = await response.json();
-        setUser && setUser(parsedResponse);
+        const parsedResponse: LogInResponseForm = await response.json();
+        setUser && setUser(parsedResponse.user);
+        console.log(hasUser && hasUser());
+        if (hasUser && hasUser()) window.location.assign(pushRoute);
     }
 
     function onHandleInputs() {

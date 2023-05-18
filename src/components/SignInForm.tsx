@@ -3,10 +3,11 @@ import Form from './Form';
 import Input from './Input';
 
 interface SignInFormProps {
-    setUser: (user: LogInResponseForm) => void;
+    setUser: (user: boolean) => void;
+    hasUser?: () => boolean;
 }
 
-export default function SignInForm({ setUser }: SignInFormProps) {
+export default function SignInForm({ setUser, hasUser }: SignInFormProps) {
     const { validateUsername, validatePassword, validateAllInputs } =
         useValidate(inputs);
 
@@ -19,7 +20,8 @@ export default function SignInForm({ setUser }: SignInFormProps) {
                     method="POST"
                     action={process.env.NEXT_PUBLIC_SIGN_IN_LINK as string}
                     legend="SignIn"
-                    setUser={(data) => setUser(data)}
+                    setUser={setUser}
+                    hasUser={hasUser}
                 >
                     <Input
                         label="Username"
@@ -33,29 +35,8 @@ export default function SignInForm({ setUser }: SignInFormProps) {
                     />
                 </Form>
             </div>
-            <button
-                className="button is-primary"
-                onClick={() => onFetchDBApi('GET')}
-            >
-                GETDB
-            </button>
-            <button
-                className="button is-primary"
-                onClick={() => onFetchDBApi('DELETE')}
-            >
-                DELETEDB
-            </button>
         </div>
     );
-}
-
-function onFetchDBApi(method: 'DELETE' | 'GET' | 'POST') {
-    return fetch(process.env.NEXT_PUBLIC_HANDLE_DB_LINK as string, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
 }
 
 const inputs: FormInputsType = {

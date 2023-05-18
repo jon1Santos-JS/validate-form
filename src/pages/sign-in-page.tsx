@@ -1,13 +1,14 @@
 import SignInForm from '@/components/SignInForm';
 
 interface SignInPageProps {
-    setUser: (user: LogInResponseForm) => void;
+    setUser: (user: boolean) => void;
+    hasUser?: () => boolean;
 }
 
-export default function SignInPage({ setUser }: SignInPageProps) {
+export default function SignInPage({ setUser, hasUser }: SignInPageProps) {
     return (
         <div>
-            <SignInForm setUser={setUser} />
+            <SignInForm setUser={setUser} hasUser={hasUser} />
         </div>
     );
 }
