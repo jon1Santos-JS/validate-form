@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface FormContextType {
-    showInputErrorsMessagesByForm?: boolean;
+    showInputErrorsMessagesByForm: boolean;
 }
 
 export default React.createContext<FormContextType>({

@@ -1,3 +1,8 @@
+import {
+    createConstraint,
+    createID,
+    createTimeStamp,
+} from '@/lib/inputHandler';
 import { DataBase } from './miniDB';
 import { MiniDBHandler } from './miniDBHandler';
 
@@ -16,12 +21,14 @@ export class MiniDBAccountHandler {
     }
 
     async signUp(userAccount: InputDataBaseType) {
-        if (!(await this.#onInitDB())) return 'internal server error';
+        if (!(await this.#onInitDB())) return null;
         if (this.#authAccount(userAccount)) {
             console.log('account already exist');
-            return 'account already exist';
+            return null;
         }
-        return this.#createAccount(userAccount);
+        const response = await this.#createAccount(userAccount);
+        if (!response) return null;
+        return { username: userAccount.username.value };
     }
 
     async #onInitDB() {
@@ -29,10 +36,11 @@ export class MiniDBAccountHandler {
             await this.#DB.init();
             return true;
         } catch {
-            return false;
+            return null;
         }
     }
 
+    // DONT NEED 'TO REFRESH DB' WHEN 'INIT FUNCTION' HAVE BEEN CALLED BY BOTH FUNCTIONS SIGN IN AND SIGN UP
     #authAccount(userAccount: InputDataBaseType) {
         const account = DataBase.state.accounts.find((value) => {
             if (
@@ -40,46 +48,30 @@ export class MiniDBAccountHandler {
                 value.username.value === userAccount.username.value
             )
                 return value;
-            return undefined;
         });
-        if (!account) return false;
+        if (!account) return null;
         return account;
     }
 
     async #createAccount(userAccount: InputDataBaseType) {
-        DataBase.state.accounts.push(createConstraint(userAccount));
+        const userAccountHandled = this.#onHandleInputs(userAccount);
+        DataBase.state.accounts.push(userAccountHandled);
         const response = await this.#DB.handleDB(
             'refresh',
-            'MiniDBAccountsHandler - createAccount',
+            'MiniDBAccountHandler - createAccount',
         );
-        if (response) return response;
-        return 'account has been created';
+
+        if (!response) return null;
+        return response;
     }
-}
 
-function createTimeStamp(userAccount: InputDataBaseType) {
-    const todaysDate = new Date();
-    const todaysDateFormated = todaysDate
-        .toLocaleString()
-        .split(', ')
-        .join('-');
-    const accountWithTimeStamp = {
-        ...userAccount,
-        timeStamp: todaysDateFormated,
-    };
-
-    return accountWithTimeStamp;
-}
-
-function createID(userAccount: InputDataBaseType) {
-    const inputWithID = {
-        ID: DataBase.state.accounts.length + 1,
-        ...userAccount,
-    };
-    return createTimeStamp(inputWithID);
-}
-
-function createConstraint(userAccount: InputDataBaseType) {
-    const userWithConstraint = { constraint: 'user', ...userAccount };
-    return createID(userWithConstraint);
+    #onHandleInputs(userAccount: InputDataBaseType) {
+        const accountWithConstraint = createConstraint(userAccount, 'user');
+        const accountWithID = createID(
+            accountWithConstraint,
+            DataBase.state.accounts.length,
+        );
+        const accountWithTimeStamp = createTimeStamp(accountWithID);
+        return accountWithTimeStamp;
+    }
 }

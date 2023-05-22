@@ -1,15 +1,17 @@
-import useValidate from '@/hooks/useValidate';
 import Form from './Form';
 import Input from './Input';
+import useAPIrequest from '@/hooks/useAPIrequest';
+import useValidate from '@/hooks/useValidate';
 
 interface SignInFormProps {
     setUser: (user: boolean) => void;
-    hasUser?: () => boolean;
+    hasUser: () => boolean;
 }
 
 export default function SignInForm({ setUser, hasUser }: SignInFormProps) {
     const { validateUsername, validatePassword, validateAllInputs } =
         useValidate(inputs);
+    const { request } = useAPIrequest();
 
     return (
         <div className="o-sign-in-form">
@@ -17,11 +19,10 @@ export default function SignInForm({ setUser, hasUser }: SignInFormProps) {
                 <Form
                     inputs={inputs}
                     validateAllInputs={validateAllInputs}
-                    method="POST"
-                    action={process.env.NEXT_PUBLIC_SIGN_IN_LINK as string}
                     legend="SignIn"
                     setUser={setUser}
-                    hasUser={hasUser}
+                    hasUser={() => hasUser()}
+                    requestApi={requestApi}
                 >
                     <Input
                         label="Username"
@@ -37,6 +38,16 @@ export default function SignInForm({ setUser, hasUser }: SignInFormProps) {
             </div>
         </div>
     );
+
+    async function requestApi<T>(formContent: T) {
+        const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
+        const options: FetchOptionsType = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formContent),
+        };
+        return await request(action, options);
+    }
 }
 
 const inputs: FormInputsType = {

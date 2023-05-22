@@ -9,13 +9,14 @@ export class MiniDBHandler {
 
     async handleDB(comand: HandleDBComandType, caller?: string) {
         if (comand === 'reset') return this.#resetDB();
-        if (comand === 'get') return this.#returnDB();
+        if (comand === 'getDB') return this.#returnDB();
         if (comand === 'refresh') return this.#createAndRefreshDB(caller);
         if (comand === 'getUsers') return this.#getUsers();
     }
 
     async #getUsers() {
-        await this.#accessDB();
+        const response = await this.#accessDB();
+        if (response) return response;
         return DataBase.state.accounts;
     }
 
@@ -25,7 +26,7 @@ export class MiniDBHandler {
             DataBase.state = JSON.parse(data);
         } catch {
             DataBase.state = INITIAL_STATE;
-            return await this.#createAndRefreshDB('MiniDB - accessDB');
+            return await this.#createAndRefreshDB('MiniDBHandler - accessDB');
         }
     }
 
@@ -48,7 +49,6 @@ export class MiniDBHandler {
     }
 
     async #createAndRefreshDB(caller?: string) {
-        if (!this.#checkDBState()) return 'internal server error';
         const json = JSON.stringify(DataBase.state, undefined, 2);
         try {
             await writeFileSync(MINI_DB_FILE_PATH_NAME, json);

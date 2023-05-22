@@ -11,7 +11,7 @@ interface InputProps {
 
 const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     const formContext = useContext(FormContext);
-    const [input, setInput] = useState('');
+    const [inputvalue, setInputValue] = useState('');
     const [showErrorMessage, setShowErrorMessage] = useState<
         boolean | undefined
     >(false);
@@ -20,21 +20,21 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     );
 
     useEffect(() => {
-        setErrorList(validation && validation(input));
-    }, [input, setErrorList, validation]);
+        setErrorList(validation && validation(inputvalue));
+    }, [inputvalue, setErrorList, validation]);
 
     useEffect(() => {
         // UP MESSAGE
         if (errorList && errorList?.length >= 1) {
-            const currentTimer = onShowMessage(true, 650);
+            const currentTimer = setTimer(true, 650);
             return () => clearTimeout(currentTimer);
         }
         setShowErrorMessage(false);
-    }, [errorList, input]);
+    }, [errorList, inputvalue]);
 
     useEffect(() => {
         // DOWN MESSAGE
-        const currentTimer = onShowMessage(false, 2550);
+        const currentTimer = setTimer(false, 2550);
         return () => clearTimeout(currentTimer);
     }, [showErrorMessage, formContext]);
 
@@ -51,8 +51,8 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
             <input
                 id={label}
                 className="input"
-                onChange={(e) => setInput(e.target.value)}
-                value={input}
+                onChange={(e) => setInputValue(e.target.value)}
+                value={inputvalue}
                 type={inputType}
             />
             {renderErrors()}
@@ -69,7 +69,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
         ));
     }
 
-    function onShowMessage(value: boolean, time: number) {
+    function setTimer(value: boolean, time: number) {
         const currentTimer = setTimeout(() => {
             setShowErrorMessage(value);
         }, time);

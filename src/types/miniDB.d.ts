@@ -12,23 +12,11 @@ declare interface InputDataBaseType {
     password: { value: string };
 }
 
-declare interface InputDataBaseTypeWithConstraint extends InputDataBaseType {
-    constraint: 'user' | 'admin';
-}
-
-declare interface InputDataBaseTypeWithID
-    extends InputDataBaseTypeWithConstraint {
-    ID: number;
-}
-
-declare interface InputDataBaseTypeWithTimeStamp
-    extends InputDataBaseTypeWithID {
-    timeStamp: string;
-}
+declare type ConstraintsType = 'user';
 
 declare type HandleDBComandType =
     | 'reset'
-    | 'get'
+    | 'getDB'
     | 'create'
     | 'refresh'
     | 'getUsers';

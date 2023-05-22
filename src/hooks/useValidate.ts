@@ -1,13 +1,21 @@
 export default function useValidate(formInputs: FormInputsType) {
     const validateAllInputs = () => {
         Object.keys(formInputs).map((key) => {
-            [validateUsername, validatePassword, validateCofirmPassword].map(
-                (validationFunc) => {
-                    if (validationFunc.name.includes(key))
-                        validationFunc(formInputs[key].value);
-                },
-            );
+            Object.values(inputsValidation).map((validationFunc) => {
+                if (validationFunc.name.includes(key))
+                    validationFunc(formInputs[key].value);
+            });
         });
+
+        const verificationArray = [];
+        for (const i in formInputs) {
+            if (formInputs[i].errors?.length >= 1 || formInputs[i].isEmpty) {
+                verificationArray.push(1);
+            } else {
+                verificationArray.push(0);
+            }
+        }
+        return verificationArray.find((value) => value === 1);
     };
 
     const validateUsername = (currentInputValue = '') => {
@@ -34,12 +42,13 @@ export default function useValidate(formInputs: FormInputsType) {
         );
     };
 
-    return {
+    const inputsValidation = {
         validateUsername,
         validatePassword,
-        validateAllInputs,
         validateCofirmPassword,
     };
+
+    return { ...inputsValidation, validateAllInputs };
 }
 
 function preValidate(

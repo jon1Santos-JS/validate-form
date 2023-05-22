@@ -1,19 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { MiniDBAccountHandler } from '../../database/accountHandler';
+import { signUp } from '@/lib/DBcontroller';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    res.status(200).send(await onHandleDB(req));
-}
-async function onHandleDB(req: NextApiRequest) {
-    const accountsHandler = new MiniDBAccountHandler();
-    const response = await accountsHandler.signUp(
-        req.body as InputDataBaseType,
-    );
-    return JSON.stringify(response);
+    const response = await signUp(req.body as InputDataBaseType);
+    const conditionalResponse = response ? { user: true } : { user: false };
+    res.status(200).json(JSON.stringify(conditionalResponse));
 }
 
 export const config = {

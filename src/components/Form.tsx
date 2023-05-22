@@ -1,37 +1,36 @@
 import FormContext from '@/context/FormContext';
-import useObjecthandler from '@/hooks/useObjectHandler';
+import useInputHandler from '@/hooks/useInputHandler';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    validateAllInputs: () => void;
-    method: 'POST' | 'GET';
-    action: string;
+    validateAllInputs: () => number | undefined;
+    requestApi: <T>(content: T) => Promise<boolean>;
     inputs: FormInputsType;
     legend?: string;
-    setUser?: (data: boolean) => void;
-    hasUser?: () => boolean;
+    setUser: (user: boolean) => void;
+    hasUser: () => boolean;
     pushRoute?: string;
 }
 
 const Form: React.FC<FormProps> = ({
     children,
     validateAllInputs,
-    method,
-    action,
+    requestApi,
     inputs,
     legend,
     setUser,
-    hasUser,
     pushRoute = '/',
 }) => {
     const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
     const [showInputErrorsMessages, setshowInputErrorsMessages] =
         useState(false);
-    const { onOmitProp } = useObjecthandler();
+    const { onOmitInputs, onSubmitInputs } = useInputHandler();
+    const router = useRouter();
 
     useEffect(() => {
-        // DOWN MESSAGE
+        // TO DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
             setshowInputErrorsMessages(false);
             setShowErrorMessage(false);
@@ -91,65 +90,45 @@ const Form: React.FC<FormProps> = ({
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) {
         e.preventDefault();
-        validateAllInputs();
-        setShowErrorMessage(true);
-        setshowInputErrorsMessages(true);
-        if (!onCheckInputs()) {
+        if (!validateAllInputs()) {
+            const formatedInputs = onHandleInputs();
+            const response = await onSubmitInputs<typeof formatedInputs>(
+                formatedInputs,
+                requestApi,
+            );
             setshowInputErrorsMessages(false);
             setShowErrorMessage(false);
-            await onSubmitInputs();
+            setUser(response);
+            if (response) router.push(pushRoute);
             return;
         }
-    }
-
-    function onCheckInputs() {
-        const verificationArray = [];
-        for (const i in inputs) {
-            if (inputs[i].errors?.length >= 1 || inputs[i].isEmpty) {
-                verificationArray.push(1);
-            } else {
-                verificationArray.push(0);
-            }
-        }
-        return verificationArray.find((value) => value === 1);
-    }
-
-    async function onSubmitInputs() {
-        const formatedInputs = onHandleInputs();
-        const response = await fetch(action, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formatedInputs),
-        });
-        const parsedResponse: LogInResponseForm = await response.json();
-        setUser && setUser(parsedResponse.user);
-        console.log(hasUser && hasUser());
-        if (hasUser && hasUser()) window.location.assign(pushRoute);
+        setShowErrorMessage(true);
+        setshowInputErrorsMessages(true);
     }
 
     function onHandleInputs() {
-        const inputKeys = Object.keys(inputs).filter((key) =>
+        const newInputs = inputs;
+        const inputKeys = Object.keys(newInputs).filter((key) =>
             key.includes('confirm'),
         );
-        const inputsWithoutConfirmFields = onOmitProp<
+        const inputsWithoutConfirmField = onOmitInputs<
             FormInputsType,
-            FormInputTypeWithAuniqueProp
-        >(inputs, [...inputKeys]);
+            FormInputTypeToSubmit
+        >(newInputs, [...inputKeys]);
 
-        for (const i in inputsWithoutConfirmFields) {
-            inputsWithoutConfirmFields[i] = onOmitProp<
-                FormInputTypeWithAuniqueProp,
-                FormInputTypeWithAuniqueProp
-            >(inputsWithoutConfirmFields[i] as FormInputTypeWithAuniqueProp, [
+        for (const i in inputsWithoutConfirmField) {
+            const fieldsWithOnlyValueInput = onOmitInputs<
+                FormInputTypeToSubmit,
+                FormInputTypeToSubmit
+            >(inputsWithoutConfirmField[i] as FormInputTypeToSubmit, [
                 'isEmpty',
                 'errors',
                 'validations',
             ]);
+            inputsWithoutConfirmField[i] = fieldsWithOnlyValueInput;
         }
 
-        return inputsWithoutConfirmFields;
+        return inputsWithoutConfirmField;
     }
 };
 

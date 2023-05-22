@@ -1,8 +1,16 @@
+declare interface FetchOptionsType {
+    method: MethodTypes;
+    headers?: { [key: string]: string };
+    body?: string;
+}
+
+declare type MethodTypes = 'GET' | 'DELETE' | 'POST';
+
 declare interface FormInputsType {
     [key: string]: FormInputPropsType;
 }
 
-declare interface FormInputTypeWithAuniqueProp {
+declare interface FormInputTypeToSubmit {
     [key: string]: { value?: string };
 }
 
@@ -20,5 +28,3 @@ declare interface Validation {
     coditional: boolean | RegExpMatchArray | null;
     message: string;
 }
-
-declare type LogInResponseForm = { user: boolean };
