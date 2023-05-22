@@ -10,33 +10,36 @@ export class MiniDBAccountHandler {
     #DB = new MiniDBHandler();
 
     async signIn(userAccount: InputDataBaseType) {
-        if (!(await this.#onInitDB())) return null;
+        if (!(await this.#onInitDB())) return;
         const account = this.#authAccount(userAccount);
         if (!account) {
             console.log('account was not found');
-            return null;
+            return;
         }
-        console.log(JSON.stringify(account, undefined, 2));
-        return { username: userAccount.username.value };
+        const user = JSON.stringify({ username: userAccount.username.value });
+        console.log(user);
+        return user;
     }
 
     async signUp(userAccount: InputDataBaseType) {
-        if (!(await this.#onInitDB())) return null;
+        if (!(await this.#onInitDB())) return;
         if (this.#authAccount(userAccount)) {
             console.log('account already exist');
-            return null;
+            return;
         }
         const response = await this.#createAccount(userAccount);
-        if (!response) return null;
-        return { username: userAccount.username.value };
+        if (!response) return;
+        const user = JSON.stringify({ username: userAccount.username.value });
+        console.log(user);
+        return user;
     }
 
     async #onInitDB() {
         try {
             await this.#DB.init();
-            return true;
+            return 'DB has been initiated';
         } catch {
-            return null;
+            return;
         }
     }
 
@@ -49,7 +52,7 @@ export class MiniDBAccountHandler {
             )
                 return value;
         });
-        if (!account) return null;
+        if (!account) return;
         return account;
     }
 
@@ -61,7 +64,7 @@ export class MiniDBAccountHandler {
             'MiniDBAccountHandler - createAccount',
         );
 
-        if (!response) return null;
+        if (!response) return;
         return response;
     }
 

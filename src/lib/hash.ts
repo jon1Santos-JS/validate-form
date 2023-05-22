@@ -1,5 +1,5 @@
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
-import { onHandleDB } from './DBcontroller';
+import { handleDBController } from './DB-API-controller';
 
 export function createHash<T>(value: T) {
     const salt = genSaltSync(10);
@@ -7,12 +7,13 @@ export function createHash<T>(value: T) {
     return hash;
 }
 
-export async function onValidateHash(browserHash: string) {
+export async function onValidateHash(browserHash: string | undefined) {
+    if (!browserHash) return 'internal server error';
     const validation = { isLogged: false };
-    const response = await onHandleDB('getUsers');
-    if (!response || typeof response === 'string') return validation.isLogged;
+    const response = await handleDBController('getUsers');
+    if (!response) return validation.isLogged;
 
-    const users = response;
+    const users: InputDataBaseType[] = JSON.parse(response);
     users.map((user) => {
         const stringifiedUser = JSON.stringify({
             username: user.username.value,

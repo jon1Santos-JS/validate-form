@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { destroyCookie, getCookie, setCookie } from '@/lib/cookies';
 import { onValidateHash } from '@/lib/hash';
-import { logIn } from '@/lib/DBcontroller';
+import { signInController } from '@/lib/DB-API-controller';
 
 export default async function handler(
     req: NextApiRequest,
@@ -10,26 +10,20 @@ export default async function handler(
 ) {
     if (req.method === 'GET') {
         const browserCookie = getCookie(req, res, 'login');
-        const response = await onCheckLoginState(browserCookie);
-        res.status(200).json(response);
+        const response = await onValidateHash(browserCookie);
+        const conditionalResponse = response ? { user: true } : { user: false };
+        res.status(200).json(conditionalResponse);
     }
     if (req.method === 'POST') {
-        const user = await logIn(req.body as InputDataBaseType);
-        if (user) setCookie(req, res, 'login', user);
-        const conditionalResponse = user ? { user: true } : { user: false };
+        const response = await signInController(req.body);
+        if (response) setCookie(req, res, 'login', response);
+        const conditionalResponse = response ? { user: true } : { user: false };
         res.status(200).json(JSON.stringify(conditionalResponse));
     }
     if (req.method === 'DELETE') {
         destroyCookie(req, res, 'login');
         res.status(200).json(JSON.stringify({ user: false }));
     }
-}
-
-async function onCheckLoginState(browserCookie: string | undefined) {
-    if (!browserCookie) return 'internal server error';
-    const response = await onValidateHash(browserCookie);
-    const conditionalResponse = response ? { user: true } : { user: false };
-    return JSON.stringify(conditionalResponse);
 }
 
 export const config = {
