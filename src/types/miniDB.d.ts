@@ -14,9 +14,4 @@ declare interface InputDataBaseType {
 
 declare type ConstraintsType = 'user';
 
-declare type HandleDBComandType =
-    | 'reset'
-    | 'getDB'
-    | 'create'
-    | 'refresh'
-    | 'getUsers';
+declare type HandleDBComandType = 'reset' | 'getDB' | 'refresh' | 'getUsers';

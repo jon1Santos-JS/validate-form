@@ -2,27 +2,42 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { destroyCookie, getCookie, setCookie } from '@/lib/cookies';
 import { onValidateHash } from '@/lib/hash';
-import { signInController } from '@/lib/DB-API-controller';
+import {
+    getDBUsersController,
+    signInController,
+} from '@/lib/DB-API-controller';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
     if (req.method === 'GET') {
-        const browserCookie = getCookie(req, res, 'login');
-        const response = await onValidateHash(browserCookie);
-        const conditionalResponse = response ? { user: true } : { user: false };
-        res.status(200).json(conditionalResponse);
+        const browserCookie = getCookie(req, res, 'user-hash');
+        const controllerResponse = await getDBUsersController();
+        if (typeof controllerResponse !== 'string') {
+            const users = controllerResponse;
+            const validatedHash = await onValidateHash(browserCookie, users);
+            const response = { serverResponse: validatedHash };
+            res.status(200).json(response);
+            return;
+        }
+        res.status(200).json({ serverResponse: controllerResponse });
     }
     if (req.method === 'POST') {
-        const response = await signInController(req.body);
-        if (response) setCookie(req, res, 'login', response);
-        const conditionalResponse = response ? { user: true } : { user: false };
-        res.status(200).json(JSON.stringify(conditionalResponse));
+        const controllerResponse = await signInController(req.body);
+        const response = { serverResponse: false };
+        if (typeof controllerResponse !== 'string') {
+            const user = controllerResponse;
+            setCookie(req, res, 'user-hash', user);
+            response.serverResponse = true;
+            res.status(200).json(response);
+            return;
+        }
+        res.status(200).json({ serverResponse: controllerResponse });
     }
     if (req.method === 'DELETE') {
-        destroyCookie(req, res, 'login');
-        res.status(200).json(JSON.stringify({ user: false }));
+        destroyCookie(req, res, 'user-hash');
+        res.status(200).json({ serverResponse: true });
     }
 }
 

@@ -75,10 +75,15 @@ const inputs: FormInputsType = {
         isEmpty: true,
     },
     password: {
-        validations: (currentInputValue) => [
+        validations: (currentInputValue, formInputs) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password must has 6 characters at least',
+            },
+            {
+                coditional:
+                    currentInputValue !== formInputs['confirmPassword'].value,
+                message: 'This field has to be equal to the confirm password',
             },
         ],
         errors: [],

@@ -7,8 +7,7 @@ export default async function handler(
     res: NextApiResponse,
 ) {
     const response = await signUpController(req.body as InputDataBaseType);
-    const conditionalResponse = response ? { user: true } : { user: false };
-    res.status(200).json(JSON.stringify(conditionalResponse));
+    res.status(200).json({ serverResponse: response });
 }
 
 export const config = {

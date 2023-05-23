@@ -10,7 +10,8 @@ export default function App({ Component, pageProps }: AppProps) {
 
     const fetchData = useCallback(async () => {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
-        setUser(await requestWithouContent(action, { method: 'GET' }));
+        const response = await requestWithouContent(action, { method: 'GET' });
+        setUser(response);
     }, [requestWithouContent]);
 
     useEffect(() => {

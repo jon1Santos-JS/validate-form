@@ -8,5 +8,7 @@ export const ADMIN_ACCOUNT = {
     password: { value: 'admin1' },
 };
 
-export const DataBase: MiniDBType = { state: INITIAL_STATE };
-DataBase.state.accounts.push(ADMIN_ACCOUNT);
+export const SERVER_ERROR_RESPONSE = 'internal server error';
+
+export const DATABASE: MiniDBType = { state: INITIAL_STATE };
+DATABASE.state.accounts.push(ADMIN_ACCOUNT);

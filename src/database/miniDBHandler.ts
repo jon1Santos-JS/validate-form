@@ -1,79 +1,88 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { DataBase, INITIAL_STATE, MINI_DB_FILE_PATH_NAME } from './miniDB';
+import {
+    DATABASE,
+    INITIAL_STATE,
+    MINI_DB_FILE_PATH_NAME,
+    SERVER_ERROR_RESPONSE,
+} from './miniDB';
 
 export class MiniDBHandler {
     async init() {
         const response = await this.#accessDB();
-        if (!response) return;
-        if (!this.#checkDBState()) return;
-        return response;
+        if (response) return SERVER_ERROR_RESPONSE;
+        if (this.#checkDBState()) return SERVER_ERROR_RESPONSE;
+        return;
     }
 
-    async handleDB(comand: HandleDBComandType, caller?: string) {
-        if (comand === 'reset') return this.#resetDB();
-        if (comand === 'getDB') return this.#returnDB();
-        if (comand === 'refresh') return this.#createAndRefreshDB(caller);
-        if (comand === 'getUsers') return this.#getUsers();
+    async handleDB(command: HandleDBComandType, caller?: string) {
+        if (command === 'reset') return await this.#resetDB();
+        if (command === 'getDB') return await this.#returnDB();
+        if (command === 'refresh')
+            return await this.#createAndRefreshDB(caller);
+        if (command === 'getUsers') return await this.#getUsers();
     }
 
     async #getUsers() {
         const response = await this.#accessDB();
-        if (!response) return;
-        const stringifiedAccounts = JSON.stringify(DataBase.state.accounts);
-        return stringifiedAccounts;
+        if (response) return SERVER_ERROR_RESPONSE;
+        return DATABASE.state.accounts;
     }
 
     async #accessDB() {
         try {
             const data = await readFileSync(MINI_DB_FILE_PATH_NAME, 'utf8');
-            DataBase.state = JSON.parse(data);
+            DATABASE.state = JSON.parse(data);
             console.log('DB has been accessed');
-            return 'DB has been accessed';
+            return;
         } catch {
-            DataBase.state = INITIAL_STATE;
-            return await this.#createAndRefreshDB('MiniDBHandler - accessDB');
+            DATABASE.state = INITIAL_STATE;
+            const response = await this.#createAndRefreshDB(
+                'MiniDBHandler - accessDB',
+            );
+            if (response) return SERVER_ERROR_RESPONSE;
+            return;
         }
     }
 
     async #returnDB() {
         const response = await this.#accessDB();
-        if (!response) return;
-        return JSON.stringify(DataBase.state, undefined, 2);
+        if (response) return SERVER_ERROR_RESPONSE;
+        return DATABASE.state;
     }
 
     async #resetDB() {
-        DataBase.state = INITIAL_STATE;
-        const json = JSON.stringify(DataBase.state, undefined, 2);
+        DATABASE.state = INITIAL_STATE;
+        const json = JSON.stringify(DATABASE.state, undefined, 2);
         try {
             await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
             console.log('The DataBase has been reset');
-            return 'The DataBase has been reset';
+            return;
         } catch {
             console.log('DB file was not found');
-            return;
+            return SERVER_ERROR_RESPONSE;
         }
     }
 
     async #createAndRefreshDB(caller?: string) {
-        const json = JSON.stringify(DataBase.state, undefined, 2);
+        const json = JSON.stringify(DATABASE.state, undefined, 2);
         try {
             await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
             console.log('DB has been created or refreshed');
-            return 'DB has been created or refreshed';
+            return;
         } catch {
             console.log(
                 'failed to create or refresh file by: ',
                 caller && caller,
             );
-            return;
+            return SERVER_ERROR_RESPONSE;
         }
     }
 
     #checkDBState() {
-        if (DataBase.state.accounts.length > DataBase.state.limit) {
+        if (DATABASE.state.accounts.length > DATABASE.state.limit) {
             console.log('database limit account reached');
-            return;
+            return SERVER_ERROR_RESPONSE;
         }
-        return 'DB state is ok';
+        return;
     }
 }
