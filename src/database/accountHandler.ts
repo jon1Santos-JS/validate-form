@@ -1,7 +1,7 @@
 import {
-    createConstraint,
-    createID,
-    createTimeStamp,
+    onCreateConstraint,
+    onCreateID,
+    onCreateTimeStamp,
 } from '@/lib/inputHandler';
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
 import { MiniDBHandler } from './miniDBHandler';
@@ -9,7 +9,7 @@ import { MiniDBHandler } from './miniDBHandler';
 export class MiniDBAccountHandler {
     #DB = new MiniDBHandler();
 
-    async signIn(userAccount: InputDataBaseType) {
+    async signIn(userAccount: UserFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(userAccount)) {
             console.log('account was not found');
@@ -19,7 +19,7 @@ export class MiniDBAccountHandler {
         return userAccount;
     }
 
-    async signUp(userAccount: InputDataBaseType) {
+    async signUp(userAccount: UserFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (this.#authAccount(userAccount)) {
             console.log('account already exist');
@@ -43,7 +43,7 @@ export class MiniDBAccountHandler {
     }
 
     // DONT NEED 'TO REFRESH DB' WHEN 'INIT FUNCTION' HAVE BEEN CALLED BY BOTH FUNCTIONS SIGN IN AND SIGN UP
-    #authAccount(userAccount: InputDataBaseType) {
+    #authAccount(userAccount: UserFromClientType) {
         const account = DATABASE.state.accounts.find((value) => {
             if (
                 value.password.value === userAccount.password.value &&
@@ -55,8 +55,9 @@ export class MiniDBAccountHandler {
         return account;
     }
 
-    async #createAccount(userAccount: InputDataBaseType) {
-        const userAccountHandled = this.#onHandleInputs(userAccount);
+    async #createAccount(userAccount: UserFromClientType) {
+        const userAccountHandled: UserFromDataBaseType =
+            this.#onHandleInputs(userAccount);
         DATABASE.state.accounts.push(userAccountHandled);
         const response = await this.#DB.handleDB(
             'refresh',
@@ -67,13 +68,13 @@ export class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    #onHandleInputs(userAccount: InputDataBaseType) {
-        const accountWithConstraint = createConstraint(userAccount, 'user');
-        const accountWithID = createID(
+    #onHandleInputs(userAccount: UserFromClientType) {
+        const accountWithConstraint = onCreateConstraint(userAccount, 'user');
+        const accountWithID = onCreateID(
             accountWithConstraint,
             DATABASE.state.accounts.length,
         );
-        const accountWithTimeStamp = createTimeStamp(accountWithID);
-        return accountWithTimeStamp;
+        const accountWithTimeStamp = onCreateTimeStamp(accountWithID);
+        return accountWithTimeStamp as UserFromDataBaseType;
     }
 }

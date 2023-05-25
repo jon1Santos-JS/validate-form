@@ -1,13 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { signUpController } from '@/lib/DB-API-controller';
+import { signUpController } from '@/lib/controllers';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    const response = await signUpController(req.body as InputDataBaseType);
-    res.status(200).json({ serverResponse: response });
+    const user: UserFromClientType = req.body;
+    const controllerResponse = await signUpController(user);
+    res.status(200).json(controllerResponse);
 }
 
 export const config = {

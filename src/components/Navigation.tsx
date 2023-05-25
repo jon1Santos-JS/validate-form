@@ -1,4 +1,3 @@
-import useRequest from '@/hooks/useAPIrequest';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -11,7 +10,6 @@ export default function NavigationBar({
     hasUser,
     setUser,
 }: NavigationBarProps) {
-    const { requestWithouContent } = useRequest();
     const router = useRouter();
 
     return (
@@ -31,12 +29,9 @@ export default function NavigationBar({
 
     async function signOutUser() {
         setUser(false);
-        await requestWithouContent(
-            process.env.NEXT_PUBLIC_SIGN_IN_LINK as string,
-            {
-                method: 'DELETE',
-            },
-        );
+        const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
+        const options = { method: 'DELETE' };
+        await fetch(action, options);
         router.push('/sign-in-page');
     }
 }

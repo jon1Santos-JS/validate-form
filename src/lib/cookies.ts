@@ -1,16 +1,14 @@
 import Cookies from 'cookies';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createHash } from './hash';
 
-export function setCookie<T>(
+export function setCookie(
     req: NextApiRequest,
     res: NextApiResponse,
     name: string,
-    value: T,
+    value: string,
 ) {
     const cookies = new Cookies(req, res);
-    const hash = createHash<T>(value);
-    cookies.set(name, hash);
+    cookies.set(name, value);
 }
 
 export function getCookie(

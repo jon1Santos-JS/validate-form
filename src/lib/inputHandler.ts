@@ -1,4 +1,4 @@
-export function createTimeStamp(userAccount: InputDataBaseType) {
+export function onCreateTimeStamp(userAccount: UserFromClientType) {
     const todaysDate = new Date();
     const todaysDateFormated = todaysDate
         .toLocaleString()
@@ -12,7 +12,7 @@ export function createTimeStamp(userAccount: InputDataBaseType) {
     return accountWithTimeStamp;
 }
 
-export function createID(userAccount: InputDataBaseType, currentID: number) {
+export function onCreateID(userAccount: UserFromClientType, currentID: number) {
     const inputWithID = {
         ID: currentID + 1,
         ...userAccount,
@@ -20,10 +20,18 @@ export function createID(userAccount: InputDataBaseType, currentID: number) {
     return inputWithID;
 }
 
-export function createConstraint(
-    userAccount: InputDataBaseType,
+export function onCreateConstraint(
+    userAccount: UserFromClientType,
     constraint: ConstraintsType,
 ) {
     const userWithConstraint = { constraint: constraint, ...userAccount };
     return userWithConstraint;
+}
+
+export function onOmitDBInputFields(userAccount: UserFromDataBaseType[]) {
+    const handledAccount = userAccount.map((user) => ({
+        username: { value: user.username.value },
+        password: { value: user.password.value },
+    }));
+    return handledAccount as UserFromClientType[];
 }

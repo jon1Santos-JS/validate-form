@@ -3,7 +3,9 @@ export const INITIAL_STATE: MiniDBState = {
     limit: 10,
 };
 export const MINI_DB_FILE_PATH_NAME = 'miniDBFile.json';
-export const ADMIN_ACCOUNT = {
+export const ADMIN_ACCOUNT: UserFromDataBaseType = {
+    ID: 1,
+    constraint: 'admin',
     username: { value: 'admin1' },
     password: { value: 'admin1' },
 };

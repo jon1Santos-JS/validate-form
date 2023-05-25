@@ -3,15 +3,23 @@ declare interface MiniDBType {
 }
 
 declare interface MiniDBState {
-    accounts: InputDataBaseType[];
+    accounts: UserFromDataBaseType[];
     limit: number;
 }
 
-declare interface InputDataBaseType {
+declare interface UserFromDataBaseType {
+    ID: number;
+    constraint: ConstraintsType;
+    username: { value: string };
+    password: { value: string };
+    timeStamp?: string;
+}
+
+declare type ConstraintsType = 'user' | 'admin';
+
+declare interface UserFromClientType {
     username: { value: string };
     password: { value: string };
 }
-
-declare type ConstraintsType = 'user';
 
 declare type HandleDBComandType = 'reset' | 'getDB' | 'refresh' | 'getUsers';

@@ -18,10 +18,12 @@ export default function DashBoardPage() {
 }
 
 function onFetchDBApi(method: 'DELETE' | 'GET' | 'POST') {
-    return fetch(process.env.NEXT_PUBLIC_HANDLE_DB_LINK as string, {
+    const action = process.env.NEXT_PUBLIC_HANDLE_DB_LINK as string;
+    const options = {
         method: method,
         headers: {
             'Content-Type': 'application/json',
         },
-    });
+    };
+    return fetch(action, options);
 }

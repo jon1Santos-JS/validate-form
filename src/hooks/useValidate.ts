@@ -1,15 +1,20 @@
 export default function useValidate(formInputs: FormInputsType) {
     const validateAllInputs = () => {
-        Object.keys(formInputs).map((key) => {
-            Object.values(inputsValidation).map((validationFunc) => {
-                if (validationFunc.name.includes(key))
+        Object.keys(formInputs).forEach((key) => {
+            Object.values(inputsValidation).forEach((validationFunc) => {
+                const functionName = validationFunc.name
+                    .toLowerCase()
+                    .replace('validate', '');
+                const propName = key.toLowerCase();
+                if (functionName === propName) {
                     validationFunc(formInputs[key].value);
+                }
             });
         });
 
         const verificationArray = [];
         for (const i in formInputs) {
-            if (formInputs[i].errors?.length >= 1 || formInputs[i].isEmpty) {
+            if (formInputs[i].errors?.length >= 1) {
                 verificationArray.push(1);
             } else {
                 verificationArray.push(0);
@@ -34,7 +39,7 @@ export default function useValidate(formInputs: FormInputsType) {
         );
     };
 
-    const validateCofirmPassword = (currentInputValue = '') => {
+    const validateConfirmPassword = (currentInputValue = '') => {
         return preValidate(
             formInputs['confirmPassword'],
             currentInputValue,
@@ -45,7 +50,7 @@ export default function useValidate(formInputs: FormInputsType) {
     const inputsValidation = {
         validateUsername,
         validatePassword,
-        validateCofirmPassword,
+        validateConfirmPassword,
     };
 
     return { ...inputsValidation, validateAllInputs };
@@ -64,7 +69,6 @@ function setAndResetInput(
     input: FormInputPropsType,
     currentInputValue: string,
 ) {
-    input.isEmpty = false;
     while (input.errors.length > 0) {
         input.errors.pop();
     }
@@ -77,12 +81,12 @@ function validate(
     formInputs: FormInputsType,
 ) {
     if (!input.validations) return;
-    if (!currentInputValue) {
-        input.isEmpty = true;
-        return;
+    if (!currentInputValue && input.required) {
+        input.errors.push('This field is required');
+        return input.errors;
     }
-    const validations = input.validations(currentInputValue, formInputs);
-    validations.map((validation) => {
+    if (!currentInputValue) return input.errors;
+    input.validations(currentInputValue, formInputs).map((validation) => {
         if (validation.coditional) input.errors.push(validation.message);
     });
 

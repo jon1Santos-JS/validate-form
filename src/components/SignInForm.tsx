@@ -1,6 +1,6 @@
+import { useRouter } from 'next/router';
 import Form from './Form';
 import Input from './Input';
-import useAPIrequest from '@/hooks/useAPIrequest';
 import useValidate from '@/hooks/useValidate';
 
 interface SignInFormProps {
@@ -8,10 +8,10 @@ interface SignInFormProps {
     hasUser: () => boolean;
 }
 
-export default function SignInForm({ setUser, hasUser }: SignInFormProps) {
+export default function SignInForm({ setUser }: SignInFormProps) {
     const { validateUsername, validatePassword, validateAllInputs } =
         useValidate(inputs);
-    const { request } = useAPIrequest();
+    const router = useRouter();
 
     return (
         <div className="o-sign-in-form">
@@ -20,8 +20,6 @@ export default function SignInForm({ setUser, hasUser }: SignInFormProps) {
                     inputs={inputs}
                     validateAllInputs={validateAllInputs}
                     legend="SignIn"
-                    setUser={setUser}
-                    hasUser={() => hasUser()}
                     requestApi={requestApi}
                 >
                     <Input
@@ -46,7 +44,11 @@ export default function SignInForm({ setUser, hasUser }: SignInFormProps) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formContent),
         };
-        return await request(action, options);
+        const response = await fetch(action, options);
+        const parsedResponse: ServerSignInResponseType = await response.json();
+        if (typeof parsedResponse.serverResponse === 'string') return;
+        if (parsedResponse.serverResponse) router.push('/');
+        setUser(parsedResponse.serverResponse);
     }
 }
 
@@ -63,7 +65,7 @@ const inputs: FormInputsType = {
             },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
     },
     password: {
         validations: (currentInputValue) => [
@@ -73,6 +75,6 @@ const inputs: FormInputsType = {
             },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
     },
 };

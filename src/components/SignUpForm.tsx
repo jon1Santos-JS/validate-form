@@ -1,21 +1,16 @@
 import Form from './Form';
 import Input from './Input';
 import useValidate from '@/hooks/useValidate';
-import useAPIrequest from '@/hooks/useAPIrequest';
+import { useRouter } from 'next/router';
 
-interface SignUpFormProps {
-    setUser: (user: boolean) => void;
-    hasUser: () => boolean;
-}
-
-export default function SignUpForm({ setUser, hasUser }: SignUpFormProps) {
+export default function SignUpForm() {
     const {
         validateUsername,
         validatePassword,
         validateAllInputs,
-        validateCofirmPassword,
+        validateConfirmPassword,
     } = useValidate(inputs);
-    const { request } = useAPIrequest();
+    const router = useRouter();
 
     return (
         <div className="o-sign-up-form">
@@ -24,13 +19,11 @@ export default function SignUpForm({ setUser, hasUser }: SignUpFormProps) {
                     inputs={inputs}
                     validateAllInputs={validateAllInputs}
                     legend="SignUp"
-                    hasUser={hasUser}
-                    setUser={setUser}
                     requestApi={requestApi}
                 >
                     <Input
                         label="Username"
-                        inputType="text"
+                        inputType="password"
                         validation={validateUsername}
                     />
                     <Input
@@ -41,7 +34,7 @@ export default function SignUpForm({ setUser, hasUser }: SignUpFormProps) {
                     <Input
                         label="Confirm Password"
                         inputType="password"
-                        validation={validateCofirmPassword}
+                        validation={validateConfirmPassword}
                     />
                 </Form>
             </div>
@@ -50,12 +43,14 @@ export default function SignUpForm({ setUser, hasUser }: SignUpFormProps) {
 
     async function requestApi<T>(formContent: T) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
-        const options: FetchOptionsType = {
+        const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formContent),
         };
-        return await request(action, options);
+        const response = await fetch(action, options);
+        const parsedResponse: ServerSignUpResponseType = await response.json();
+        if (parsedResponse.serverResponse) router.push('/');
     }
 }
 
@@ -66,13 +61,9 @@ const inputs: FormInputsType = {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Username must has 6 characters at least',
             },
-            {
-                coditional: !currentInputValue.match(/\D/),
-                message: 'Only strings',
-            },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
     },
     password: {
         validations: (currentInputValue, formInputs) => [
@@ -87,7 +78,7 @@ const inputs: FormInputsType = {
             },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
     },
     confirmPassword: {
         validations: (currentInputValue, formInputs) => [
@@ -97,6 +88,6 @@ const inputs: FormInputsType = {
             },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
     },
 };

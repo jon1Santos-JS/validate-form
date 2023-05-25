@@ -1,17 +1,13 @@
 import FormContext from '@/context/FormContext';
 import useInputHandler from '@/hooks/useInputHandler';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
     validateAllInputs: () => number | undefined;
-    requestApi: <T>(content: T) => Promise<boolean>;
+    requestApi: <T>(formContent: T) => Promise<void>;
     inputs: FormInputsType;
     legend?: string;
-    setUser: (user: boolean) => void;
-    hasUser: () => boolean;
-    pushRoute?: string;
 }
 
 const Form: React.FC<FormProps> = ({
@@ -20,24 +16,20 @@ const Form: React.FC<FormProps> = ({
     requestApi,
     inputs,
     legend,
-    setUser,
-    pushRoute = '/',
 }) => {
-    const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
-    const [showInputErrorsMessages, setshowInputErrorsMessages] =
-        useState(false);
+    const [showMessage, setShowMessage] = useState<boolean>(false);
+    const [showInputsMessages, setShowInputMessages] = useState(false);
     const { onOmitInputs, onSubmitInputs } = useInputHandler();
-    const router = useRouter();
 
     useEffect(() => {
         // TO DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
-            setshowInputErrorsMessages(false);
-            setShowErrorMessage(false);
+            setShowInputMessages(false);
+            setShowMessage(false);
         }, 2550);
 
         return () => clearTimeout(timerDownMessage);
-    }, [showInputErrorsMessages]);
+    }, [showInputsMessages]);
 
     return (
         <form className="c-form">
@@ -61,7 +53,7 @@ const Form: React.FC<FormProps> = ({
             return (
                 <FormContext.Provider
                     value={{
-                        showInputErrorsMessagesByForm: showInputErrorsMessages,
+                        showInputErrorsMessagesByForm: showInputsMessages,
                     }}
                 >
                     {inputs.map((child) => (
@@ -73,7 +65,7 @@ const Form: React.FC<FormProps> = ({
         return (
             <FormContext.Provider
                 value={{
-                    showInputErrorsMessagesByForm: showInputErrorsMessages,
+                    showInputErrorsMessagesByForm: showInputsMessages,
                 }}
             >
                 {children}
@@ -82,7 +74,7 @@ const Form: React.FC<FormProps> = ({
     }
 
     function renderError() {
-        if (!showErrorMessage) return null;
+        if (!showMessage) return null;
         return <div className="notification is-danger">{'Invalid form'}</div>;
     }
 
@@ -91,44 +83,32 @@ const Form: React.FC<FormProps> = ({
     ) {
         e.preventDefault();
         if (!validateAllInputs()) {
-            const formatedInputs = onHandleInputs();
-            const response = await onSubmitInputs<typeof formatedInputs>(
-                formatedInputs,
-                requestApi,
-            );
-            setshowInputErrorsMessages(false);
-            setShowErrorMessage(false);
-            setUser(response);
-            if (response) router.push(pushRoute);
+            setShowInputMessages(false);
+            setShowMessage(false);
+            await onSubmitInputs(onHandleInputs(), requestApi);
             return;
         }
-        setShowErrorMessage(true);
-        setshowInputErrorsMessages(true);
+        setShowMessage(true);
+        setShowInputMessages(true);
     }
 
     function onHandleInputs() {
         const newInputs = inputs;
-        const inputKeys = Object.keys(newInputs).filter((key) =>
+        const fieldsToOmit = Object.keys(newInputs).filter((key) =>
             key.includes('confirm'),
         );
-        const inputsWithoutConfirmField = onOmitInputs<
+        const handledInputs = onOmitInputs<
             FormInputsType,
             FormInputTypeToSubmit
-        >(newInputs, [...inputKeys]);
+        >(newInputs, [...fieldsToOmit]);
 
-        for (const i in inputsWithoutConfirmField) {
-            const fieldsWithOnlyValueInput = onOmitInputs<
-                FormInputTypeToSubmit,
-                FormInputTypeToSubmit
-            >(inputsWithoutConfirmField[i] as FormInputTypeToSubmit, [
-                'isEmpty',
-                'errors',
-                'validations',
-            ]);
-            inputsWithoutConfirmField[i] = fieldsWithOnlyValueInput;
+        for (const i in handledInputs) {
+            const inputToHandle = handledInputs[i] as FormInputTypeToSubmit;
+            const fieldsToOmit = ['required', 'errors', 'validations'];
+            handledInputs[i] = onOmitInputs(inputToHandle, fieldsToOmit);
         }
 
-        return inputsWithoutConfirmField;
+        return handledInputs;
     }
 };
 

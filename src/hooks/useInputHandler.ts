@@ -8,7 +8,7 @@ export default function useInputHandler() {
 
     async function onSubmitInputs<T>(
         inputs: T,
-        requestFunction: <T>(formContent: T) => Promise<boolean>,
+        requestFunction: <T>(formContent: T) => Promise<void>,
     ) {
         const response = await requestFunction<T>(inputs);
         return response;

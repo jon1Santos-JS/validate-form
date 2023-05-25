@@ -20,7 +20,7 @@ declare interface FormInputPropsType {
         formInputs: FormInputsType,
     ) => Validation[];
     errors: string[];
-    isEmpty: boolean;
+    required: boolean;
     value?: string;
 }
 

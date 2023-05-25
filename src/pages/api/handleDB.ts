@@ -1,8 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import {
     getDBStateController,
-    resetOrRefreshDBStateController,
-} from '@/lib/DB-API-controller';
+    resetDBStateController,
+} from '@/lib/controllers';
 import type { NextApiResponse, NextApiRequest } from 'next';
 
 export default async function handler(
@@ -10,11 +10,11 @@ export default async function handler(
     res: NextApiResponse,
 ) {
     if (req.method === 'GET') {
-        const response = await getDBStateController();
-        res.status(200).json({ serverResponse: response });
+        const controllerResponse = await getDBStateController();
+        res.status(200).json(controllerResponse);
     }
     if (req.method === 'DELETE') {
-        const response = await resetOrRefreshDBStateController('reset');
-        res.status(200).json({ serverResponse: response });
+        const controllerResponse = await resetDBStateController('reset');
+        res.status(200).json(controllerResponse);
     }
 }

@@ -12,9 +12,7 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     const formContext = useContext(FormContext);
     const [inputvalue, setInputValue] = useState('');
-    const [showErrorMessage, setShowErrorMessage] = useState<
-        boolean | undefined
-    >(false);
+    const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[] | null | undefined>(
         null,
     );
@@ -25,23 +23,24 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
 
     useEffect(() => {
         // UP MESSAGE
+        if (!inputvalue && !formContext.showInputErrorsMessagesByForm) return; // DONT SHOW EMPTY INPUT ERROR MESSAGE ON FIRST RENDER
         if (errorList && errorList?.length >= 1) {
-            const currentTimer = setTimer(true, 650);
+            const currentTimer = setErrorMessageWithTimer(true, 650);
             return () => clearTimeout(currentTimer);
         }
-        setShowErrorMessage(false);
-    }, [errorList, inputvalue]);
+        setShowMessage(false);
+    }, [errorList, formContext.showInputErrorsMessagesByForm, inputvalue]);
 
     useEffect(() => {
         // DOWN MESSAGE
-        const currentTimer = setTimer(false, 2550);
+        const currentTimer = setErrorMessageWithTimer(false, 2400);
         return () => clearTimeout(currentTimer);
-    }, [showErrorMessage, formContext]);
+    }, [showMessage, formContext]);
 
     useEffect(() => {
-        if (!showErrorMessage)
-            setShowErrorMessage(formContext.showInputErrorsMessagesByForm);
-    }, [formContext.showInputErrorsMessagesByForm, showErrorMessage]);
+        if (!showMessage)
+            setShowMessage(formContext.showInputErrorsMessagesByForm);
+    }, [formContext.showInputErrorsMessagesByForm, showMessage]);
 
     return (
         <div className="field">
@@ -60,7 +59,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     );
 
     function renderErrors() {
-        if (!errorList || !showErrorMessage) return;
+        if (!errorList || !showMessage) return;
 
         return errorList.map((err) => (
             <div className="has-text-danger" key={err}>
@@ -69,9 +68,9 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
         ));
     }
 
-    function setTimer(value: boolean, time: number) {
+    function setErrorMessageWithTimer(value: boolean, time: number) {
         const currentTimer = setTimeout(() => {
-            setShowErrorMessage(value);
+            setShowMessage(value);
         }, time);
         return currentTimer;
     }
