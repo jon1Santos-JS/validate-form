@@ -22,8 +22,9 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     }, [inputvalue, setErrorList, validation]);
 
     useEffect(() => {
+        // DONT SHOW ERROR MESSAGE ON FIRST RENDER
+        if (!inputvalue && !formContext.showInputErrorsMessagesByForm) return;
         // UP MESSAGE
-        if (!inputvalue && !formContext.showInputErrorsMessagesByForm) return; // DONT SHOW EMPTY INPUT ERROR MESSAGE ON FIRST RENDER
         if (errorList && errorList?.length >= 1) {
             const currentTimer = setErrorMessageWithTimer(true, 650);
             return () => clearTimeout(currentTimer);
@@ -33,9 +34,9 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
 
     useEffect(() => {
         // DOWN MESSAGE
-        const currentTimer = setErrorMessageWithTimer(false, 2400);
+        const currentTimer = setErrorMessageWithTimer(false, 2550);
         return () => clearTimeout(currentTimer);
-    }, [showMessage, formContext]);
+    }, [showMessage]);
 
     useEffect(() => {
         if (!showMessage)

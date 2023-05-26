@@ -19,17 +19,25 @@ const Form: React.FC<FormProps> = ({
 }) => {
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showInputsMessages, setShowInputMessages] = useState(false);
-    const { onOmitInputs, onSubmitInputs } = useInputHandler();
+    const { onSubmitInputs, onOmitFormInputFields } = useInputHandler();
 
     useEffect(() => {
         // TO DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
             setShowInputMessages(false);
-            setShowMessage(false);
         }, 2550);
 
         return () => clearTimeout(timerDownMessage);
     }, [showInputsMessages]);
+
+    useEffect(() => {
+        // TO DOWN MESSAGE
+        const timerDownMessage = setTimeout(() => {
+            setShowMessage(false);
+        }, 2550);
+
+        return () => clearTimeout(timerDownMessage);
+    }, [showMessage]);
 
     return (
         <form className="c-form">
@@ -83,32 +91,22 @@ const Form: React.FC<FormProps> = ({
     ) {
         e.preventDefault();
         if (!validateAllInputs()) {
+            const mainInputsToOmit = Object.keys(inputs).filter((key) =>
+                key.includes('confirm'),
+            );
+            const secondaryInputsToOmit = ['required', 'errors', 'validations'];
+            const handledInputs = onOmitFormInputFields(
+                inputs,
+                mainInputsToOmit,
+                secondaryInputsToOmit,
+            );
             setShowInputMessages(false);
             setShowMessage(false);
-            await onSubmitInputs(onHandleInputs(), requestApi);
+            await onSubmitInputs(handledInputs, requestApi);
             return;
         }
         setShowMessage(true);
         setShowInputMessages(true);
-    }
-
-    function onHandleInputs() {
-        const newInputs = inputs;
-        const fieldsToOmit = Object.keys(newInputs).filter((key) =>
-            key.includes('confirm'),
-        );
-        const handledInputs = onOmitInputs<
-            FormInputsType,
-            FormInputTypeToSubmit
-        >(newInputs, [...fieldsToOmit]);
-
-        for (const i in handledInputs) {
-            const inputToHandle = handledInputs[i] as FormInputTypeToSubmit;
-            const fieldsToOmit = ['required', 'errors', 'validations'];
-            handledInputs[i] = onOmitInputs(inputToHandle, fieldsToOmit);
-        }
-
-        return handledInputs;
     }
 };
 

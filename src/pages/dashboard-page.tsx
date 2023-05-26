@@ -17,7 +17,7 @@ export default function DashBoardPage() {
     );
 }
 
-function onFetchDBApi(method: 'DELETE' | 'GET' | 'POST') {
+function onFetchDBApi(method: MethodTypes) {
     const action = process.env.NEXT_PUBLIC_HANDLE_DB_LINK as string;
     const options = {
         method: method,

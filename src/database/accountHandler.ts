@@ -42,16 +42,14 @@ export class MiniDBAccountHandler {
         }
     }
 
-    // DONT NEED 'TO REFRESH DB' WHEN 'INIT FUNCTION' HAVE BEEN CALLED BY BOTH FUNCTIONS SIGN IN AND SIGN UP
+    // DONT NEED 'TO REFRESH DB (async)' WHEN 'INIT FUNCTION' HAVE BEEN CALLED BY BOTH FUNCTIONS SIGN IN AND SIGN UP
     #authAccount(userAccount: UserFromClientType) {
-        const account = DATABASE.state.accounts.find((value) => {
-            if (
-                value.password.value === userAccount.password.value &&
-                value.username.value === userAccount.username.value
-            )
-                return value;
+        const account = DATABASE.state.accounts.find((DBAccount) => {
+            if (DBAccount.username.value !== userAccount.username.value) {
+                return;
+            }
+            return DBAccount;
         });
-        if (!account) return;
         return account;
     }
 
@@ -63,7 +61,6 @@ export class MiniDBAccountHandler {
             'refresh',
             'MiniDBAccountHandler - createAccount',
         );
-
         if (!response) return;
         return SERVER_ERROR_RESPONSE;
     }
