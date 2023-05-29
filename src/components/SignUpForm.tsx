@@ -17,9 +17,9 @@ export default function SignUpForm() {
             <div className="c-container">
                 <Form
                     inputs={inputs}
-                    validateAllInputs={validateAllInputs}
+                    haveInputsErrors={validateAllInputs}
                     legend="SignUp"
-                    requestApi={requestApi}
+                    onSubmitInputs={onSubmitInputs}
                 >
                     <Input
                         label="Username"
@@ -41,7 +41,7 @@ export default function SignUpForm() {
         </div>
     );
 
-    async function requestApi<T>(formContent: T) {
+    async function onSubmitInputs<T>(formContent: T) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const options = {
             method: 'POST',

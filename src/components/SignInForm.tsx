@@ -18,9 +18,9 @@ export default function SignInForm({ setUser }: SignInFormProps) {
             <div className="c-container">
                 <Form
                     inputs={inputs}
-                    validateAllInputs={validateAllInputs}
+                    haveInputsErrors={validateAllInputs}
                     legend="SignIn"
-                    requestApi={requestApi}
+                    onSubmitInputs={onSubmitInputs}
                 >
                     <Input
                         label="Username"
@@ -37,7 +37,7 @@ export default function SignInForm({ setUser }: SignInFormProps) {
         </div>
     );
 
-    async function requestApi<T>(formContent: T) {
+    async function onSubmitInputs<T>(formContent: T) {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {
             method: 'POST',

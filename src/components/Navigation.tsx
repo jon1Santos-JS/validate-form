@@ -23,6 +23,7 @@ export default function NavigationBar({
                         Sign out
                     </div>
                 )}
+                {hasUser() && <Link href="/dashboard-page">Profile</Link>}
             </div>
         </div>
     );

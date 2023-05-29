@@ -4,25 +4,25 @@ import React, { useEffect, useState } from 'react';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    validateAllInputs: () => number | undefined;
-    requestApi: <T>(formContent: T) => Promise<void>;
+    haveInputsErrors: () => boolean;
+    onSubmitInputs: <T>(formContent: T) => Promise<void>;
     inputs: FormInputsType;
     legend?: string;
 }
 
 const Form: React.FC<FormProps> = ({
     children,
-    validateAllInputs,
-    requestApi,
+    haveInputsErrors,
+    onSubmitInputs,
     inputs,
     legend,
 }) => {
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showInputsMessages, setShowInputMessages] = useState(false);
-    const { onSubmitInputs, onOmitFormInputFields } = useInputHandler();
+    const { onOmitFormInputFields } = useInputHandler();
 
     useEffect(() => {
-        // TO DOWN MESSAGE
+        // DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
             setShowInputMessages(false);
         }, 2550);
@@ -31,7 +31,7 @@ const Form: React.FC<FormProps> = ({
     }, [showInputsMessages]);
 
     useEffect(() => {
-        // TO DOWN MESSAGE
+        // DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
             setShowMessage(false);
         }, 2550);
@@ -61,7 +61,7 @@ const Form: React.FC<FormProps> = ({
             return (
                 <FormContext.Provider
                     value={{
-                        showInputErrorsMessagesByForm: showInputsMessages,
+                        showMessagesByForm: showInputsMessages,
                     }}
                 >
                     {inputs.map((child) => (
@@ -73,7 +73,7 @@ const Form: React.FC<FormProps> = ({
         return (
             <FormContext.Provider
                 value={{
-                    showInputErrorsMessagesByForm: showInputsMessages,
+                    showMessagesByForm: showInputsMessages,
                 }}
             >
                 {children}
@@ -90,7 +90,7 @@ const Form: React.FC<FormProps> = ({
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) {
         e.preventDefault();
-        if (!validateAllInputs()) {
+        if (!haveInputsErrors()) {
             const mainInputsToOmit = Object.keys(inputs).filter((key) =>
                 key.includes('confirm'),
             );
@@ -102,7 +102,7 @@ const Form: React.FC<FormProps> = ({
             );
             setShowInputMessages(false);
             setShowMessage(false);
-            await onSubmitInputs(handledInputs, requestApi);
+            await onSubmitInputs(handledInputs);
             return;
         }
         setShowMessage(true);

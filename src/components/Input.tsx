@@ -1,5 +1,3 @@
-'use client';
-
 import FormContext from '@/context/FormContext';
 import React, { useState, useEffect, useContext } from 'react';
 
@@ -22,15 +20,15 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     }, [inputvalue, setErrorList, validation]);
 
     useEffect(() => {
-        // DONT SHOW ERROR MESSAGE ON FIRST RENDER
-        if (!inputvalue && !formContext.showInputErrorsMessagesByForm) return;
+        // DONT SHOW MESSAGE ON FIRST RENDER
+        if (!inputvalue && !formContext.showMessagesByForm) return;
         // UP MESSAGE
         if (errorList && errorList?.length >= 1) {
             const currentTimer = setErrorMessageWithTimer(true, 650);
             return () => clearTimeout(currentTimer);
         }
         setShowMessage(false);
-    }, [errorList, formContext.showInputErrorsMessagesByForm, inputvalue]);
+    }, [errorList, formContext.showMessagesByForm, inputvalue]);
 
     useEffect(() => {
         // DOWN MESSAGE
@@ -39,9 +37,8 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     }, [showMessage]);
 
     useEffect(() => {
-        if (!showMessage)
-            setShowMessage(formContext.showInputErrorsMessagesByForm);
-    }, [formContext.showInputErrorsMessagesByForm, showMessage]);
+        if (!showMessage) setShowMessage(formContext.showMessagesByForm);
+    }, [formContext.showMessagesByForm, showMessage]);
 
     return (
         <div className="field">

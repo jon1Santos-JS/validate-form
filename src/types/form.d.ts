@@ -10,10 +10,6 @@ declare interface FormInputsType {
     [key: string]: FormInputPropsType;
 }
 
-declare interface FormInputTypeToSubmit {
-    [key: string]: { value?: string };
-}
-
 declare interface FormInputPropsType {
     validations?: (
         currentInput: string,

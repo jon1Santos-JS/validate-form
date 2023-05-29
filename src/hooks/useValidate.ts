@@ -1,23 +1,24 @@
 export default function useValidate(formInputs: FormInputsType) {
     const validateAllInputs = () => {
-        const formInputsProps = Object.keys(formInputs);
-        formInputsProps.forEach((inputName) => {
+        const inputsNames = Object.keys(formInputs);
+        const inputsErrors = inputsNames.map((inputName) => {
             const validationFunction = getInputValidationFunction(
-                inputsValidation,
+                inputsValidationFunctions,
                 inputName,
             );
-            validationFunction(formInputs[inputName].value);
+            return validationFunction(formInputs[inputName].value);
         });
+        const validations = inputsErrors.map((error) => {
+            if (!error) return false;
+            if (error.length >= 1) return true;
+            return false;
+        });
+        const validation = validations.find(
+            (validation) => validation === true,
+        );
+        const conditional = validation === undefined ? false : validation;
 
-        const verificationArray = [];
-        for (const i in formInputs) {
-            if (formInputs[i].errors?.length >= 1) {
-                verificationArray.push(1);
-            } else {
-                verificationArray.push(0);
-            }
-        }
-        return verificationArray.find((value) => value === 1);
+        return conditional;
     };
 
     const validateUsername = (currentInputValue = '') => {
@@ -44,52 +45,13 @@ export default function useValidate(formInputs: FormInputsType) {
         );
     };
 
-    const inputsValidation = {
+    const inputsValidationFunctions = {
         validateUsername,
         validatePassword,
         validateConfirmPassword,
     };
 
-    function preValidate(
-        input: FormInputPropsType,
-        currentInputValue: string,
-        formInputs: FormInputsType,
-    ) {
-        setAndResetInput(input, currentInputValue);
-        return validate(input, currentInputValue, formInputs);
-    }
-
-    function setAndResetInput(
-        input: FormInputPropsType,
-        currentInputValue: string,
-    ) {
-        while (input.errors.length > 0) {
-            input.errors.pop();
-        }
-        input.value = currentInputValue;
-    }
-
-    function validate(
-        input: FormInputPropsType,
-        currentInputValue: string,
-        formInputs: FormInputsType,
-    ) {
-        if (!input.validations) return;
-        if (!currentInputValue && input.required) {
-            input.errors.push('This field is required');
-            return input.errors;
-        }
-        if (!currentInputValue) return;
-
-        input.validations(currentInputValue, formInputs).map((validation) => {
-            if (validation.coditional) input.errors.push(validation.message);
-        });
-
-        if (input.errors.length < 1) return;
-        return input.errors;
-    }
-
-    return { ...inputsValidation, validateAllInputs };
+    return { ...inputsValidationFunctions, validateAllInputs };
 }
 
 function getInputValidationFunction(
@@ -110,4 +72,42 @@ function getInputValidationFunction(
         },
     );
     return validationFunctionFound[0];
+}
+
+function preValidate(
+    input: FormInputPropsType,
+    currentInputValue: string,
+    formInputs: FormInputsType,
+) {
+    setAndResetInput(input, currentInputValue);
+    return validate(input, currentInputValue, formInputs);
+}
+
+function setAndResetInput(
+    input: FormInputPropsType,
+    currentInputValue: string,
+) {
+    while (input.errors.length > 0) {
+        input.errors.pop();
+    }
+    input.value = currentInputValue;
+}
+
+function validate(
+    input: FormInputPropsType,
+    currentInputValue: string,
+    formInputs: FormInputsType,
+) {
+    if (!input.validations) return;
+    if (!currentInputValue && input.required) {
+        input.errors.push('This field is required');
+        return input.errors;
+    }
+    if (!currentInputValue) return;
+
+    input.validations(currentInputValue, formInputs).map((validation) => {
+        if (validation.coditional) input.errors.push(validation.message);
+    });
+    if (input.errors.length < 1) return;
+    return input.errors;
 }

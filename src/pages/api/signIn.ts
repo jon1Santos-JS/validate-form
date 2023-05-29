@@ -1,15 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { destroyCookie, getCookie, setCookie } from '@/lib/cookies';
 import { createHash } from '@/lib/hash';
 import { getUserStateController, signInController } from '@/lib/controllers';
+import Cookies from 'cookies';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
+    const cookies = new Cookies(req, res);
     if (req.method === 'GET') {
-        const browserHash = getCookie(req, res, 'user-hash');
+        const browserHash = cookies.get('user-hash');
         const controllerResponse = await getUserStateController(browserHash);
         res.status(200).json(controllerResponse);
     }
@@ -18,12 +19,12 @@ export default async function handler(
         const controllerResponse = await signInController(user);
         if (controllerResponse.serverResponse) {
             const hash = createHash(user);
-            setCookie(req, res, 'user-hash', hash);
+            cookies.set('user-hash', hash);
         }
         res.status(200).json(controllerResponse);
     }
     if (req.method === 'DELETE') {
-        destroyCookie(req, res, 'user-hash');
+        cookies.set('user-hash');
         const response = { serverResponse: true };
         res.status(200).json(response);
     }
