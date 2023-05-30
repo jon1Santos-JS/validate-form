@@ -1,11 +1,3 @@
-declare interface ServerSignInResponseType {
-    serverResponse: boolean | string;
-}
-
-declare interface ServerSignUpResponseType {
-    serverResponse: boolean | string;
-}
-
-declare interface ServerUserStateResponseType {
+declare interface ServerResponse {
     serverResponse: boolean | string;
 }

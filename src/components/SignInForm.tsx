@@ -4,8 +4,8 @@ import Input from './Input';
 import useValidate from '@/hooks/useValidate';
 
 interface SignInFormProps {
-    setUser: (user: boolean) => void;
-    hasUser: () => boolean;
+    setUser: SetUserType;
+    hasUser: HasUserType;
 }
 
 export default function SignInForm({ setUser }: SignInFormProps) {
@@ -45,7 +45,7 @@ export default function SignInForm({ setUser }: SignInFormProps) {
             body: JSON.stringify(formContent),
         };
         const response = await fetch(action, options);
-        const parsedResponse: ServerSignInResponseType = await response.json();
+        const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         if (parsedResponse.serverResponse) router.push('/');
         setUser(parsedResponse.serverResponse);

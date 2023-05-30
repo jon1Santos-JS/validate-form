@@ -1,18 +1,17 @@
 import type { AppProps } from 'next/app';
 import '../styles/sass/index.scss';
 import { useCallback, useEffect, useState } from 'react';
-import Navigation from '@/components/Navigation';
+import MainNavigationBar from '@/components/MainNavigationBar';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const [user, setUser] = useState<boolean>(false);
+    const [user, setUser] = useState<boolean | string>('');
 
     const fetchData = useCallback(async () => {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const response = await fetch(action, {
             method: 'GET',
         });
-        const parsedResponse: ServerUserStateResponseType =
-            await response.json();
+        const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         setUser(parsedResponse.serverResponse);
     }, []);
@@ -26,9 +25,10 @@ export default function App({ Component, pageProps }: AppProps) {
     return (
         <>
             <div className="o-app">
-                <Navigation
+                <MainNavigationBar
                     hasUser={() => user}
                     setUser={(user: boolean) => setUser(user)}
+                    isUserStateLoading={() => typeof user === 'string'}
                 />
                 <Component
                     hasUser={() => user}

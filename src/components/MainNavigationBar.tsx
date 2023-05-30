@@ -1,20 +1,29 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-interface NavigationBarProps {
-    hasUser: () => boolean;
-    setUser: (user: boolean) => void;
+interface MainNavigationBarProps {
+    hasUser: HasUserType;
+    setUser: SetUserType;
+    isUserStateLoading: IsUserStateLoadingType;
 }
 
-export default function NavigationBar({
+export default function MainNavigationBar({
     hasUser,
     setUser,
-}: NavigationBarProps) {
+    isUserStateLoading,
+}: MainNavigationBarProps) {
     const router = useRouter();
 
     return (
         <div className="o-navigation-bar">
-            <div className="navigation-container">
+            <div className="navigation-container">{renderContent()}</div>
+        </div>
+    );
+
+    function renderContent() {
+        if (isUserStateLoading()) return null;
+        return (
+            <>
                 <Link href="/">Home</Link>
                 {!hasUser() && <Link href="/sign-in-page">Sign in</Link>}
                 {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
@@ -24,9 +33,9 @@ export default function NavigationBar({
                     </div>
                 )}
                 {hasUser() && <Link href="/dashboard-page">Profile</Link>}
-            </div>
-        </div>
-    );
+            </>
+        );
+    }
 
     async function signOutUser() {
         setUser(false);

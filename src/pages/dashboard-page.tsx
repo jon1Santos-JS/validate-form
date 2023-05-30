@@ -1,15 +1,28 @@
-export default function DashBoardPage() {
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+
+interface DashBoardPageProps {
+    setUser: SetUserType;
+    hasUser: HasUserType;
+}
+
+export default function DashBoardPage({ hasUser }: DashBoardPageProps) {
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!hasUser()) router.back();
+    }, [hasUser, router]);
     return (
         <div className="c-dashboard">
             <button
                 className="button is-primary"
-                onClick={() => onFetchDBApi('GET')}
+                onClick={async () => console.log(await onFetchDBApi('GET'))}
             >
                 GETDB
             </button>
             <button
                 className="button is-primary"
-                onClick={() => onFetchDBApi('DELETE')}
+                onClick={async () => await onFetchDBApi('DELETE')}
             >
                 DELETEDB
             </button>
@@ -17,7 +30,7 @@ export default function DashBoardPage() {
     );
 }
 
-function onFetchDBApi(method: MethodTypes) {
+async function onFetchDBApi(method: MethodTypes) {
     const action = process.env.NEXT_PUBLIC_HANDLE_DB_LINK as string;
     const options = {
         method: method,
@@ -25,5 +38,7 @@ function onFetchDBApi(method: MethodTypes) {
             'Content-Type': 'application/json',
         },
     };
-    return fetch(action, options);
+    const response = await fetch(action, options);
+    const parsedResponse = await response.json();
+    return parsedResponse;
 }

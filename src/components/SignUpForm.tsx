@@ -49,7 +49,7 @@ export default function SignUpForm() {
             body: JSON.stringify(formContent),
         };
         const response = await fetch(action, options);
-        const parsedResponse: ServerSignUpResponseType = await response.json();
+        const parsedResponse: ServerResponse = await response.json();
         if (parsedResponse.serverResponse) router.push('/');
     }
 }
