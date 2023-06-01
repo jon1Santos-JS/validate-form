@@ -19,7 +19,7 @@ export default async function handler(
         const controllerResponse = await signInController(user);
         if (controllerResponse.serverResponse) {
             const hash = createHash(user);
-            cookies.set('user-hash', hash, { httpOnly: false });
+            cookies.set('user-hash', hash);
         }
         res.status(200).json(controllerResponse);
     }
