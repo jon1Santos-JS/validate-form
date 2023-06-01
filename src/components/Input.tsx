@@ -24,7 +24,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
         if (!inputvalue && !formContext.showMessagesByForm) return;
         // UP MESSAGE
         if (errorList && errorList?.length >= 1) {
-            const currentTimer = setErrorMessageWithTimer(true, 650);
+            const currentTimer = setErrorMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
         setShowMessage(false);
