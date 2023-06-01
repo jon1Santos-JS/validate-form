@@ -30,7 +30,13 @@ export default async function handler(req: NextRequest) {
     return new NextResponse(
         JSON.stringify({
             success: false,
-            message: anotherValueToTest.value,
+            message:
+                getValueToTest.value +
+                typeof getValueToTest.value +
+                ' - ' +
+                anotherValueToTest.value +
+                ' ' +
+                typeof anotherValueToTest.value,
         }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
