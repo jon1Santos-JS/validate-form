@@ -9,7 +9,7 @@ export default async function handler(req: NextRequest) {
     ADRESSES?.forEach((address) => {
         if (authorization.requestURL === address) authorization.isValid = true;
     });
-    console.log(authorization.requestURL);
+    console.log();
     ADRESSES?.forEach((address) => {
         AUTHORIZED_PAGE_ROUTES.forEach((route) => {
             if (authorization.requestURL + route === address + route)
@@ -18,7 +18,7 @@ export default async function handler(req: NextRequest) {
     });
     if (authorization.isValid) return NextResponse.next();
     return new NextResponse(
-        JSON.stringify({ success: false, message: 'authentication failed' }),
+        JSON.stringify({ success: false, message: authorization.requestURL }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
 }
