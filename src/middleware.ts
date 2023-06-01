@@ -2,7 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const ADRESSES = process.env.AUTHORIZED_ADRESSES?.split(', ');
-const AUTHORIZED_PAGE_ROUTES = ['/sign-up-page', '/sign-in-page'];
+const AUTHORIZED_PAGE_ROUTES = [
+    '/sign-up-page',
+    '/sign-in-page',
+    '/dashboard-page',
+];
 
 export default async function handler(req: NextRequest) {
     const authorization = { requestURL: req.nextUrl.origin, isValid: false };
