@@ -14,7 +14,7 @@ export default async function handler(req: NextRequest) {
     ADRESSES?.forEach((address) => {
         AUTHORIZED_PAGE_ROUTES.forEach((route) => {
             if (authorization.requestURL + route === address + route) {
-                getValueToTest.value = 'entrei';
+                getValueToTest.value = authorization.requestURL + route;
                 authorization.isValid = true;
             }
         });
