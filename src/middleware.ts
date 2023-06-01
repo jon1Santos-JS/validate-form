@@ -32,6 +32,7 @@ export default async function handler(req: NextRequest) {
             success: false,
             message:
                 getValueToTest.value +
+                ' ' +
                 typeof getValueToTest.value +
                 ' - ' +
                 anotherValueToTest.value +
