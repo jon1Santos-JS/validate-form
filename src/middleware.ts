@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const ADRESSES = process.env.AUTHORIZED_ADRESSES?.split(', ');
-const AUTHORIZED_PAGE_ROUTES = ['/sign-up-page'];
+const AUTHORIZED_PAGE_ROUTES = ['/sign-up-page', '/sign-in-page'];
 
 export default async function handler(req: NextRequest) {
     const authorization = { requestURL: req.nextUrl.origin, isValid: false };
@@ -30,10 +30,7 @@ export default async function handler(req: NextRequest) {
     return new NextResponse(
         JSON.stringify({
             success: false,
-            message:
-                anotherValueToTest.value +
-                ' ' +
-                typeof anotherValueToTest.value,
+            message: 'Not authenticated',
         }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
@@ -41,5 +38,5 @@ export default async function handler(req: NextRequest) {
 
 // PROTECTED APIS
 export const config = {
-    matcher: ['/api/signUp', '/api/handleDB'],
+    matcher: ['/api/signUp', '/api/handleDB', '/api/signIn'],
 };
