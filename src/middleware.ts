@@ -9,6 +9,7 @@ export default async function handler(req: NextRequest) {
     ADRESSES?.forEach((address) => {
         if (authorization.requestURL === address) authorization.isValid = true;
     });
+    console.log(authorization.requestURL);
     ADRESSES?.forEach((address) => {
         AUTHORIZED_PAGE_ROUTES.forEach((route) => {
             if (authorization.requestURL + route === address + route)
