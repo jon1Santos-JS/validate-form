@@ -28,7 +28,7 @@ export default async function handler(req: NextRequest) {
     return new NextResponse(
         JSON.stringify({
             success: false,
-            message: getValueToTest.value,
+            message: anotherValueToTest.value,
         }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
