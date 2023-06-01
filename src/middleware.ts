@@ -9,10 +9,12 @@ export default async function handler(req: NextRequest) {
     const getValueToTest = { value: '' };
     const anotherValueToTest = { value: '' };
     ADRESSES?.forEach((address) => {
+        address.replace("'", '');
         if (authorization.requestURL === address) authorization.isValid = true;
     });
     console.log();
     ADRESSES?.forEach((address) => {
+        address.replace("'", '');
         AUTHORIZED_PAGE_ROUTES.forEach((route) => {
             getValueToTest.value = authorization.requestURL + route;
             anotherValueToTest.value = address + route;
