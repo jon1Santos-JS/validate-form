@@ -9,13 +9,14 @@ export default async function handler(req: NextRequest) {
     const getValueToTest = { value: '' };
     ADRESSES?.forEach((address) => {
         if (authorization.requestURL === address) authorization.isValid = true;
-        getValueToTest.value = address;
     });
     console.log();
     ADRESSES?.forEach((address) => {
         AUTHORIZED_PAGE_ROUTES.forEach((route) => {
-            if (authorization.requestURL + route === address + route)
+            if (authorization.requestURL + route === address + route) {
+                getValueToTest.value = 'entrei';
                 authorization.isValid = true;
+            }
         });
     });
     if (authorization.isValid) return NextResponse.next();
