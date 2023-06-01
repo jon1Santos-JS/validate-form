@@ -7,6 +7,7 @@ const AUTHORIZED_PAGE_ROUTES = ['/sign-up-page'];
 export default async function handler(req: NextRequest) {
     const authorization = { requestURL: req.nextUrl.origin, isValid: false };
     const getValueToTest = { value: '' };
+    const anotherValueToTest = { value: '' };
     ADRESSES?.forEach((address) => {
         if (authorization.requestURL === address) authorization.isValid = true;
     });
@@ -14,6 +15,7 @@ export default async function handler(req: NextRequest) {
     ADRESSES?.forEach((address) => {
         AUTHORIZED_PAGE_ROUTES.forEach((route) => {
             getValueToTest.value = authorization.requestURL + route;
+            anotherValueToTest.value = address + route;
             if (authorization.requestURL + route === address + route) {
                 authorization.isValid = true;
             }
@@ -23,7 +25,7 @@ export default async function handler(req: NextRequest) {
     return new NextResponse(
         JSON.stringify({
             success: false,
-            message: getValueToTest.value + ' - ' + authorization.requestURL,
+            message: getValueToTest.value + ' - ' + anotherValueToTest.value,
         }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
