@@ -31,10 +31,6 @@ export default async function handler(req: NextRequest) {
         JSON.stringify({
             success: false,
             message:
-                getValueToTest.value +
-                ' ' +
-                typeof getValueToTest.value +
-                ' - ' +
                 anotherValueToTest.value +
                 ' ' +
                 typeof anotherValueToTest.value,
