@@ -9,6 +9,7 @@ import {
 export class MiniDBHandler {
     async init() {
         const response = await this.#accessDB();
+        console.log(DATABASE.state);
         if (response) return SERVER_ERROR_RESPONSE;
         if (this.#checkDBState()) return SERVER_ERROR_RESPONSE;
         return;
