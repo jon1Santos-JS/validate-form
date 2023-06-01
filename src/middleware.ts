@@ -18,7 +18,7 @@ export default async function handler(req: NextRequest) {
     });
     if (authorization.isValid) return NextResponse.next();
     return new NextResponse(
-        JSON.stringify({ success: false, message: authorization.requestURL }),
+        JSON.stringify({ success: false, message: JSON.stringify(ADRESSES) }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
 }
