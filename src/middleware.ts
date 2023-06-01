@@ -6,8 +6,10 @@ const AUTHORIZED_PAGE_ROUTES = ['/sign-up-page'];
 
 export default async function handler(req: NextRequest) {
     const authorization = { requestURL: req.nextUrl.origin, isValid: false };
+    const getValueToTest = { value: '' };
     ADRESSES?.forEach((address) => {
         if (authorization.requestURL === address) authorization.isValid = true;
+        getValueToTest.value = address;
     });
     console.log();
     ADRESSES?.forEach((address) => {
@@ -18,7 +20,7 @@ export default async function handler(req: NextRequest) {
     });
     if (authorization.isValid) return NextResponse.next();
     return new NextResponse(
-        JSON.stringify({ success: false, message: JSON.stringify(ADRESSES) }),
+        JSON.stringify({ success: false, message: getValueToTest.value }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
 }
