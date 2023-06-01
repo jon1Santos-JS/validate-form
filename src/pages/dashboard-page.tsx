@@ -16,7 +16,9 @@ export default function DashBoardPage({ hasUser }: DashBoardPageProps) {
         <div className="c-dashboard">
             <button
                 className="button is-primary"
-                onClick={async () => console.log(await onFetchDBApi('GET'))}
+                onClick={async () =>
+                    console.log('your DB:', await onFetchDBApi('GET'))
+                }
             >
                 GETDB
             </button>
