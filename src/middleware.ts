@@ -16,6 +16,7 @@ export default async function handler(req: NextRequest) {
     ADRESSES?.forEach((address) => {
         address.replace("'", '');
         AUTHORIZED_PAGE_ROUTES.forEach((route) => {
+            route.replace("'", '');
             getValueToTest.value = authorization.requestURL + route;
             anotherValueToTest.value = address + route;
             if (authorization.requestURL + route === address + route) {
