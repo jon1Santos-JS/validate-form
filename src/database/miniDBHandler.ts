@@ -64,7 +64,7 @@ export class MiniDBHandler {
     }
 
     async #createAndRefreshDB(caller?: string) {
-        const json = JSON.stringify(DATABASE.state, undefined, 2);
+        const json = JSON.stringify(DATABASE.state);
         try {
             await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
             console.log('DB has been created or refreshed');
