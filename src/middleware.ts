@@ -20,7 +20,10 @@ export default async function handler(req: NextRequest) {
     });
     if (authorization.isValid) return NextResponse.next();
     return new NextResponse(
-        JSON.stringify({ success: false, message: getValueToTest.value }),
+        JSON.stringify({
+            success: false,
+            message: getValueToTest.value + ' - ' + authorization.requestURL,
+        }),
         { status: 401, headers: { 'content-type': 'application/json' } },
     );
 }
