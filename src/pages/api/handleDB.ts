@@ -18,6 +18,8 @@ export default async function handler(
     }
     if (req.method === 'DELETE') {
         // const controllerResponse = await resetDBStateController('reset');
-        readFile('test-file', (err, data) => res.status(200).send(data));
+        readFile('test-file', (err, data) =>
+            res.status(200).send(JSON.stringify(data)),
+        );
     }
 }
