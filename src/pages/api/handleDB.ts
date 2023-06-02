@@ -17,7 +17,6 @@ export default async function handler(
     }
     if (req.method === 'DELETE') {
         // const controllerResponse = await resetDBStateController('reset');
-        readFile('test-file', (data) => data);
-        res.status(200).send('pode ter dado');
+        readFile('test-file', (err, data) => res.status(200).send(data));
     }
 }
