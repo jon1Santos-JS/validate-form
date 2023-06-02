@@ -12,9 +12,7 @@ export default async function handler(
 ) {
     if (req.method === 'GET') {
         // const controllerResponse = await getDBStateController();
-        writeFile('test-file', JSON.stringify({ test: 'oi' }), (data) =>
-            res.status(200).send(data),
-        );
+        writeFile('test-file', 'oi', (data) => res.status(200).send(data));
     }
     if (req.method === 'DELETE') {
         // const controllerResponse = await resetDBStateController('reset');
