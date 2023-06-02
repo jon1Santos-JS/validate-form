@@ -3,7 +3,6 @@ import {
     getDBStateController,
     resetDBStateController,
 } from '@/lib/controllers';
-import { readFile, readFileSync, writeFile, writeFileSync } from 'fs';
 import type { NextApiResponse, NextApiRequest } from 'next';
 
 export default async function handler(
@@ -11,13 +10,11 @@ export default async function handler(
     res: NextApiResponse,
 ) {
     if (req.method === 'GET') {
-        // const controllerResponse = await getDBStateController();
-        writeFile('test-file', 'oi', (data) => res.status(200).send(data));
+        const controllerResponse = await getDBStateController();
+        res.status(200).json(controllerResponse);
     }
     if (req.method === 'DELETE') {
-        // const controllerResponse = await resetDBStateController('reset');
-        readFile('test-file', (err, data) =>
-            res.status(200).send(JSON.stringify(data)),
-        );
+        const controllerResponse = await resetDBStateController('reset');
+        res.status(200).json(controllerResponse);
     }
 }
