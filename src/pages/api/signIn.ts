@@ -31,8 +31,8 @@ export default async function handler(
             });
             return;
         }
-        const users = controllerResponse.serverResponse;
-        const validatedHash = await onValidateHash(browserHash, users);
+        const DBusers = controllerResponse.serverResponse;
+        const validatedHash = await onValidateHash(browserHash, DBusers);
         res.status(200).json({
             serverResponse: validatedHash,
         });
