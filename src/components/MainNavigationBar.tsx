@@ -16,12 +16,15 @@ export default function MainNavigationBar({
 
     return (
         <div className="o-navigation-bar">
-            <div className="navigation-container">{renderContent()}</div>
+            <div className="navigation-container">
+                {renderAlternativeContent()}
+            </div>
         </div>
     );
 
-    function renderContent() {
-        if (isUserStateLoading()) return null;
+    function renderAlternativeContent() {
+        if (isUserStateLoading() && typeof window !== undefined) return null;
+
         return (
             <>
                 <Link href="/">Home</Link>
