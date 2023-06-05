@@ -23,7 +23,7 @@ export default function MainNavigationBar({
     );
 
     function renderAlternativeContent() {
-        if (isUserStateLoading() && typeof window !== undefined) return null;
+        if (isUserStateLoading()) return null;
 
         return (
             <>

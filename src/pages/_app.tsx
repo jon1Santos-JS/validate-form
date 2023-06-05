@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const [user, setUser] = useState<boolean | string>('');
+    const [user, setUser] = useState(false);
+    const [userStateLoading, setUserStateLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
@@ -14,6 +15,7 @@ export default function App({ Component, pageProps }: AppProps) {
         const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         setUser(parsedResponse.serverResponse);
+        setUserStateLoading(false);
     }, []);
 
     useEffect(() => {
@@ -28,7 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 <MainNavigationBar
                     hasUser={() => user}
                     setUser={(user: boolean) => setUser(user)}
-                    isUserStateLoading={() => typeof user === 'string'}
+                    isUserStateLoading={() => userStateLoading}
                 />
                 <Component
                     hasUser={() => user}
