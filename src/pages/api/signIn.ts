@@ -1,8 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createHash } from '@/lib/hash';
-import { signInController } from '@/lib/controllers';
-import { compareSync } from 'bcrypt-ts';
+import { createHash, onValidateHash } from '@/lib/hash';
+import { getUserStateController, signInController } from '@/lib/controllers';
 import Cookies from 'cookies';
 
 export default async function handler(
@@ -12,38 +11,42 @@ export default async function handler(
     const cookies = new Cookies(req, res);
     if (req.method === 'GET') {
         const browserHash = cookies.get('user-hash');
-        // const controllerResponse = await getUserStateController();
-        // if (!controllerResponse.serverResponse) {
-        //     res.status(200).json({ serverResponse: false });
-        //     return;
-        // }
-        // IF THERE IS DATABASE YOU CAN CHECK MORE THEN ONE ACCOUNT
-        // const users = controllerResponse.serverResponse;
-        // const validatedHash = await onValidateHash(browserHash, users);
-        const stringifiedUser = JSON.stringify({
-            username: { value: 'admin1' },
-            password: { value: 'admin1' },
-        });
         if (!browserHash) {
             res.status(200).json({ serverResponse: false });
             return;
         }
+        const controllerResponse = await getUserStateController();
+        // IF THERE'S NO DATABASE USERS, IT'LL COMPARE ADMIN'S ACCOUNT TO HASH
+        if (!controllerResponse.serverResponse) {
+            const admin = [
+                {
+                    username: { value: process.env.ADMIN_USERNAME as string },
+                    password: { value: process.env.ADMIN_PASSWORD as string },
+                },
+            ];
+
+            const validatedHash = await onValidateHash(browserHash, admin);
+            res.status(200).json({
+                serverResponse: validatedHash,
+            });
+            return;
+        }
+        const users = controllerResponse.serverResponse;
+        const validatedHash = await onValidateHash(browserHash, users);
         res.status(200).json({
-            serverResponse: compareSync(stringifiedUser, browserHash),
+            serverResponse: validatedHash,
         });
     }
     if (req.method === 'POST') {
         const user: UserFromClientType = req.body;
         const controllerResponse = await signInController(user);
         if (controllerResponse.serverResponse) {
-            const cookies = new Cookies(req, res);
             const hash = createHash(user);
             cookies.set('user-hash', hash);
         }
         res.status(200).json(controllerResponse);
     }
     if (req.method === 'DELETE') {
-        const cookies = new Cookies(req, res);
         cookies.set('user-hash');
         const response = { serverResponse: true };
         res.status(200).json(response);

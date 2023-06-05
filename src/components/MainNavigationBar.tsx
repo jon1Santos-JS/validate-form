@@ -30,12 +30,12 @@ export default function MainNavigationBar({
                 <Link href="/">Home</Link>
                 {!hasUser() && <Link href="/sign-in-page">Sign in</Link>}
                 {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
+                {hasUser() && <Link href="/dashboard-page">Profile</Link>}
                 {hasUser() && (
                     <div className="c-button" onClick={signOutUser}>
                         Sign out
                     </div>
                 )}
-                {hasUser() && <Link href="/dashboard-page">Profile</Link>}
             </>
         );
     }

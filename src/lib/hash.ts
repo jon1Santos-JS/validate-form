@@ -16,6 +16,8 @@ export async function onValidateHash(
         console.log('invalid hash');
         return validation.isValid;
     }
+    if (users.length === 1)
+        return compareSync(JSON.stringify(users[0]), browserHash);
 
     users.forEach((user) => {
         const stringifiedUser = JSON.stringify(user);
@@ -23,5 +25,6 @@ export async function onValidateHash(
             validation.isValid = true;
         }
     });
+
     return validation.isValid;
 }
