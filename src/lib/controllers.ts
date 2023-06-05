@@ -1,22 +1,16 @@
 import { MiniDBAccountHandler } from '@/database/accountHandler';
 import { MiniDBHandler } from '@/database/miniDBHandler';
-import { onValidateHash } from './hash';
 import { onOmitDBInputFields } from './inputHandler';
 
-export async function getUserStateController(hash: string | undefined) {
+export async function getUserStateController() {
     const DBHandler = new MiniDBHandler();
     const response = await DBHandler.handleDB('getUsers');
     if (typeof response === 'string') {
         console.log('controller error to get users: ', response);
-        return { serverResponse: false };
+        return { serverResponse: undefined };
     }
     const users = onOmitDBInputFields(response as UserFromDataBaseType[]);
-    const validatedHash = await onValidateHash(hash, users);
-    if (typeof validatedHash === 'string') {
-        console.log('controller error to validate hash: ', validatedHash);
-        return { serverResponse: false };
-    }
-    return { serverResponse: true };
+    return { serverResponse: users };
 }
 
 export async function getDBStateController() {
