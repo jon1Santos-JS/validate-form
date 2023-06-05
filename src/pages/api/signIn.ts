@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createHash } from '@/lib/hash';
-import { getUserStateController, signInController } from '@/lib/controllers';
+import { signInController } from '@/lib/controllers';
 import { compareSync } from 'bcrypt-ts';
 import Cookies from 'cookies';
 
@@ -12,11 +12,11 @@ export default async function handler(
     const cookies = new Cookies(req, res);
     if (req.method === 'GET') {
         const browserHash = cookies.get('user-hash');
-        const controllerResponse = await getUserStateController();
-        if (!controllerResponse.serverResponse) {
-            res.status(200).json({ serverResponse: false });
-            return;
-        }
+        // const controllerResponse = await getUserStateController();
+        // if (!controllerResponse.serverResponse) {
+        //     res.status(200).json({ serverResponse: false });
+        //     return;
+        // }
         // IF THERE IS DATABASE YOU CAN CHECK MORE THEN ONE ACCOUNT
         // const users = controllerResponse.serverResponse;
         // const validatedHash = await onValidateHash(browserHash, users);
@@ -25,7 +25,7 @@ export default async function handler(
             password: { value: 'admin1' },
         });
         if (!browserHash) {
-            res.status(200).json({ serverResponse: browserHash });
+            res.status(200).json({ serverResponse: false });
             return;
         }
         res.status(200).json({
