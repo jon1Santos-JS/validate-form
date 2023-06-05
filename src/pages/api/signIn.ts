@@ -2,8 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createHash } from '@/lib/hash';
 import { getUserStateController, signInController } from '@/lib/controllers';
-import Cookies from 'cookies';
 import { compareSync } from 'bcrypt-ts';
+import Cookies from 'cookies';
 
 export default async function handler(
     req: NextApiRequest,
@@ -25,23 +25,25 @@ export default async function handler(
             password: { value: 'admin1' },
         });
         if (!browserHash) {
-            res.status(200).json({ serverResponse: false });
+            res.status(200).json({ serverResponse: browserHash });
             return;
         }
         res.status(200).json({
-            serverResponse: browserHash,
+            serverResponse: compareSync(stringifiedUser, browserHash),
         });
     }
     if (req.method === 'POST') {
         const user: UserFromClientType = req.body;
         const controllerResponse = await signInController(user);
         if (controllerResponse.serverResponse) {
+            const cookies = new Cookies(req, res);
             const hash = createHash(user);
             cookies.set('user-hash', hash);
         }
         res.status(200).json(controllerResponse);
     }
     if (req.method === 'DELETE') {
+        const cookies = new Cookies(req, res);
         cookies.set('user-hash');
         const response = { serverResponse: true };
         res.status(200).json(response);
