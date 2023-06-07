@@ -1,1 +1,37 @@
-{"accounts":[{"ID":1,"constraint":"admin","username":{"value":"admin1"},"password":{"value":"admin1"}}],"limit":10}
+{
+  "accounts": [
+    {
+      "ID": 1,
+      "constraint": "admin",
+      "username": {
+        "value": "admin1"
+      },
+      "password": {
+        "value": "admin1"
+      }
+    },
+    {
+      "ID": 2,
+      "constraint": "user",
+      "username": {
+        "value": "asd123"
+      },
+      "password": {
+        "value": "asd123"
+      },
+      "timeStamp": "06/06/2023-11:03:54"
+    },
+    {
+      "ID": 3,
+      "constraint": "user",
+      "username": {
+        "value": "asd1232"
+      },
+      "password": {
+        "value": "asd1232"
+      },
+      "timeStamp": "07/06/2023-11:22:27"
+    }
+  ],
+  "limit": 10
+}

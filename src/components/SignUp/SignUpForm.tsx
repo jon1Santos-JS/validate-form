@@ -1,9 +1,13 @@
-import Form from './Form';
-import Input from './Input';
+import Form from '../Form';
+import Input from '../Input';
 import useValidate from '@/hooks/useValidate';
 import { useRouter } from 'next/router';
 
-export default function SignUpForm() {
+interface SignUpFormPropsType {
+    setResponse: (data: boolean) => void;
+}
+
+export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
     const {
         validateUsername,
         validatePassword,
@@ -50,7 +54,12 @@ export default function SignUpForm() {
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
-        if (parsedResponse.serverResponse) router.push('/');
+        if (typeof parsedResponse.serverResponse === 'string') return;
+        if (parsedResponse.serverResponse) {
+            router.push('/');
+            return;
+        }
+        setResponse(true);
     }
 }
 

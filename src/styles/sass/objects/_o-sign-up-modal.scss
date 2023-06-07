@@ -1,0 +1,9 @@
+.o-sign-up-modal {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    .content {
+        padding: calc(var(--app-base-measure) * 2);
+    }
+}
