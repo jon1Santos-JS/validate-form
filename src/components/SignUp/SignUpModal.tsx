@@ -5,7 +5,8 @@ interface SignUpModalPropsType {
 
 const MODAL_TEXT = {
     warning:
-        'Failed to sign up account, account already exist or you are not in "localhost" server',
+        'Failed to sign up account, account already exist or you are not in "localhost" server.',
+    advise: 'You can access the app with "admins account(username: admin1/password: admin1)", or execute the app in "localhost".',
     stepsTittle:
         'To execute this application in "localhost" follow the steps below:',
     step1: '1 - Access the following link: https://github.com/jon1Santos/validate-form-refactoring',
@@ -30,6 +31,7 @@ export default function SignUpModal({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h3>{MODAL_TEXT.warning}</h3>
+                        <h4>{MODAL_TEXT.advise}</h4>
                         <h4>{MODAL_TEXT.stepsTittle}</h4>
                         <div>{MODAL_TEXT.step1}</div>
                         <div>{MODAL_TEXT.step2}</div>

@@ -12,6 +12,7 @@ export default function DashBoardPage({ hasUser }: DashBoardPageProps) {
     useEffect(() => {
         if (!hasUser()) router.back();
     }, [hasUser, router]);
+
     return (
         <div className="c-dashboard">
             <button
