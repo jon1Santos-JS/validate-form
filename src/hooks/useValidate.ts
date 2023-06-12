@@ -1,4 +1,9 @@
-export default function useValidate(formInputs: FormInputsType) {
+export default function useValidate(preformInputs: FormInputsType) {
+    for (const i in preformInputs) {
+        preformInputs[i].errors = [];
+    }
+    const formInputs = preformInputs;
+
     const validateAllInputs = () => {
         const inputsNames = Object.keys(formInputs);
         const inputsErrors = inputsNames.map((inputName) => {
@@ -6,6 +11,7 @@ export default function useValidate(formInputs: FormInputsType) {
                 inputsValidationFunctions,
                 inputName,
             );
+            if (!validationFunction) return;
             return validationFunction(formInputs[inputName].value);
         });
         const validations = inputsErrors.map((error) => {
@@ -23,8 +29,8 @@ export default function useValidate(formInputs: FormInputsType) {
 
     const validateUsername = (currentInputValue = '') => {
         return preValidate(
-            formInputs['username'],
-            currentInputValue,
+            formInputs['username'], // OBJECT WITH PROPERTIES (VALIDATION - REQUIRED)
+            currentInputValue, // JUST THE INPUT CURRENT VALUE
             formInputs,
         );
     };
@@ -59,19 +65,17 @@ function getInputValidationFunction(
     inputName: string,
 ) {
     const handledFunctions = Object.values(validationFunctions);
-    const validationFunctionFound = handledFunctions.filter(
-        (validationFunc) => {
-            const handledFunctionName = validationFunc.name
-                .toLowerCase()
-                .replace('validate', '');
-            const handledInputName = inputName.toLowerCase();
-            if (handledFunctionName === handledInputName) {
-                return validationFunc;
-            }
-            return;
-        },
-    );
-    return validationFunctionFound[0];
+    const validationFunctionFound = handledFunctions.find((validationFunc) => {
+        const handledFunctionName = validationFunc.name
+            .toLowerCase()
+            .replace('validate', '');
+        const handledInputName = inputName.toLowerCase();
+        if (handledFunctionName === handledInputName) {
+            return validationFunc;
+        }
+        return;
+    });
+    return validationFunctionFound;
 }
 
 function preValidate(
@@ -108,6 +112,7 @@ function validate(
     input.validations(currentInputValue, formInputs).map((validation) => {
         if (validation.coditional) input.errors.push(validation.message);
     });
+
     if (input.errors.length < 1) return;
     return input.errors;
 }

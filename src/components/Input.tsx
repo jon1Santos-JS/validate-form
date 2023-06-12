@@ -5,9 +5,15 @@ interface InputProps {
     label: string;
     inputType: string;
     validation?: (inputValue: string) => string[] | undefined;
+    crossValidation?: (data: string) => void;
 }
 
-const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
+const Input: React.FC<InputProps> = ({
+    label,
+    inputType,
+    validation,
+    crossValidation,
+}) => {
     const formContext = useContext(FormContext);
     const [inputvalue, setInputValue] = useState('');
     const [showMessage, setShowMessage] = useState(false);
@@ -16,8 +22,14 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
     );
 
     useEffect(() => {
-        setErrorList(validation && validation(inputvalue));
-    }, [inputvalue, setErrorList, validation]);
+        if (!crossValidation || !inputvalue) return;
+        crossValidation(inputvalue);
+    }, [crossValidation, inputvalue]);
+
+    useEffect(() => {
+        if (!validation) return;
+        setErrorList(validation(inputvalue));
+    }, [inputvalue, setErrorList, validation, errorList]);
 
     useEffect(() => {
         // DONT SHOW MESSAGE ON FIRST RENDER
@@ -32,7 +44,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, validation }) => {
 
     useEffect(() => {
         // DOWN MESSAGE
-        const currentTimer = setErrorMessageWithTimer(false, 2550);
+        const currentTimer = setErrorMessageWithTimer(false, 2750);
         return () => clearTimeout(currentTimer);
     }, [showMessage]);
 

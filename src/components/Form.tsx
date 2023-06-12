@@ -34,7 +34,7 @@ const Form: React.FC<FormProps> = ({
         // DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
             setShowMessage(false);
-        }, 2550);
+        }, 2750);
 
         return () => clearTimeout(timerDownMessage);
     }, [showMessage]);

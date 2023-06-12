@@ -7,7 +7,7 @@ export default function useInputHandler() {
     ) {
         const handled = _.omit(inputs, fieldsToOmit[0]);
         const handledFieldsToOmit = fieldsToOmit;
-        while (fieldsToOmit[0 + 1]) {
+        while (handledFieldsToOmit[0 + 1]) {
             handledFieldsToOmit.shift();
             for (const i in handled) {
                 handled[i] = onOmitFormInputFields(

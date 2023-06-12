@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Form from '../Form';
 import Input from '../Input';
 import useValidate from '@/hooks/useValidate';
@@ -15,6 +16,10 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         validateConfirmPassword,
     } = useValidate(inputs);
     const router = useRouter();
+    const [inputsState, setInputsState] = useState({
+        password: '',
+        confirmPassword: '',
+    });
 
     return (
         <div className="o-sign-up-form">
@@ -34,11 +39,23 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                         label="Password"
                         inputType="password"
                         validation={validatePassword}
+                        crossValidation={(value: string) =>
+                            setInputsState({
+                                password: value,
+                                confirmPassword: inputsState.confirmPassword,
+                            })
+                        }
                     />
                     <Input
                         label="Confirm Password"
                         inputType="password"
                         validation={validateConfirmPassword}
+                        crossValidation={(value: string) =>
+                            setInputsState({
+                                password: inputsState.password,
+                                confirmPassword: value,
+                            })
+                        }
                     />
                 </Form>
             </div>
@@ -65,13 +82,12 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
 
 const inputs: FormInputsType = {
     username: {
-        validations: (currentInputValue: string) => [
+        validations: (currentInputValue) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Username must has 6 characters at least',
             },
         ],
-        errors: [],
         required: true,
     },
     password: {
@@ -86,7 +102,6 @@ const inputs: FormInputsType = {
                 message: 'This field has to be equal to the confirm password',
             },
         ],
-        errors: [],
         required: true,
     },
     confirmPassword: {
@@ -96,7 +111,6 @@ const inputs: FormInputsType = {
                 message: 'This field has to be equal to the password',
             },
         ],
-        errors: [],
         required: true,
     },
 };

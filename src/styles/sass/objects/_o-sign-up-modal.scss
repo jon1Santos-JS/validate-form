@@ -4,6 +4,9 @@
     justify-content: center;
 
     .content {
+        font-size: var(--app-base-font-size);
+        overflow: auto;
         padding: calc(var(--app-base-measure) * 2);
+        width: 80%;
     }
 }
