@@ -1,7 +1,8 @@
 declare interface ReturnValidationFunctionsType {
-    [key: string]: ValidationFunctionType;
+    [key: string]: Function;
 }
 
 declare type ValidationFunctionType = (
     currentInputValue?: string,
+    fieldName: string,
 ) => string[] | undefined;

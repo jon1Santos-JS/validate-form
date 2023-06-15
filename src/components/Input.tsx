@@ -4,13 +4,15 @@ import React, { useState, useEffect, useContext } from 'react';
 interface InputProps {
     label: string;
     inputType: string;
-    validation?: (inputValue: string) => string[];
-    crossValidation?: (data: string) => void;
+    fieldName: string;
+    validation?: (inputValue: string, fieldName: string) => string[];
+    crossValidation?: (inputValue: string) => void;
 }
 
 const Input: React.FC<InputProps> = ({
     label,
     inputType,
+    fieldName,
     validation,
     crossValidation,
 }) => {
@@ -23,8 +25,8 @@ const Input: React.FC<InputProps> = ({
         // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
         setShowMessage(false);
         if (!validation) return;
-        setErrorList(validation(inputvalue));
-    }, [inputvalue, setErrorList, validation]);
+        setErrorList(validation(inputvalue, fieldName));
+    }, [inputvalue, setErrorList, validation, fieldName]);
 
     useEffect(() => {
         // DONT SHOW THE MESSAGE ON FIRST RENDER
@@ -66,7 +68,7 @@ const Input: React.FC<InputProps> = ({
         setInputValue(e.target.value);
         if (!crossValidation) return;
         crossValidation(e.target.value);
-        if (validation) setErrorList(validation(e.target.value));
+        if (validation) setErrorList(validation(e.target.value, fieldName));
     }
 
     function renderErrors() {

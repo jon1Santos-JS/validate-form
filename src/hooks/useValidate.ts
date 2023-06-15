@@ -1,17 +1,74 @@
-export default function useValidate(preFormInputs: PreFormInputsType) {
-    const formInputs = onAddFormInputsFields(preFormInputs);
+export default function useValidate(preObjectfiedInputs: PreFormInputsType) {
+    const objectfiedInputs = onAddFormInputsFields(preObjectfiedInputs);
+
+    const validateUsername = (currentInputValue = '', fieldName: string) => {
+        return preValidate(
+            objectfiedInputs[fieldName], // OBJECTIFIED INPUT
+            currentInputValue, // INPUT CURRENT VALUE STATE
+            objectfiedInputs,
+        );
+    };
+
+    const validatePassword = (currentInputValue = '', fieldName: string) => {
+        return preValidate(
+            objectfiedInputs[fieldName],
+            currentInputValue,
+            objectfiedInputs,
+        );
+    };
+
+    const validateConfirmPassword = (
+        currentInputValue = '',
+        fieldName: string,
+    ) => {
+        return preValidate(
+            objectfiedInputs[fieldName],
+            currentInputValue,
+            objectfiedInputs,
+        );
+    };
+
+    const validateEmail = (currentInputValue = '', fieldName: string) => {
+        return preValidate(
+            objectfiedInputs[fieldName],
+            currentInputValue,
+            objectfiedInputs,
+        );
+    };
+
+    const validateConfirmEmail = (
+        currentInputValue = '',
+        fieldName: string,
+    ) => {
+        return preValidate(
+            objectfiedInputs[fieldName],
+            currentInputValue,
+            objectfiedInputs,
+        );
+    };
+
+    const inputsValidationFunctions = {
+        validateUsername,
+        validatePassword,
+        validateConfirmPassword,
+        validateEmail,
+        validateConfirmEmail,
+    };
 
     const validateAllInputs = () => {
-        const inputsNames = Object.keys(formInputs);
-        const inputsErrors = inputsNames.map((inputName) => {
+        const inputsNames = Object.keys(objectfiedInputs);
+        const inputErrors = inputsNames.map((inputName) => {
             const validationFunction = getInputValidationFunction(
                 inputsValidationFunctions,
                 inputName,
             );
             if (!validationFunction) return;
-            return validationFunction(formInputs[inputName].value);
+            return validationFunction(
+                objectfiedInputs[inputName].value,
+                inputName,
+            );
         });
-        const validations = inputsErrors.map((error) => {
+        const validations = inputErrors.map((error) => {
             if (!error) return false;
             if (error.length >= 1) return true;
             return false;
@@ -24,79 +81,52 @@ export default function useValidate(preFormInputs: PreFormInputsType) {
         return conditional;
     };
 
-    const validateUsername = (currentInputValue = '') => {
-        return preValidate(
-            formInputs['username'], // OBJECT WITH PROPERTIES (VALIDATION - REQUIRED)
-            currentInputValue, // JUST THE INPUT CURRENT VALUE
-            formInputs,
-        );
-    };
-
-    const validatePassword = (currentInputValue = '') => {
-        return preValidate(
-            formInputs['password'],
-            currentInputValue,
-            formInputs,
-        );
-    };
-
-    const validateConfirmPassword = (currentInputValue = '') => {
-        return preValidate(
-            formInputs['confirmPassword'],
-            currentInputValue,
-            formInputs,
-        );
-    };
-
-    const inputsValidationFunctions = {
-        validateUsername,
-        validatePassword,
-        validateConfirmPassword,
-    };
-
     return { ...inputsValidationFunctions, validateAllInputs };
 }
 
 function preValidate(
-    input: FormInputPropsType,
+    objectfiedInput: FormInputPropsType,
     currentInputValue: string,
     formInputs: FormInputsType,
 ) {
-    setAndResetInput(input, currentInputValue);
-    return validate(input, currentInputValue, formInputs);
+    setAndResetInput(objectfiedInput, currentInputValue);
+    return validate(objectfiedInput, currentInputValue, formInputs);
 }
 
 function setAndResetInput(
-    input: FormInputPropsType,
+    objectfiedInput: FormInputPropsType,
     currentInputValue: string,
 ) {
-    while (input.errors.length > 0) {
-        input.errors.pop();
+    while (objectfiedInput.errors.length > 0) {
+        objectfiedInput.errors.pop();
     }
-    input.value = currentInputValue;
+    objectfiedInput.value = currentInputValue;
 }
 
 function validate(
-    input: FormInputPropsType,
+    objectfiedInput: FormInputPropsType,
     currentInputValue: string,
     formInputs: FormInputsType,
 ) {
-    if (!input.validations) return [];
-    if (!currentInputValue && input.required) {
-        if (typeof input.required === 'string') {
-            input.errors.push(input.required);
-            return input.errors;
+    if (!objectfiedInput.validations) return [];
+    if (!currentInputValue && objectfiedInput.required) {
+        if (typeof objectfiedInput.required === 'string') {
+            objectfiedInput.errors.push(objectfiedInput.required);
+            return objectfiedInput.errors;
         }
-        input.errors.push('This field is required');
-        return input.errors;
+        objectfiedInput.errors.push('This field is required');
+        return objectfiedInput.errors;
     }
     if (!currentInputValue) return [];
 
-    input.validations(currentInputValue, formInputs).map((validation) => {
-        if (validation.coditional) input.errors.push(validation.message);
-    });
-    if (input.errors.length < 1) return [];
-    return input.errors;
+    objectfiedInput
+        .validations(currentInputValue, formInputs)
+        .map((validation) => {
+            if (validation.coditional)
+                objectfiedInput.errors.push(validation.message);
+        });
+    if (objectfiedInput.errors.length < 1) return [];
+    return objectfiedInput.errors;
 }
 
 /*

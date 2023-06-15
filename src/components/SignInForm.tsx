@@ -25,10 +25,12 @@ export default function SignInForm({ setUser }: SignInFormProps) {
                     <Input
                         label="Username"
                         inputType="text"
+                        fieldName="username"
                         validation={validateUsername}
                     />
                     <Input
                         label="Password"
+                        fieldName="password"
                         inputType="password"
                         validation={validatePassword}
                     />

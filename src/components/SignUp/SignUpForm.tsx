@@ -14,11 +14,18 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         validatePassword,
         validateAllInputs,
         validateConfirmPassword,
+        validateEmail,
+        validateConfirmEmail,
     } = useValidate(inputs);
     const router = useRouter();
-    const [inputsState, setInputsState] = useState({
+    // CROSS VALIDATE INPUTS
+    const [crossPassword, setCrossPassword] = useState({
         password: '',
         confirmPassword: '',
+    });
+    const [crossEmail, setCrossEmail] = useState({
+        email: '',
+        confirmEmail: '',
     });
 
     return (
@@ -32,28 +39,55 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                 >
                     <Input
                         label="Username"
-                        inputType="password"
+                        inputType="text"
+                        fieldName="username"
                         validation={validateUsername}
                     />
                     <Input
                         label="Password"
-                        inputType="text"
+                        inputType="password"
+                        fieldName="password"
                         validation={validatePassword}
                         crossValidation={(value: string) => {
-                            setInputsState({
+                            setCrossPassword({
                                 password: value,
-                                confirmPassword: inputsState.confirmPassword,
+                                confirmPassword: crossPassword.confirmPassword,
                             });
                         }}
                     />
                     <Input
                         label="Confirm Password"
-                        inputType="text"
+                        inputType="confirmPassword"
+                        fieldName="password"
                         validation={validateConfirmPassword}
                         crossValidation={(value: string) => {
-                            setInputsState({
-                                password: inputsState.password,
+                            setCrossPassword({
+                                password: crossPassword.password,
                                 confirmPassword: value,
+                            });
+                        }}
+                    />
+                    <Input
+                        label="Email"
+                        inputType="text"
+                        fieldName="email"
+                        validation={validateEmail}
+                        crossValidation={(value: string) => {
+                            setCrossEmail({
+                                email: value,
+                                confirmEmail: crossEmail.confirmEmail,
+                            });
+                        }}
+                    />
+                    <Input
+                        label="Confirm Email"
+                        inputType="text"
+                        fieldName="confirmEmail"
+                        validation={validateConfirmEmail}
+                        crossValidation={(value: string) => {
+                            setCrossEmail({
+                                email: crossEmail.email,
+                                confirmEmail: value,
                             });
                         }}
                     />
@@ -109,6 +143,29 @@ const inputs: PreFormInputsType = {
             {
                 coditional: currentInputValue !== formInputs['password'].value,
                 message: 'This field has to be equal to the password',
+            },
+        ],
+        required: true,
+    },
+    email: {
+        validations: (currentInputValue, formInputs) => [
+            {
+                coditional: !currentInputValue.match(/.{6,}/),
+                message: 'Password must has 6 characters at least',
+            },
+            {
+                coditional:
+                    currentInputValue !== formInputs['confirmEmail'].value,
+                message: 'This field has to be equal to the confirmEmail',
+            },
+        ],
+        required: true,
+    },
+    confirmEmail: {
+        validations: (currentInputValue, formInputs) => [
+            {
+                coditional: currentInputValue !== formInputs['email'].value,
+                message: 'This field has to be equal to the email',
             },
         ],
         required: true,
