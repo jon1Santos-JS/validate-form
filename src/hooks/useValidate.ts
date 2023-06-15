@@ -1,5 +1,3 @@
-import { onAddFormInputsFields } from './useInputHandler';
-
 export default function useValidate(preFormInputs: PreFormInputsType) {
     const formInputs = onAddFormInputsFields(preFormInputs);
 
@@ -59,24 +57,6 @@ export default function useValidate(preFormInputs: PreFormInputsType) {
     return { ...inputsValidationFunctions, validateAllInputs };
 }
 
-function getInputValidationFunction(
-    validationFunctions: ReturnValidationFunctionsType,
-    inputName: string,
-) {
-    const handledFunctions = Object.values(validationFunctions);
-    const validationFunctionFound = handledFunctions.find((validationFunc) => {
-        const handledFunctionName = validationFunc.name
-            .toLowerCase()
-            .replace('validate', '');
-        const handledInputName = inputName.toLowerCase();
-        if (handledFunctionName === handledInputName) {
-            return validationFunc;
-        }
-        return;
-    });
-    return validationFunctionFound;
-}
-
 function preValidate(
     input: FormInputPropsType,
     currentInputValue: string,
@@ -117,4 +97,39 @@ function validate(
     });
     if (input.errors.length < 1) return [];
     return input.errors;
+}
+
+/*
+AUXILIARY FUNCTIONS
+*/
+
+function getInputValidationFunction(
+    validationFunctions: ReturnValidationFunctionsType,
+    inputName: string,
+) {
+    const handledFunctions = Object.values(validationFunctions);
+    const validationFunctionFound = handledFunctions.find((validationFunc) => {
+        const handledFunctionName = validationFunc.name
+            .toLowerCase()
+            .replace('validate', '');
+        const handledInputName = inputName.toLowerCase();
+        if (handledFunctionName === handledInputName) {
+            return validationFunc;
+        }
+        return;
+    });
+    return validationFunctionFound;
+}
+
+export function onAddFormInputsFields(inputs: PreFormInputsType) {
+    const handledInputs = addErrorInput();
+
+    function addErrorInput() {
+        for (const i in inputs) {
+            inputs[i].errors = [];
+        }
+        return inputs;
+    }
+
+    return handledInputs as FormInputsType;
 }
