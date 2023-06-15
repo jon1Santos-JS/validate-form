@@ -52,29 +52,23 @@ export default function SignInForm({ setUser }: SignInFormProps) {
     }
 }
 
-const inputs: FormInputsType = {
+const inputs: PreFormInputsType = {
     username: {
         validations: (currentInputValue: string) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Username must has 6 characters at least',
-            },
-            {
-                coditional: !currentInputValue.match(/\D/),
-                message: 'Only strings',
+                message: 'Username incorrect',
             },
         ],
-        errors: [],
-        required: true,
+        required: 'Username incorrect',
     },
     password: {
         validations: (currentInputValue) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Password must has 6 characters at least',
+                message: 'Password incorrect',
             },
         ],
-        errors: [],
-        required: true,
+        required: 'Password incorrect',
     },
 };

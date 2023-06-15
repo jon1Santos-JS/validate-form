@@ -1,12 +1,12 @@
 import FormContext from '@/context/FormContext';
-import useInputHandler from '@/hooks/useInputHandler';
+import { onOmitFormInputFields } from '@/hooks/useInputHandler';
 import React, { useEffect, useState } from 'react';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
     haveInputsErrors: () => boolean;
     onSubmitInputs: <T>(formContent: T) => Promise<void>;
-    inputs: FormInputsType;
+    inputs: PreFormInputsType;
     legend?: string;
 }
 
@@ -19,7 +19,6 @@ const Form: React.FC<FormProps> = ({
 }) => {
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showInputsMessages, setShowInputMessages] = useState(false);
-    const { onOmitFormInputFields } = useInputHandler();
 
     useEffect(() => {
         // DOWN MESSAGE
@@ -56,15 +55,15 @@ const Form: React.FC<FormProps> = ({
     );
 
     function renderInputs() {
-        const inputs = children as JSX.Element[];
-        if (inputs?.length > 1) {
+        const inputsElements = children as JSX.Element[];
+        if (inputsElements?.length > 1) {
             return (
                 <FormContext.Provider
                     value={{
                         showMessagesByForm: showInputsMessages,
                     }}
                 >
-                    {inputs.map((child) => (
+                    {inputsElements.map((child) => (
                         <div key={child.props.label}>{child}</div>
                     ))}
                 </FormContext.Provider>
@@ -94,7 +93,7 @@ const Form: React.FC<FormProps> = ({
             const mainInputsToOmit = Object.keys(inputs).filter((key) =>
                 key.includes('confirm'),
             );
-            const secondaryInputsToOmit = ['required', 'errors', 'validations'];
+            const secondaryInputsToOmit = ['required', 'validations'];
             const handledInputs = onOmitFormInputFields(
                 inputs,
                 mainInputsToOmit,

@@ -37,25 +37,25 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                     />
                     <Input
                         label="Password"
-                        inputType="password"
+                        inputType="text"
                         validation={validatePassword}
-                        crossValidation={(value: string) =>
+                        crossValidation={(value: string) => {
                             setInputsState({
                                 password: value,
                                 confirmPassword: inputsState.confirmPassword,
-                            })
-                        }
+                            });
+                        }}
                     />
                     <Input
                         label="Confirm Password"
-                        inputType="password"
+                        inputType="text"
                         validation={validateConfirmPassword}
-                        crossValidation={(value: string) =>
+                        crossValidation={(value: string) => {
                             setInputsState({
                                 password: inputsState.password,
                                 confirmPassword: value,
-                            })
-                        }
+                            });
+                        }}
                     />
                 </Form>
             </div>
@@ -80,7 +80,7 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
     }
 }
 
-const inputs: FormInputsType = {
+const inputs: PreFormInputsType = {
     username: {
         validations: (currentInputValue) => [
             {

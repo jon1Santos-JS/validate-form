@@ -1,8 +1,7 @@
-export default function useValidate(preformInputs: FormInputsType) {
-    for (const i in preformInputs) {
-        preformInputs[i].errors = [];
-    }
-    const formInputs = preformInputs;
+import { onAddFormInputsFields } from './useInputHandler';
+
+export default function useValidate(preFormInputs: PreFormInputsType) {
+    const formInputs = onAddFormInputsFields(preFormInputs);
 
     const validateAllInputs = () => {
         const inputsNames = Object.keys(formInputs);
@@ -102,17 +101,20 @@ function validate(
     currentInputValue: string,
     formInputs: FormInputsType,
 ) {
-    if (!input.validations) return;
+    if (!input.validations) return [];
     if (!currentInputValue && input.required) {
+        if (typeof input.required === 'string') {
+            input.errors.push(input.required);
+            return input.errors;
+        }
         input.errors.push('This field is required');
         return input.errors;
     }
-    if (!currentInputValue) return;
+    if (!currentInputValue) return [];
 
     input.validations(currentInputValue, formInputs).map((validation) => {
         if (validation.coditional) input.errors.push(validation.message);
     });
-
-    if (input.errors.length < 1) return;
+    if (input.errors.length < 1) return [];
     return input.errors;
 }
