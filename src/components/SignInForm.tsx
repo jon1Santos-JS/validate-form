@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import Form from './Form';
 import Input from './Input';
-import useValidate from '@/hooks/useValidate';
+import InputHandler from './InputHandler';
 
 interface SignInFormProps {
     setUser: SetUserType;
@@ -9,32 +9,25 @@ interface SignInFormProps {
 }
 
 export default function SignInForm({ setUser }: SignInFormProps) {
-    const { validateUsername, validatePassword, validateAllInputs } =
-        useValidate(inputs);
     const router = useRouter();
 
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
-                <Form
-                    inputs={inputs}
-                    haveInputsErrors={validateAllInputs}
-                    legend="SignIn"
-                    onSubmitInputs={onSubmitInputs}
-                >
-                    <Input
-                        label="Username"
-                        inputType="text"
-                        fieldName="username"
-                        validation={validateUsername}
-                    />
-                    <Input
-                        label="Password"
-                        fieldName="password"
-                        inputType="password"
-                        validation={validatePassword}
-                    />
-                </Form>
+                <InputHandler inputs={inputs}>
+                    <Form legend="SignIn" onSubmitInputs={onSubmitInputs}>
+                        <Input
+                            label="Username"
+                            inputType="text"
+                            fieldName="username"
+                        />
+                        <Input
+                            label="Password"
+                            inputType="password"
+                            fieldName="password"
+                        />
+                    </Form>
+                </InputHandler>
             </div>
         </div>
     );

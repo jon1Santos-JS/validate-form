@@ -1,24 +1,20 @@
 import FormContext from '@/context/FormContext';
 import { onOmitFormInputFields } from '@/hooks/useInputHandler';
-import React, { useEffect, useState } from 'react';
+import useValidate from '@/hooks/useValidate';
+import React, { useContext, useEffect, useState } from 'react';
+import InputHandlerContext from '@/context/InputHandlerContext';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    haveInputsErrors: () => boolean;
     onSubmitInputs: <T>(formContent: T) => Promise<void>;
-    inputs: PreFormInputsType;
     legend?: string;
 }
 
-const Form: React.FC<FormProps> = ({
-    children,
-    haveInputsErrors,
-    onSubmitInputs,
-    inputs,
-    legend,
-}) => {
+const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
+    const inputHandlerContext = useContext(InputHandlerContext);
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [showInputsMessages, setShowInputMessages] = useState(false);
+    const { validateAllInputs } = useValidate();
 
     useEffect(() => {
         // DOWN MESSAGE
@@ -89,13 +85,13 @@ const Form: React.FC<FormProps> = ({
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) {
         e.preventDefault();
-        if (!haveInputsErrors()) {
-            const mainInputsToOmit = Object.keys(inputs).filter((key) =>
-                key.includes('confirm'),
-            );
+        if (!validateAllInputs(inputHandlerContext.handledInputs)) {
+            const mainInputsToOmit = Object.keys(
+                inputHandlerContext.handledInputs,
+            ).filter((key) => key.includes('confirm'));
             const secondaryInputsToOmit = ['required', 'validations'];
             const handledInputs = onOmitFormInputFields(
-                inputs,
+                inputHandlerContext.handledInputs,
                 mainInputsToOmit,
                 secondaryInputsToOmit,
             );

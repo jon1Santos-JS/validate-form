@@ -21,11 +21,12 @@ declare interface FormInputPropsType {
     ) => Validation[];
     required: boolean | string;
     errors: string[];
-    value?: string;
+    value: string;
 }
 
 declare interface PreFormInputPropsType extends FormInputPropsType {
     errors?: string[];
+    value?: string;
 }
 
 declare interface Validation {

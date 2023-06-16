@@ -17,3 +17,24 @@ export function onOmitFormInputFields<T extends object>(
     }
     return handled as T[Extract<keyof T, string>];
 }
+
+export function onAddFormInputsFields(inputs: PreFormInputsType) {
+    const inputsWithError = addErrorInput(inputs);
+    const inputsWithValue = addValueInput(inputsWithError);
+
+    function addErrorInput(handledInputs: PreFormInputsType) {
+        for (const i in handledInputs) {
+            handledInputs[i].errors = [];
+        }
+        return handledInputs;
+    }
+
+    function addValueInput(handledInputs: PreFormInputsType) {
+        for (const i in handledInputs) {
+            handledInputs[i].value = '';
+        }
+        return handledInputs;
+    }
+
+    return inputsWithValue as FormInputsType;
+}

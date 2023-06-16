@@ -1,11 +1,12 @@
 import FormContext from '@/context/FormContext';
+import InputHandlerContext from '@/context/InputHandlerContext';
+import useValidate from '@/hooks/useValidate';
 import React, { useState, useEffect, useContext } from 'react';
 
 interface InputProps {
     label: string;
     inputType: string;
     fieldName: string;
-    validation?: (inputValue: string, fieldName: string) => string[];
     crossValidation?: (inputValue: string) => void;
 }
 
@@ -13,20 +14,21 @@ const Input: React.FC<InputProps> = ({
     label,
     inputType,
     fieldName,
-    validation,
     crossValidation,
 }) => {
     const formContext = useContext(FormContext);
+    const { handledInputs, updateHandledInputs } =
+        useContext(InputHandlerContext);
     const [inputvalue, setInputValue] = useState('');
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
+    const { preValidate } = useValidate();
 
     useEffect(() => {
         // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
         setShowMessage(false);
-        if (!validation) return;
-        setErrorList(validation(inputvalue, fieldName));
-    }, [inputvalue, setErrorList, validation, fieldName]);
+        setErrorList(preValidate(fieldName, handledInputs));
+    }, [fieldName, handledInputs, inputvalue]);
 
     useEffect(() => {
         // DONT SHOW THE MESSAGE ON FIRST RENDER
@@ -66,9 +68,18 @@ const Input: React.FC<InputProps> = ({
 
     function onSetValues(e: React.ChangeEvent<HTMLInputElement>) {
         setInputValue(e.target.value);
+        updateHandledInputs({
+            ...handledInputs,
+            [fieldName]: {
+                validations: handledInputs[fieldName].validations,
+                value: e.target.value,
+                errors: handledInputs[fieldName].errors,
+                required: handledInputs[fieldName].required,
+            },
+        });
+        setErrorList(preValidate(fieldName, handledInputs));
         if (!crossValidation) return;
         crossValidation(e.target.value);
-        if (validation) setErrorList(validation(e.target.value, fieldName));
     }
 
     function renderErrors() {
