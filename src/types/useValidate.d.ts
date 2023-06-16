@@ -1,5 +1,5 @@
 declare interface ReturnValidationFunctionsType {
-    [key: string]: Function;
+    [key: string]: ValidationFunctionType;
 }
 
 declare type ValidationFunctionType = (
