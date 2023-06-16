@@ -85,12 +85,12 @@ export default function useValidate(preObjectfiedInputs: PreFormInputsType) {
 }
 
 function preValidate(
-    objectfiedInput: FormInputPropsType,
+    objectifiedInput: FormInputPropsType,
     currentInputValue: string,
     formInputs: FormInputsType,
 ) {
-    setAndResetInput(objectfiedInput, currentInputValue);
-    return validate(objectfiedInput, currentInputValue, formInputs);
+    setAndResetInput(objectifiedInput, currentInputValue);
+    return validate(objectifiedInput, currentInputValue, formInputs);
 }
 
 function setAndResetInput(
