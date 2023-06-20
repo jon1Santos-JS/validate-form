@@ -1,7 +1,7 @@
 import Form from '../Form';
 import Input from '../Input';
 import { useRouter } from 'next/router';
-import InputHandler from '../InputHandler';
+import InputsHandler from '../InputsHandler';
 
 interface SignUpFormPropsType {
     setResponse: (data: boolean) => void;
@@ -9,12 +9,11 @@ interface SignUpFormPropsType {
 
 export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
     const router = useRouter();
-    // CROSS VALIDATE INPUTS
 
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
-                <InputHandler inputs={inputs}>
+                <InputsHandler preInputs={preInputs}>
                     <Form legend="SignUp" onSubmitInputs={onSubmitInputs}>
                         <Input
                             label="Username"
@@ -32,7 +31,7 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                             fieldName="confirmPassword"
                         />
                     </Form>
-                </InputHandler>
+                </InputsHandler>
             </div>
         </div>
     );
@@ -55,7 +54,7 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
     }
 }
 
-const inputs: PreFormInputsType = {
+const preInputs: PreFormInputsType = {
     username: {
         validations: (currentInputValue) => [
             {

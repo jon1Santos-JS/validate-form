@@ -13,26 +13,6 @@ export async function getUserStateController() {
     return { serverResponse: users };
 }
 
-export async function getDBStateController() {
-    const DBHandler = new MiniDBHandler();
-    const response = await DBHandler.handleDB('getDB');
-    if (typeof response === 'string') {
-        console.log('controller error to get database: ', response);
-        return { serverResponse: false };
-    }
-    return { serverResponse: response as MiniDBState };
-}
-
-export async function resetDBStateController(command: 'reset') {
-    const DBHandler = new MiniDBHandler();
-    const response = await DBHandler.handleDB(command);
-    if (typeof response === 'string') {
-        console.log('controller error to reset DB: ', response);
-        return { serverResponse: false };
-    }
-    return { serverResponse: true };
-}
-
 export async function signInController(userAccount: UserFromClientType) {
     const accountsHandler = new MiniDBAccountHandler();
     const response = await accountsHandler.signIn(userAccount);

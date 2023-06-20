@@ -3,7 +3,7 @@ import SignUpForm from './SignUpForm';
 import SignUpModal from './SignUpModal';
 
 export default function SignUpContent() {
-    const [signUpResponse, setSignUpResponse] = useState(false);
+    const [signUpResponse, setSignUpResponse] = useState(false); // SHOW MODAL
     return (
         <>
             <SignUpForm

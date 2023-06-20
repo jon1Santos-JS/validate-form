@@ -1,5 +1,3 @@
-import FormContext from '@/context/FormContext';
-import { onOmitFormInputFields } from '@/hooks/useInputHandler';
 import useValidate from '@/hooks/useValidate';
 import React, { useContext, useEffect, useState } from 'react';
 import InputHandlerContext from '@/context/InputHandlerContext';
@@ -11,22 +9,24 @@ interface FormProps {
 }
 
 const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
-    const inputHandlerContext = useContext(InputHandlerContext);
+    const {
+        inputs,
+        showInputMessages,
+        setShowInputsMessage,
+        updateInputsToSubmit,
+    } = useContext(InputHandlerContext);
     const [showMessage, setShowMessage] = useState<boolean>(false);
-    const [showInputsMessages, setShowInputMessages] = useState(false);
     const { validateAllInputs } = useValidate();
 
     useEffect(() => {
-        // DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
-            setShowInputMessages(false);
+            setShowInputsMessage(false);
         }, 2550);
 
         return () => clearTimeout(timerDownMessage);
-    }, [showInputsMessages]);
+    }, [setShowInputsMessage, showInputMessages]);
 
     useEffect(() => {
-        // DOWN MESSAGE
         const timerDownMessage = setTimeout(() => {
             setShowMessage(false);
         }, 2750);
@@ -53,27 +53,11 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
     function renderInputs() {
         const inputsElements = children as JSX.Element[];
         if (inputsElements?.length > 1) {
-            return (
-                <FormContext.Provider
-                    value={{
-                        showMessagesByForm: showInputsMessages,
-                    }}
-                >
-                    {inputsElements.map((child) => (
-                        <div key={child.props.label}>{child}</div>
-                    ))}
-                </FormContext.Provider>
-            );
+            return inputsElements.map((child) => (
+                <div key={child.props.label}>{child}</div>
+            ));
         }
-        return (
-            <FormContext.Provider
-                value={{
-                    showMessagesByForm: showInputsMessages,
-                }}
-            >
-                {children}
-            </FormContext.Provider>
-        );
+        return children;
     }
 
     function renderError() {
@@ -85,23 +69,15 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) {
         e.preventDefault();
-        if (!validateAllInputs(inputHandlerContext.handledInputs)) {
-            const mainInputsToOmit = Object.keys(
-                inputHandlerContext.handledInputs,
-            ).filter((key) => key.includes('confirm'));
-            const secondaryInputsToOmit = ['required', 'validations'];
-            const handledInputs = onOmitFormInputFields(
-                inputHandlerContext.handledInputs,
-                mainInputsToOmit,
-                secondaryInputsToOmit,
-            );
-            setShowInputMessages(false);
+        if (!validateAllInputs(inputs)) {
+            const inputsToSubmit = updateInputsToSubmit();
+            setShowInputsMessage(false);
             setShowMessage(false);
-            await onSubmitInputs(handledInputs);
+            await onSubmitInputs(inputsToSubmit);
             return;
         }
         setShowMessage(true);
-        setShowInputMessages(true);
+        setShowInputsMessage(true);
     }
 };
 

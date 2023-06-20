@@ -6,27 +6,35 @@ declare interface FetchOptionsType {
 
 declare type MethodTypes = 'GET' | 'DELETE' | 'POST';
 
-declare interface FormInputsType {
-    [key: string]: FormInputPropsType;
-}
-
 declare interface PreFormInputsType {
     [key: string]: PreFormInputPropsType;
 }
 
-declare interface FormInputPropsType {
+declare interface PreFormInputPropsType {
     validations?: (
         currentInput: string,
         formInputs: FormInputsType,
     ) => Validation[];
-    required: boolean | string;
+    required?: boolean | string;
+    errors?: string[];
+    value?: string;
+}
+
+declare interface FormInputsType {
+    [key: string]: FormInputPropsType;
+}
+
+declare interface FormInputPropsType extends PreFormInputPropsType {
     errors: string[];
     value: string;
 }
 
-declare interface PreFormInputPropsType extends FormInputPropsType {
-    errors?: string[];
-    value?: string;
+declare interface FormInputsTypeToSubmit {
+    [key: string]: FormInputPropsTypeToSubmit;
+}
+
+declare interface FormInputPropsTypeToSubmit extends PreFormInputPropsType {
+    value: string;
 }
 
 declare interface Validation {

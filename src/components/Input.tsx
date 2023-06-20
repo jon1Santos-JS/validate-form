@@ -1,4 +1,3 @@
-import FormContext from '@/context/FormContext';
 import InputHandlerContext from '@/context/InputHandlerContext';
 import useValidate from '@/hooks/useValidate';
 import React, { useState, useEffect, useContext } from 'react';
@@ -7,46 +6,34 @@ interface InputProps {
     label: string;
     inputType: string;
     fieldName: string;
-    crossValidation?: (inputValue: string) => void;
 }
 
-const Input: React.FC<InputProps> = ({
-    label,
-    inputType,
-    fieldName,
-    crossValidation,
-}) => {
-    const formContext = useContext(FormContext);
-    const { handledInputs, updateHandledInputs } =
+const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
+    const { inputs, showInputMessages, updateInputValue } =
         useContext(InputHandlerContext);
-    const [inputvalue, setInputValue] = useState('');
+    const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
-    const { preValidate } = useValidate();
 
     useEffect(() => {
-        // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
-        setShowMessage(false);
-        setErrorList(preValidate(fieldName, handledInputs));
-    }, [fieldName, handledInputs, inputvalue]);
+        setShowMessage(false); // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
+        setErrorList(preValidate(fieldName, inputs));
+    }, [fieldName, inputs, preValidate]);
 
     useEffect(() => {
-        // DONT SHOW THE MESSAGE ON FIRST RENDER
-        if (!inputvalue) return;
-        // UP MESSAGE
-        if (errorList && errorList?.length >= 1) {
-            const currentTimer = setErrorMessageWithTimer(true, 850);
+        if (!inputs[fieldName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
+        if (errorList?.length >= 1) {
+            const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
-    }, [errorList, inputvalue]);
+    }, [errorList, fieldName, inputs]);
 
     useEffect(() => {
-        if (!showMessage) setShowMessage(formContext.showMessagesByForm);
-    }, [formContext.showMessagesByForm, showMessage]);
+        if (!showMessage) setShowMessage(showInputMessages);
+    }, [showInputMessages, showMessage]);
 
     useEffect(() => {
-        // DOWN MESSAGE
-        const currentTimer = setErrorMessageWithTimer(false, 2750);
+        const currentTimer = setMessageWithTimer(false, 2750);
         return () => clearTimeout(currentTimer);
     }, [showMessage]);
 
@@ -58,29 +45,13 @@ const Input: React.FC<InputProps> = ({
             <input
                 id={label}
                 className="input"
-                onChange={(e) => onSetValues(e)}
-                value={inputvalue}
+                onChange={(e) => updateInputValue(e.target.value, fieldName)}
+                value={inputs[fieldName].value}
                 type={inputType}
             />
             {renderErrors()}
         </div>
     );
-
-    function onSetValues(e: React.ChangeEvent<HTMLInputElement>) {
-        setInputValue(e.target.value);
-        updateHandledInputs({
-            ...handledInputs,
-            [fieldName]: {
-                validations: handledInputs[fieldName].validations,
-                value: e.target.value,
-                errors: handledInputs[fieldName].errors,
-                required: handledInputs[fieldName].required,
-            },
-        });
-        setErrorList(preValidate(fieldName, handledInputs));
-        if (!crossValidation) return;
-        crossValidation(e.target.value);
-    }
 
     function renderErrors() {
         if (!showMessage) return null;
@@ -91,7 +62,7 @@ const Input: React.FC<InputProps> = ({
         ));
     }
 
-    function setErrorMessageWithTimer(value: boolean, time: number) {
+    function setMessageWithTimer(value: boolean, time: number) {
         const currentTimer = setTimeout(() => {
             setShowMessage(value);
         }, time);

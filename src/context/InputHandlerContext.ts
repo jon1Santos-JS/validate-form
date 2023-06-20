@@ -1,11 +1,17 @@
 import React from 'react';
 
 interface InputHandlerContextType {
-    handledInputs: FormInputsType;
-    updateHandledInputs: (value: FormInputsType) => void;
+    showInputMessages: boolean;
+    inputs: FormInputsType;
+    updateInputValue: (value: string, fieldName: string) => void;
+    updateInputsToSubmit: () => void;
+    setShowInputsMessage: (value: boolean) => void;
 }
 
 export default React.createContext<InputHandlerContextType>({
-    handledInputs: {},
-    updateHandledInputs: () => 1,
+    showInputMessages: false,
+    inputs: {},
+    updateInputsToSubmit: () => 1,
+    updateInputValue: () => 1,
+    setShowInputsMessage: () => 1,
 });

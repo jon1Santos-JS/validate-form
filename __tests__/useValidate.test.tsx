@@ -15,7 +15,7 @@ const inputs: FormInputsType = {
             },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
         value: 'asd123',
     },
     password: {
@@ -26,7 +26,7 @@ const inputs: FormInputsType = {
             },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
         value: 'asd123',
     },
     confirmPassword: {
@@ -37,22 +37,15 @@ const inputs: FormInputsType = {
             },
         ],
         errors: [],
-        isEmpty: true,
+        required: true,
         value: 'asd123',
     },
 };
 
 test('testing validate hook', async () => {
-    const {
-        validateUsername,
-        validatePassword,
-        validateAllInputs,
-        validateCofirmPassword,
-    } = useValidate(inputs);
-    expect(validateUsername(inputs.username.value)).toBe(undefined);
-    expect(validatePassword(inputs.password.value)).toBe(undefined);
-    expect(validateCofirmPassword(inputs.confirmPassword.value)).toBe(
-        undefined,
-    );
-    expect(validateAllInputs()).toBe(undefined);
+    const { validateAllInputs, preValidate } = useValidate();
+    expect(preValidate('username', inputs)).toBe(undefined);
+    expect(preValidate('password', inputs)).toBe(undefined);
+    expect(preValidate('confirmPassword', inputs)).toBe(undefined);
+    expect(validateAllInputs(inputs)).toBe(undefined);
 });

@@ -19,55 +19,18 @@
       "password": {
         "value": "asd123"
       },
-      "timeStamp": "06/06/2023-11:03:54"
+      "timeStamp": "20/06/2023-16:21:09"
     },
     {
       "ID": 3,
       "constraint": "user",
       "username": {
-        "value": "asd1232"
+        "value": "asd321"
       },
       "password": {
-        "value": "asd1232"
+        "value": "asd321"
       },
-      "timeStamp": "07/06/2023-11:22:27"
-    },
-    {
-      "ID": 4,
-      "constraint": "user",
-      "username": {
-        "value": "asd123u"
-      },
-      "password": {
-        "value": "asd123u"
-      },
-      "timeStamp": "07/06/2023-14:07:56"
-    },
-    {
-      "ID": 5,
-      "constraint": "user",
-      "username": {
-        "errors": [],
-        "value": "ASD123"
-      },
-      "password": {
-        "errors": [],
-        "value": "asd123s"
-      },
-      "timeStamp": "15/06/2023-14:02:16"
-    },
-    {
-      "ID": 6,
-      "constraint": "user",
-      "username": {
-        "errors": [],
-        "value": "asd123ss"
-      },
-      "password": {
-        "errors": [],
-        "value": "asd123sssss"
-      },
-      "timeStamp": "16/06/2023-13:48:17"
+      "timeStamp": "20/06/2023-16:21:34"
     }
   ],
   "limit": 10

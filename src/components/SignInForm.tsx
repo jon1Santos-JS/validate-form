@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import Form from './Form';
 import Input from './Input';
-import InputHandler from './InputHandler';
+import InputsHandler from './InputsHandler';
 
 interface SignInFormProps {
     setUser: SetUserType;
@@ -14,7 +14,7 @@ export default function SignInForm({ setUser }: SignInFormProps) {
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
-                <InputHandler inputs={inputs}>
+                <InputsHandler preInputs={preInputs}>
                     <Form legend="SignIn" onSubmitInputs={onSubmitInputs}>
                         <Input
                             label="Username"
@@ -27,7 +27,7 @@ export default function SignInForm({ setUser }: SignInFormProps) {
                             fieldName="password"
                         />
                     </Form>
-                </InputHandler>
+                </InputsHandler>
             </div>
         </div>
     );
@@ -47,7 +47,7 @@ export default function SignInForm({ setUser }: SignInFormProps) {
     }
 }
 
-const inputs: PreFormInputsType = {
+const preInputs: PreFormInputsType = {
     username: {
         validations: (currentInputValue: string) => [
             {

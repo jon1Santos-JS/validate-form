@@ -15,8 +15,6 @@ export class MiniDBHandler {
     }
 
     async handleDB(command: HandleDBComandType, caller?: string) {
-        if (command === 'reset') return await this.#resetDB();
-        if (command === 'getDB') return await this.#returnDB();
         if (command === 'refresh')
             return await this.#createAndRefreshDB(caller);
         if (command === 'getUsers') return await this.#getUsers();
@@ -41,25 +39,6 @@ export class MiniDBHandler {
             );
             if (response) return SERVER_ERROR_RESPONSE;
             return;
-        }
-    }
-
-    async #returnDB() {
-        const response = await this.#accessDB();
-        if (response) return SERVER_ERROR_RESPONSE;
-        return DATABASE.state;
-    }
-
-    async #resetDB() {
-        DATABASE.state = INITIAL_STATE;
-        const json = JSON.stringify(DATABASE.state, undefined, 2);
-        try {
-            await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
-            console.log('The DataBase has been reset');
-            return;
-        } catch {
-            console.log('DB file was not found');
-            return SERVER_ERROR_RESPONSE;
         }
     }
 
