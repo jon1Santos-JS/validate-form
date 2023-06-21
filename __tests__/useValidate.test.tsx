@@ -1,6 +1,14 @@
-import '@testing-library/jest-dom';
 import useValidate from '@/hooks/useValidate';
 import '@testing-library/jest-dom';
+import { useEffect } from 'react';
+import { act, render } from '@testing-library/react';
+
+interface CustomHookWrapperPropsType {
+    inputs?: FormInputsType;
+    fieldName?: string;
+    setIsolatedResult?: (newValue: string[]) => void;
+    setResult?: (newValue: boolean) => void;
+}
 
 const inputs: FormInputsType = {
     username: {
@@ -42,10 +50,68 @@ const inputs: FormInputsType = {
     },
 };
 
-test('testing validate hook', async () => {
-    const { validateAllInputs, preValidate } = useValidate();
-    expect(preValidate('username', inputs)).toBe(undefined);
-    expect(preValidate('password', inputs)).toBe(undefined);
-    expect(preValidate('confirmPassword', inputs)).toBe(undefined);
-    expect(validateAllInputs(inputs)).toBe(undefined);
+test('testing preValidate function from the useValidate hook', async () => {
+    let isolatedResult: string[] = [];
+    act(() => {
+        render(
+            <CustomHookWrapper
+                inputs={inputs}
+                fieldName={'username'}
+                setIsolatedResult={(newValue) => (isolatedResult = newValue)}
+            />,
+        );
+        render(
+            <CustomHookWrapper
+                inputs={inputs}
+                fieldName={'password'}
+                setIsolatedResult={(newValue) => (isolatedResult = newValue)}
+            />,
+        );
+        render(
+            <CustomHookWrapper
+                inputs={inputs}
+                fieldName={'confirmPassword'}
+                setIsolatedResult={(newValue) => (isolatedResult = newValue)}
+            />,
+        );
+    });
+    expect(isolatedResult).toStrictEqual([]);
 });
+
+test('testing validateAllInputs function from the useValidate hook', async () => {
+    let result = false;
+
+    act(() => {
+        render(
+            <CustomHookWrapper
+                inputs={inputs}
+                setResult={(newValue) => (result = newValue)}
+            />,
+        );
+    });
+    expect(result).toBe(false);
+});
+
+const CustomHookWrapper = ({
+    inputs,
+    fieldName,
+    setResult,
+    setIsolatedResult,
+}: CustomHookWrapperPropsType) => {
+    const { validateAllInputs, preValidate } = useValidate();
+
+    useEffect(() => {
+        if (fieldName && inputs && setIsolatedResult)
+            setIsolatedResult(preValidate(fieldName, inputs));
+        if (inputs && setResult) setResult(validateAllInputs(inputs));
+    }, [
+        fieldName,
+        inputs,
+        preValidate,
+        setIsolatedResult,
+        setResult,
+        validateAllInputs,
+    ]);
+
+    return null;
+};
