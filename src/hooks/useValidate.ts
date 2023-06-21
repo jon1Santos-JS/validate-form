@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 export default function useValidate() {
     const validateAllInputs = (formInputs: FormInputsType) => {
         const inputsNames = Object.keys(formInputs);
@@ -19,13 +17,10 @@ export default function useValidate() {
         return conditional;
     };
 
-    // DO NOT RECREATE A FUNCTION FOR EACH INPUT
-    const preValidate = useMemo(() => {
-        return (fieldName: string, formInputs: FormInputsType) => {
-            setAndResetInput(formInputs[fieldName]);
-            return validate(formInputs[fieldName], formInputs);
-        };
-    }, []);
+    const preValidate = (fieldName: string, formInputs: FormInputsType) => {
+        setAndResetInput(formInputs[fieldName]);
+        return validate(formInputs[fieldName], formInputs);
+    };
 
     function setAndResetInput(objectfiedInput: FormInputPropsType) {
         while (objectfiedInput.errors.length > 0) {
@@ -37,7 +32,7 @@ export default function useValidate() {
         currentInput: FormInputPropsType,
         formInputs: FormInputsType,
     ) {
-        if (!currentInput.validations) return [];
+        if (!currentInput.validations) return currentInput.errors;
         if (!currentInput.value && currentInput.required) {
             if (typeof currentInput.required === 'string') {
                 currentInput.errors.push(currentInput.required);
@@ -47,7 +42,7 @@ export default function useValidate() {
             currentInput.errors.push('This field is required');
             return currentInput.errors;
         }
-        if (!currentInput.value) return [];
+        if (!currentInput.value) return currentInput.errors;
 
         currentInput
             .validations(currentInput.value, formInputs)
@@ -55,7 +50,6 @@ export default function useValidate() {
                 if (validation.coditional)
                     currentInput.errors.push(validation.message);
             });
-        if (currentInput.errors.length < 1) return [];
         return currentInput.errors;
     }
 

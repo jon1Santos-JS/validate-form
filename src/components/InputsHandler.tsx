@@ -13,12 +13,12 @@ export default function InputsHandler({
 }: InputHandlerPropsTypes) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
 
-    const [showInputMessages, setShowInputMessages] = useState(false);
+    const [showInputMessagesByOutside, setShowInputMessages] = useState(false);
 
     return (
         <InputHandlerContext.Provider
             value={{
-                showInputMessages,
+                showInputMessagesByOutside,
                 inputs,
                 updateInputValue,
                 updateInputsToSubmit,

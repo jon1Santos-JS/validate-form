@@ -9,19 +9,19 @@ interface InputProps {
 }
 
 const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
-    const { inputs, showInputMessages, updateInputValue } =
+    const { inputs, showInputMessagesByOutside, updateInputValue } =
         useContext(InputHandlerContext);
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
 
     useEffect(() => {
-        setShowMessage(false); // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
         setErrorList(preValidate(fieldName, inputs));
     }, [fieldName, inputs, preValidate]);
 
     useEffect(() => {
         if (!inputs[fieldName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
+        setShowMessage(false); // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
@@ -29,8 +29,8 @@ const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
     }, [errorList, fieldName, inputs]);
 
     useEffect(() => {
-        if (!showMessage) setShowMessage(showInputMessages);
-    }, [showInputMessages, showMessage]);
+        if (!showMessage) setShowMessage(showInputMessagesByOutside);
+    }, [showInputMessagesByOutside, showMessage]);
 
     useEffect(() => {
         const currentTimer = setMessageWithTimer(false, 2750);

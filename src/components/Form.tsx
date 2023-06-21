@@ -9,12 +9,8 @@ interface FormProps {
 }
 
 const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
-    const {
-        inputs,
-        showInputMessages,
-        setShowInputsMessage,
-        updateInputsToSubmit,
-    } = useContext(InputHandlerContext);
+    const { inputs, setShowInputsMessage, updateInputsToSubmit } =
+        useContext(InputHandlerContext);
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const { validateAllInputs } = useValidate();
 
@@ -24,7 +20,7 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
         }, 2550);
 
         return () => clearTimeout(timerDownMessage);
-    }, [setShowInputsMessage, showInputMessages]);
+    }, [setShowInputsMessage]);
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {

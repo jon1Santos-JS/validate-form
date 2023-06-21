@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface InputHandlerContextType {
-    showInputMessages: boolean;
+    showInputMessagesByOutside: boolean;
     inputs: FormInputsType;
     updateInputValue: (value: string, fieldName: string) => void;
     updateInputsToSubmit: () => void;
@@ -9,7 +9,7 @@ interface InputHandlerContextType {
 }
 
 export default React.createContext<InputHandlerContextType>({
-    showInputMessages: false,
+    showInputMessagesByOutside: false,
     inputs: {},
     updateInputsToSubmit: () => 1,
     updateInputValue: () => 1,
