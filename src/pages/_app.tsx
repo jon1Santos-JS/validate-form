@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const [user, setUser] = useState(false);
+    const [user, setUser] = useState<UserType>();
+    const [hasUser, setHasUser] = useState(false);
     const [userStateLoading, setUserStateLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
@@ -13,8 +14,13 @@ export default function App({ Component, pageProps }: AppProps) {
             method: 'GET',
         });
         const parsedResponse: ServerResponse = await response.json();
-        if (typeof parsedResponse.serverResponse === 'string') return;
+        if (typeof parsedResponse.serverResponse !== 'string') {
+            setHasUser(parsedResponse.serverResponse);
+            setUserStateLoading(false);
+            return;
+        }
         setUser(parsedResponse.serverResponse);
+        setHasUser(true);
         setUserStateLoading(false);
     }, []);
 
@@ -28,16 +34,29 @@ export default function App({ Component, pageProps }: AppProps) {
         <>
             <div className="o-app">
                 <MainNavigationBar
-                    hasUser={() => user}
-                    setUser={(user: boolean) => setUser(user)}
+                    hasUser={() => hasUser}
+                    setHasUser={onUpdateHasUser}
+                    user={user}
+                    setUser={onUpdateUser}
                     isUserStateLoading={() => userStateLoading}
                 />
                 <Component
-                    hasUser={() => user}
-                    setUser={(user: boolean) => setUser(user)}
+                    hasUser={() => hasUser}
+                    setHasUser={onUpdateHasUser}
+                    user={user}
+                    setUser={onUpdateUser}
+                    isUserStateLoading={() => userStateLoading}
                     {...pageProps}
                 />
             </div>
         </>
     );
+
+    function onUpdateUser(user: UserType) {
+        setUser(user);
+    }
+
+    function onUpdateHasUser(value: boolean) {
+        setHasUser(value);
+    }
 }

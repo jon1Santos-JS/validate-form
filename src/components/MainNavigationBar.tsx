@@ -1,14 +1,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-interface MainNavigationBarProps {
-    hasUser: HasUserType;
-    setUser: SetUserType;
-    isUserStateLoading: IsUserStateLoadingType;
-}
+type MainNavigationBarProps = HandlerUserStateProps;
 
 export default function MainNavigationBar({
     hasUser,
+    setHasUser,
     setUser,
     isUserStateLoading,
 }: MainNavigationBarProps) {
@@ -41,10 +38,11 @@ export default function MainNavigationBar({
     }
 
     async function signOutUser() {
-        setUser(false);
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options = { method: 'DELETE' };
         await fetch(action, options);
+        setUser(undefined);
+        setHasUser(false);
         router.push('/sign-in-page');
     }
 }

@@ -1,17 +1,20 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-interface DashBoardPageProps {
-    setUser: SetUserType;
-    hasUser: HasUserType;
-}
+type DashBoardPageProps = HandlerUserStateProps;
 
-export default function DashBoardPage({ hasUser }: DashBoardPageProps) {
+export default function DashBoardPage({
+    hasUser,
+    user,
+    isUserStateLoading,
+}: DashBoardPageProps) {
     const router = useRouter();
 
     useEffect(() => {
-        if (!hasUser()) router.back();
-    }, [hasUser, router]);
+        if (!hasUser() && !isUserStateLoading()) router.back();
+    }, [hasUser, isUserStateLoading, router]);
 
-    return <div className="c-dashboard">{`welcome to dashboard page`}</div>;
+    return (
+        <div className="o-dashboard-page">{`welcome to dashboard page ${user}`}</div>
+    );
 }

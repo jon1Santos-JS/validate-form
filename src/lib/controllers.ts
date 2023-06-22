@@ -20,7 +20,7 @@ export async function signInController(userAccount: UserFromClientType) {
         console.log('controller error to sign in user: ', response);
         return { serverResponse: false };
     }
-    return { serverResponse: true };
+    return { serverResponse: userAccount.username.value };
 }
 
 export async function signUpController(userAccount: UserFromClientType) {

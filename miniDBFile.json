@@ -9,6 +9,17 @@
       "password": {
         "value": "admin1"
       }
+    },
+    {
+      "ID": 2,
+      "constraint": "user",
+      "username": {
+        "value": "joaosinho"
+      },
+      "password": {
+        "value": "asd123"
+      },
+      "timeStamp": "22/06/2023-14:24:27"
     }
   ],
   "limit": 10

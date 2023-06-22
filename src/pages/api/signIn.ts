@@ -18,14 +18,14 @@ export default async function handler(
         const controllerResponse = await getUserStateController();
         // IF THERE'S NO DATABASE USERS, IT'LL COMPARE ADMIN'S ACCOUNT TO HASH
         if (!controllerResponse.serverResponse) {
-            const admin = [
+            const admins = [
                 {
                     username: { value: process.env.ADMIN_USERNAME as string },
                     password: { value: process.env.ADMIN_PASSWORD as string },
                 },
             ];
 
-            const validatedHash = await onValidateHash(browserHash, admin);
+            const validatedHash = await onValidateHash(browserHash, admins);
             res.status(200).json({
                 serverResponse: validatedHash,
             });

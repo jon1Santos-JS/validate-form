@@ -3,12 +3,9 @@ import Form from './Form';
 import Input from './Input';
 import InputsHandler from './InputsHandler';
 
-interface SignInFormProps {
-    setUser: SetUserType;
-    hasUser: HasUserType;
-}
+type SignInFormProps = HandlerUserStateProps;
 
-export default function SignInForm({ setUser }: SignInFormProps) {
+export default function SignInForm({ setUser, setHasUser }: SignInFormProps) {
     const router = useRouter();
 
     return (
@@ -41,8 +38,12 @@ export default function SignInForm({ setUser }: SignInFormProps) {
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
-        if (typeof parsedResponse.serverResponse === 'string') return;
-        if (parsedResponse.serverResponse) router.push('/');
+        if (typeof parsedResponse.serverResponse !== 'string') {
+            setHasUser(false);
+            return;
+        }
+        if (parsedResponse.serverResponse) router.push('/dashboard-page');
+        setHasUser(true);
         setUser(parsedResponse.serverResponse);
     }
 }

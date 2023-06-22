@@ -1,14 +1,11 @@
 import SignInForm from '@/components/SignInForm';
 
-interface SignInPageProps {
-    setUser: SetUserType;
-    hasUser: HasUserType;
-}
+type SignInPageProps = HandlerUserStateProps;
 
-export default function SignInPage({ setUser, hasUser }: SignInPageProps) {
+export default function SignInPage(userprops: SignInPageProps) {
     return (
         <div>
-            <SignInForm setUser={setUser} hasUser={hasUser} />
+            <SignInForm {...userprops} />
         </div>
     );
 }

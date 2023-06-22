@@ -61,6 +61,10 @@ const preInputs: PreFormInputsType = {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Username must has 6 characters at least',
             },
+            {
+                coditional: !currentInputValue.match(/^[A-Za-z]+$/),
+                message: 'Only characters',
+            },
         ],
         required: true,
     },
