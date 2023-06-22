@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 export default function useValidate() {
     const validateAllInputs = (formInputs: FormInputsType) => {
         const inputsNames = Object.keys(formInputs);
@@ -17,10 +19,13 @@ export default function useValidate() {
         return conditional;
     };
 
-    const preValidate = (fieldName: string, formInputs: FormInputsType) => {
-        setAndResetInput(formInputs[fieldName]);
-        return validate(formInputs[fieldName], formInputs);
-    };
+    const preValidate = useMemo(
+        () => (fieldName: string, formInputs: FormInputsType) => {
+            setAndResetInput(formInputs[fieldName]);
+            return validate(formInputs[fieldName], formInputs);
+        },
+        [],
+    );
 
     function setAndResetInput(objectfiedInput: FormInputPropsType) {
         while (objectfiedInput.errors.length > 0) {

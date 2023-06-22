@@ -12,7 +12,6 @@ export default function InputsHandler({
     children,
 }: InputHandlerPropsTypes) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
-
     const [showInputMessagesByOutside, setShowInputMessages] = useState(false);
 
     return (
