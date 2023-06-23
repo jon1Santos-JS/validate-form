@@ -14,7 +14,12 @@ export default function DashBoardPage({
         if (!hasUser() && !isUserStateLoading()) router.back();
     }, [hasUser, isUserStateLoading, router]);
 
-    return (
-        <div className="o-dashboard-page">{`welcome to dashboard page ${user}`}</div>
-    );
+    return <>{renderElement()}</>;
+
+    function renderElement() {
+        if (!hasUser()) return null;
+        return (
+            <div className="o-dashboard-page">{`welcome to dashboard page ${user}`}</div>
+        );
+    }
 }
