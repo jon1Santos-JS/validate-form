@@ -1,8 +1,4 @@
-import {
-    onCreateConstraint,
-    onCreateID,
-    onCreateTimeStamp,
-} from '@/lib/inputHandler';
+import { onCreateConstraint, onCreateID } from '@/lib/inputHandler';
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
 import { MiniDBHandler } from './miniDBHandler';
 
@@ -71,7 +67,6 @@ export class MiniDBAccountHandler {
             accountWithConstraint,
             DATABASE.state.accounts.length,
         );
-        const accountWithTimeStamp = onCreateTimeStamp(accountWithID);
-        return accountWithTimeStamp as UserFromDataBaseType;
+        return accountWithID as UserFromDataBaseType;
     }
 }

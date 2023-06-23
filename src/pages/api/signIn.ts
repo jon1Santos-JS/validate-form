@@ -1,6 +1,5 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createHash, onValidateHash } from '@/lib/hash';
+import { createHash, ReturnUserByHash } from '@/lib/hash';
 import { getUserStateController, signInController } from '@/lib/controllers';
 import Cookies from 'cookies';
 
@@ -25,16 +24,16 @@ export default async function handler(
                 },
             ];
 
-            const validatedHash = await onValidateHash(browserHash, admins);
+            const user = await ReturnUserByHash(browserHash, admins);
             res.status(200).json({
-                serverResponse: validatedHash,
+                serverResponse: user,
             });
             return;
         }
         const DBusers = controllerResponse.serverResponse;
-        const validatedHash = await onValidateHash(browserHash, DBusers);
+        const user = await ReturnUserByHash(browserHash, DBusers);
         res.status(200).json({
-            serverResponse: validatedHash,
+            serverResponse: user,
         });
     }
     if (req.method === 'POST') {

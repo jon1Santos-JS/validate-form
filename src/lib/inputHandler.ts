@@ -1,17 +1,3 @@
-export function onCreateTimeStamp(userAccount: UserFromClientType) {
-    const todaysDate = new Date();
-    const todaysDateFormated = todaysDate
-        .toLocaleString()
-        .split(', ')
-        .join('-');
-    const accountWithTimeStamp = {
-        ...userAccount,
-        timeStamp: todaysDateFormated,
-    };
-
-    return accountWithTimeStamp;
-}
-
 export function onCreateID(userAccount: UserFromClientType, currentID: number) {
     const inputWithID = {
         ID: currentID + 1,

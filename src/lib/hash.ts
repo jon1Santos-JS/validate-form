@@ -7,7 +7,7 @@ export function createHash<T>(value: T) {
     return hash;
 }
 
-export async function onValidateHash(
+export async function ReturnUserByHash(
     browserHash: string | undefined,
     users: UserFromClientType[],
 ) {
