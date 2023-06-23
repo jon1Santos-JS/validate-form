@@ -9,7 +9,7 @@ interface InputProps {
 }
 
 const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
-    const { inputs, showInputMessagesByOutside, updateInputValue } =
+    const { inputs, showInputMessagesFromOutside, updateInputValue } =
         useContext(InputHandlerContext);
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
@@ -29,8 +29,8 @@ const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
     }, [errorList, fieldName, inputs]);
 
     useEffect(() => {
-        if (!showMessage) setShowMessage(showInputMessagesByOutside);
-    }, [showInputMessagesByOutside, showMessage]);
+        if (!showMessage) setShowMessage(showInputMessagesFromOutside);
+    }, [showInputMessagesFromOutside, showMessage]);
 
     useEffect(() => {
         const currentTimer = setMessageWithTimer(false, 2750);
