@@ -21,4 +21,9 @@ declare interface UserFromClientType {
     password: { value: string };
 }
 
-declare type HandleDBComandType = 'reset' | 'getDB' | 'refresh' | 'getUsers';
+declare interface UserToChangePasswordFromClientType
+    extends UserFromClientType {
+    newPassword: { value: string };
+}
+
+declare type HandleDBComandType = 'reset' | 'refresh' | 'getUsers';

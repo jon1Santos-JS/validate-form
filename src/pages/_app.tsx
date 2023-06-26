@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const [user, setUser] = useState<UserType>();
+    const [user, setUser] = useState('');
     const [hasUser, setHasUser] = useState(false);
     const [userStateLoading, setUserStateLoading] = useState(true);
 
@@ -52,7 +52,7 @@ export default function App({ Component, pageProps }: AppProps) {
         </>
     );
 
-    function onUpdateUser(user: UserType) {
+    function onUpdateUser(user: string) {
         setUser(user);
     }
 

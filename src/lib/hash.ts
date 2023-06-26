@@ -22,7 +22,6 @@ export async function ReturnUserByHash(
         }
         return validation.isValid;
     }
-
     users.forEach((user) => {
         const stringifiedUser = JSON.stringify(user);
         if (compareSync(stringifiedUser, browserHash)) {

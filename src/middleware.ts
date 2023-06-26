@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { NextRequest, NextResponse } from 'next/server';
 
 const ADRESSES = process.env.AUTHORIZED_ADRESSES?.split(', ');
@@ -39,5 +38,10 @@ export default async function handler(req: NextRequest) {
 
 // PROTECTED APIS
 export const config = {
-    matcher: ['/api/signUp', '/api/handleDB', '/api/signIn'],
+    matcher: [
+        '/api/signUp',
+        '/api/handleDB',
+        '/api/signIn',
+        '/api/changePassword',
+    ],
 };

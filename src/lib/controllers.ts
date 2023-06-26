@@ -32,3 +32,15 @@ export async function signUpController(userAccount: UserFromClientType) {
     }
     return { serverResponse: true };
 }
+
+export async function changePasswordController(
+    userAccount: UserToChangePasswordFromClientType,
+) {
+    const accountsHandler = new MiniDBAccountHandler();
+    const response = await accountsHandler.updatePassword(userAccount);
+    if (typeof response === 'string') {
+        console.log('controller error to change user password: ', response);
+        return { serverResponse: false };
+    }
+    return { serverResponse: true };
+}

@@ -55,6 +55,10 @@ const preInputs: PreFormInputsType = {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Username incorrect',
             },
+            {
+                coditional: !currentInputValue.match(/^[A-Za-z]+$/),
+                message: 'Username incorrect',
+            },
         ],
         required: 'Username incorrect',
     },
