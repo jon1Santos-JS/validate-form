@@ -22,12 +22,12 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                         />
                         <Input
                             label="Password"
-                            inputType="text"
+                            inputType="password"
                             fieldName="password"
                         />
                         <Input
                             label="Confirm Password"
-                            inputType="text"
+                            inputType="password"
                             fieldName="confirmPassword"
                         />
                     </Form>

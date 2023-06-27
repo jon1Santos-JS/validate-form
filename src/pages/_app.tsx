@@ -14,14 +14,13 @@ export default function App({ Component, pageProps }: AppProps) {
             method: 'GET',
         });
         const parsedResponse: ServerResponse = await response.json();
+        setUserStateLoading(false);
         if (typeof parsedResponse.serverResponse !== 'string') {
             setHasUser(parsedResponse.serverResponse);
-            setUserStateLoading(false);
             return;
         }
         setUser(parsedResponse.serverResponse);
         setHasUser(true);
-        setUserStateLoading(false);
     }, []);
 
     useEffect(() => {
@@ -39,6 +38,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     user={user}
                     setUser={onUpdateUser}
                     isUserStateLoading={() => userStateLoading}
+                    setUserStateLoading={onUpdateState}
                 />
                 <Component
                     hasUser={() => hasUser}
@@ -46,6 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     user={user}
                     setUser={onUpdateUser}
                     isUserStateLoading={() => userStateLoading}
+                    setUserStateLoading={onUpdateState}
                     {...pageProps}
                 />
             </div>
@@ -58,5 +59,9 @@ export default function App({ Component, pageProps }: AppProps) {
 
     function onUpdateHasUser(value: boolean) {
         setHasUser(value);
+    }
+
+    function onUpdateState(value: boolean) {
+        setUserStateLoading(value);
     }
 }

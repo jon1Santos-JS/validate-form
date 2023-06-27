@@ -5,7 +5,7 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    const user: UserFromClientType = req.body;
+    const user: AccountFromClientType = req.body;
     const controllerResponse = await signUpController(user);
     res.status(200).json(controllerResponse);
 }

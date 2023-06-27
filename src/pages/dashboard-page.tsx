@@ -1,36 +1,41 @@
 import ChangePasswordForm from '@/components/ChangePasswordForm';
+import ChangeUsernameForm from '@/components/ChangeUsernameForm';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
 type DashBoardPageProps = HandlerUserStateProps;
 
 export default function DashBoardPage({
     hasUser,
-    setHasUser,
     isUserStateLoading,
     user,
-    setUser,
+    ...restProps
 }: DashBoardPageProps) {
     const router = useRouter();
-
-    useEffect(() => {
-        if (!hasUser() && !isUserStateLoading()) router.back();
-    }, [hasUser, isUserStateLoading, router]);
 
     return <>{renderElement()}</>;
 
     function renderElement() {
-        if (!hasUser()) return null;
+        if (isUserStateLoading()) return null;
+        if (!hasUser() && !isUserStateLoading()) {
+            router.push('/');
+            return null;
+        }
+
         return (
             <div className="o-dashboard-page">
                 <div>{`welcome to dashboard page ${user}`}</div>
                 <div>
                     <ChangePasswordForm
                         hasUser={hasUser}
-                        setHasUser={setHasUser}
-                        isUserStateLoading={isUserStateLoading}
                         user={user}
-                        setUser={setUser}
+                        isUserStateLoading={isUserStateLoading}
+                        {...restProps}
+                    />
+                    <ChangeUsernameForm
+                        hasUser={hasUser}
+                        user={user}
+                        isUserStateLoading={isUserStateLoading}
+                        {...restProps}
                     />
                 </div>
             </div>

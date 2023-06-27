@@ -25,23 +25,36 @@ export default async function handler(
             ];
 
             const user = await ReturnUserByHash(browserHash, admins);
+            if (typeof user === 'boolean') {
+                res.status(200).json({
+                    serverResponse: false,
+                });
+                return;
+            }
             res.status(200).json({
-                serverResponse: user,
+                serverResponse: user.username.value,
             });
             return;
         }
         const DBusers = controllerResponse.serverResponse;
         const user = await ReturnUserByHash(browserHash, DBusers);
+        if (typeof user === 'boolean') {
+            res.status(200).json({
+                serverResponse: false,
+            });
+            return;
+        }
         res.status(200).json({
-            serverResponse: user,
+            serverResponse: user.username.value,
         });
     }
     if (req.method === 'POST') {
-        const user: UserFromClientType = req.body;
+        const user: AccountFromClientType = req.body;
         const controllerResponse = await signInController(user);
         if (controllerResponse.serverResponse) {
             const hash = createHash(user);
-            cookies.set('user-hash', hash);
+            const expires = new Date(Date.now() + 1000 * 60 * 60 * 60 * 2);
+            cookies.set('user-hash', hash, { expires });
         }
         res.status(200).json(controllerResponse);
     }

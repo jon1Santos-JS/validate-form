@@ -11,23 +11,23 @@ export async function ReturnUserByHash(
     browserHash: string | undefined,
     users: UserFromClientType[],
 ) {
-    const validation = { isValid: false, user: '' };
+    const validation = { isValid: false, user: {} };
     if (!browserHash) {
         console.log('invalid hash');
         return validation.isValid;
     }
     if (users.length === 1) {
         if (compareSync(JSON.stringify(users[0]), browserHash)) {
-            return (validation.user = users[0].username.value);
+            return (validation.user = users[0]);
         }
         return validation.isValid;
     }
     users.forEach((user) => {
         const stringifiedUser = JSON.stringify(user);
         if (compareSync(stringifiedUser, browserHash)) {
-            validation.user = user.username.value;
+            validation.user = user;
         }
     });
 
-    return validation.user;
+    return validation.user as UserFromClientType;
 }

@@ -14,10 +14,20 @@
       "ID": 2,
       "constraint": "user",
       "username": {
-        "value": "asdasd"
+        "value": "abacate"
       },
       "password": {
         "value": "asdasd"
+      }
+    },
+    {
+      "ID": 3,
+      "constraint": "user",
+      "username": {
+        "value": "joaosinho"
+      },
+      "password": {
+        "value": "asd123"
       }
     }
   ],

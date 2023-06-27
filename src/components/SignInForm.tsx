@@ -1,13 +1,14 @@
-import { useRouter } from 'next/router';
 import Form from './Form';
 import Input from './Input';
 import InputsHandler from './InputsHandler';
 
 type SignInFormProps = HandlerUserStateProps;
 
-export default function SignInForm({ setUser, setHasUser }: SignInFormProps) {
-    const router = useRouter();
-
+export default function SignInForm({
+    setUser,
+    setHasUser,
+    setUserStateLoading,
+}: SignInFormProps) {
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
@@ -38,11 +39,13 @@ export default function SignInForm({ setUser, setHasUser }: SignInFormProps) {
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
+        setUserStateLoading(false);
         if (typeof parsedResponse.serverResponse !== 'string') {
             setHasUser(false);
             return;
         }
-        if (parsedResponse.serverResponse) router.push('/dashboard-page');
+        if (parsedResponse.serverResponse)
+            window.location.assign('/dashboard-page');
         setHasUser(true);
         setUser(parsedResponse.serverResponse);
     }

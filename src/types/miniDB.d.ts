@@ -18,11 +18,19 @@ declare type ConstraintsType = 'user' | 'admin';
 
 declare interface UserFromClientType {
     username: { value: string };
+}
+
+declare interface AccountFromClientType {
+    username: { value: string };
     password: { value: string };
 }
 
-declare interface UserToChangePasswordFromClientType
-    extends UserFromClientType {
+declare interface ChangeUsernameFromClientType {
+    username: { value: string };
+    newUsername: { value: string };
+}
+
+declare interface ChangePasswordFromClientType extends AccountFromClientType {
     newPassword: { value: string };
 }
 

@@ -13,7 +13,7 @@ export async function getUserStateController() {
     return { serverResponse: users };
 }
 
-export async function signInController(userAccount: UserFromClientType) {
+export async function signInController(userAccount: AccountFromClientType) {
     const accountsHandler = new MiniDBAccountHandler();
     const response = await accountsHandler.signIn(userAccount);
     if (typeof response === 'string') {
@@ -23,7 +23,7 @@ export async function signInController(userAccount: UserFromClientType) {
     return { serverResponse: userAccount.username.value };
 }
 
-export async function signUpController(userAccount: UserFromClientType) {
+export async function signUpController(userAccount: AccountFromClientType) {
     const accountsHandler = new MiniDBAccountHandler();
     const response = await accountsHandler.signUp(userAccount);
     if (typeof response === 'string') {
@@ -34,7 +34,7 @@ export async function signUpController(userAccount: UserFromClientType) {
 }
 
 export async function changePasswordController(
-    userAccount: UserToChangePasswordFromClientType,
+    userAccount: ChangePasswordFromClientType,
 ) {
     const accountsHandler = new MiniDBAccountHandler();
     const response = await accountsHandler.updatePassword(userAccount);
@@ -43,4 +43,16 @@ export async function changePasswordController(
         return { serverResponse: false };
     }
     return { serverResponse: true };
+}
+
+export async function changeUsernameController(
+    user: ChangeUsernameFromClientType,
+) {
+    const accountsHandler = new MiniDBAccountHandler();
+    const response = await accountsHandler.updateUsername(user);
+    if (typeof response === 'string') {
+        console.log('controller error to change username: ', response);
+        return { serverResponse: false };
+    }
+    return { serverResponse: response };
 }

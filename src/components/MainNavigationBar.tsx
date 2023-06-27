@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 type MainNavigationBarProps = HandlerUserStateProps;
 
@@ -9,8 +8,6 @@ export default function MainNavigationBar({
     setUser,
     isUserStateLoading,
 }: MainNavigationBarProps) {
-    const router = useRouter();
-
     return (
         <div className="o-navigation-bar">
             <div className="navigation-container">
@@ -43,6 +40,6 @@ export default function MainNavigationBar({
         await fetch(action, options);
         setUser('');
         setHasUser(false);
-        router.push('/sign-in-page');
+        window.location.assign('/sign-in-page');
     }
 }

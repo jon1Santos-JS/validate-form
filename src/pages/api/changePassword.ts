@@ -7,17 +7,18 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    const cookies = new Cookies(req, res);
     if (req.method === 'POST') {
-        const user: UserToChangePasswordFromClientType = req.body;
-        const userToSetHash = {
-            username: { value: user.username.value },
-            password: { value: user.newPassword.value },
-        };
+        const user: ChangePasswordFromClientType = req.body;
         const controllerResponse = await changePasswordController(user);
         if (controllerResponse.serverResponse) {
+            const cookies = new Cookies(req, res);
+            const userToSetHash = {
+                username: { value: user.username.value },
+                password: { value: user.newPassword.value },
+            };
+            const expires = new Date(Date.now() + 1000 * 60 * 60 * 60 * 2);
             const hash = createHash(userToSetHash);
-            cookies.set('user-hash', hash);
+            cookies.set('user-hash', hash, { expires });
         }
         res.status(200).json(controllerResponse);
     }
