@@ -30,7 +30,6 @@ export class MiniDBHandler {
         try {
             const data = await readFileSync(MINI_DB_FILE_PATH_NAME, 'utf8');
             DATABASE.state = JSON.parse(data);
-            console.log('DB has been accessed');
             return;
         } catch {
             DATABASE.state = INITIAL_STATE;

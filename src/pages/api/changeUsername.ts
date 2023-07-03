@@ -8,19 +8,18 @@ export default async function handler(
     res: NextApiResponse,
 ) {
     if (req.method === 'POST') {
-        const cookies = new Cookies(req, res);
         const userFromClient: ChangeUsernameFromClientType = req.body;
         const controllerResponse = await changeUsernameController(
             userFromClient,
         );
-
         if (typeof controllerResponse.serverResponse === 'boolean') {
             res.status(200).json(controllerResponse);
             return;
         }
         const newUserAccountFromDB = controllerResponse.serverResponse;
-        const expires = new Date(Date.now() + 1000 * 60 * 60 * 60 * 2);
         const hash = createHash(newUserAccountFromDB);
+        const cookies = new Cookies(req, res);
+        const expires = new Date(Date.now() + 1000 * 60 * 60 * 60 * 2);
         cookies.set('user-hash', hash, { expires });
         res.status(200).json({
             serverResponse: newUserAccountFromDB.username.value,

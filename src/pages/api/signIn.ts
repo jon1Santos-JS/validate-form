@@ -25,7 +25,7 @@ export default async function handler(
             ];
 
             const user = await ReturnUserByHash(browserHash, admins);
-            if (typeof user === 'boolean') {
+            if (!user) {
                 res.status(200).json({
                     serverResponse: false,
                 });

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Form from './Form';
 import Input from './Input';
 import InputsHandler from './InputsHandler';
@@ -9,18 +10,22 @@ export default function ChangePasswordForm({
     user,
     setUser,
 }: ChangePasswordFormPropsTypes) {
+    const [alternativeErrors, setAlternativeErrors] = useState<string[]>([]);
     const router = useRouter();
 
     return (
-        <InputsHandler preInputs={preInputs}>
-            <Form legend="Change Username" onSubmitInputs={onSubmitInputs}>
-                <Input
-                    label="New Username"
-                    inputType="password"
-                    fieldName="newUsername"
-                />
-            </Form>
-        </InputsHandler>
+        <>
+            <InputsHandler preInputs={preInputs}>
+                <Form legend="Change Username" onSubmitInputs={onSubmitInputs}>
+                    <Input
+                        label="New Username"
+                        inputType="password"
+                        fieldName="newUsername"
+                        alternativeErrors={...alternativeErrors}
+                    />
+                </Form>
+            </InputsHandler>
+        </>
     );
 
     async function onSubmitInputs<T>(formContent: T) {
@@ -34,10 +39,15 @@ export default function ChangePasswordForm({
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse !== 'string') {
+            setAlternativeErrors(['This username is already used']);
             return;
         }
-        setUser(parsedResponse.serverResponse);
+        const value: string = parsedResponse.serverResponse;
+        setAlternativeErrors([]);
         router.reload();
+        window.addEventListener('load', () => {
+            setUser(value);
+        });
     }
 }
 

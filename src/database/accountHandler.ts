@@ -37,10 +37,7 @@ export class MiniDBAccountHandler {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(currentUserAccount))
             return SERVER_ERROR_RESPONSE;
-        const response = await this.#changePassword(
-            currentUserAccount,
-            userAccount.newPassword.value,
-        );
+        const response = await this.#changePassword(userAccount);
         if (!response) {
             console.log(`user: ${userAccount.username.value} has been changed`);
             return;
@@ -61,7 +58,7 @@ export class MiniDBAccountHandler {
         };
         if (!response) {
             console.log(
-                `user: ${currentUserAccount.username.value} has been changed`,
+                `user: ${currentUserAccount.username.value} has been changed to ${newUserAccount.username.value}`,
             );
             return newUserAccount;
         }
@@ -101,10 +98,7 @@ export class MiniDBAccountHandler {
         return account;
     }
 
-    async #changePassword(
-        userAccount: AccountFromClientType,
-        newPassword: string,
-    ) {
+    async #changePassword(userAccount: ChangePasswordFromClientType) {
         DATABASE.state.accounts = DATABASE.state.accounts.map((account) => {
             if (
                 account.username.value === userAccount.username.value &&
@@ -114,7 +108,7 @@ export class MiniDBAccountHandler {
                     ID: account.ID,
                     constraint: account.constraint,
                     username: { value: userAccount.username.value },
-                    password: { value: newPassword },
+                    password: { value: userAccount.newPassword.value },
                 };
             }
             return account;
@@ -141,7 +135,7 @@ export class MiniDBAccountHandler {
         });
         const handleResponse = await this.#DB.handleDB(
             'refresh',
-            'MiniDBAccountHandler - changePassword',
+            'MiniDBAccountHandler - changeUsername',
         );
         if (!handleResponse) return;
         return SERVER_ERROR_RESPONSE;

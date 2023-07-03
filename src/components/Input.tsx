@@ -6,9 +6,15 @@ interface InputProps {
     label: string;
     inputType: string;
     fieldName: string;
+    alternativeErrors?: string[];
 }
 
-const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
+const Input: React.FC<InputProps> = ({
+    label,
+    inputType,
+    fieldName,
+    alternativeErrors,
+}) => {
     const { inputs, showInputMessagesFromOutside, updateInputValue } =
         useContext(InputHandlerContext);
     const { preValidate } = useValidate();
@@ -20,9 +26,15 @@ const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
     }, [fieldName, inputs, preValidate]);
 
     useEffect(() => {
+        if (!alternativeErrors) return;
+        setErrorList(alternativeErrors);
+    }, [alternativeErrors]);
+
+    useEffect(() => {
         if (!inputs[fieldName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
         setShowMessage(false); // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
+            console.log(errorList);
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
@@ -55,6 +67,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
 
     function renderErrors() {
         if (!showMessage) return null;
+
         return errorList.map((err) => (
             <div className="has-text-danger" key={err}>
                 {err}
