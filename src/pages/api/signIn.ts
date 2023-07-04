@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createHash, ReturnUserByHash } from '@/lib/hash';
+import { HASH_ERROR_RESPONSE, createHash, returnUserByHash } from '@/lib/hash';
 import { getUserStateController, signInController } from '@/lib/controllers';
 import Cookies from 'cookies';
+import { ADMIN_ACCOUNT, COOKIES_EXPIRES } from '@/database/miniDB';
 
 export default async function handler(
     req: NextApiRequest,
@@ -11,56 +12,49 @@ export default async function handler(
     if (req.method === 'GET') {
         const browserHash = cookies.get('user-hash');
         if (!browserHash) {
-            res.status(200).json({ serverResponse: false });
+            res.status(200).json({
+                serverResponse: false,
+                body: HASH_ERROR_RESPONSE,
+            });
             return;
         }
         const controllerResponse = await getUserStateController();
-        // IF THERE'S NO DATABASE USERS, IT'LL COMPARE ADMIN'S ACCOUNT TO HASH
-        if (!controllerResponse.serverResponse) {
-            const admins = [
-                {
-                    username: { value: process.env.ADMIN_USERNAME as string },
-                    password: { value: process.env.ADMIN_PASSWORD as string },
-                },
-            ];
 
-            const user = await ReturnUserByHash(browserHash, admins);
+        if (controllerResponse.serverResponse) {
+            const DBusers = controllerResponse.body;
+            let user = await returnUserByHash(browserHash, DBusers);
+            if (!user) {
+                // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
+                user = await returnUserByHash(browserHash, [ADMIN_ACCOUNT]);
+            }
             if (!user) {
                 res.status(200).json({
                     serverResponse: false,
+                    body: 'User was not found by hash',
                 });
                 return;
             }
             res.status(200).json({
-                serverResponse: user.username.value,
+                serverResponse: true,
+                body: user.username.value,
             });
             return;
         }
-        const DBusers = controllerResponse.serverResponse;
-        const user = await ReturnUserByHash(browserHash, DBusers);
-        if (typeof user === 'boolean') {
-            res.status(200).json({
-                serverResponse: false,
-            });
-            return;
-        }
-        res.status(200).json({
-            serverResponse: user.username.value,
-        });
+
+        return;
     }
     if (req.method === 'POST') {
         const user: AccountFromClientType = req.body;
         const controllerResponse = await signInController(user);
         if (controllerResponse.serverResponse) {
             const hash = createHash(user);
-            const expires = new Date(Date.now() + 1000 * 60 * 60 * 60 * 2);
-            cookies.set('user-hash', hash, { expires });
+            cookies.set('user-hash', hash, { expires: COOKIES_EXPIRES });
         }
         res.status(200).json(controllerResponse);
     }
     if (req.method === 'DELETE') {
         cookies.set('user-hash');
-        const response = { serverResponse: true };
+        const response = { serverResponse: true, body: 'User logged out' };
         res.status(200).json(response);
     }
 }

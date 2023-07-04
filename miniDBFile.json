@@ -4,30 +4,20 @@
       "ID": 1,
       "constraint": "admin",
       "username": {
-        "value": "admin1"
+        "value": "admins"
       },
       "password": {
-        "value": "admin1"
+        "value": "admins"
       }
     },
     {
       "ID": 2,
       "constraint": "user",
       "username": {
-        "value": "abacate"
+        "value": "joaosinho"
       },
       "password": {
-        "value": "asdasd"
-      }
-    },
-    {
-      "ID": 3,
-      "constraint": "user",
-      "username": {
-        "value": "abacatre"
-      },
-      "password": {
-        "value": "asdasd"
+        "value": "asd123"
       }
     }
   ],

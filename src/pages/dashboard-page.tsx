@@ -16,7 +16,7 @@ export default function DashBoardPage({
 
     function renderElement() {
         if (isUserStateLoading()) return null;
-        if (!hasUser() && !isUserStateLoading()) {
+        if (!isUserStateLoading() && !hasUser()) {
             router.push('/');
             return null;
         }

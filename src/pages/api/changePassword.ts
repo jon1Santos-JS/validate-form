@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { changePasswordController } from '@/lib/controllers';
 import { createHash } from '@/lib/hash';
 import Cookies from 'cookies';
+import { COOKIES_EXPIRES } from '@/database/miniDB';
 
 export default async function handler(
     req: NextApiRequest,
@@ -16,9 +17,8 @@ export default async function handler(
                 username: { value: user.username.value },
                 password: { value: user.newPassword.value },
             };
-            const expires = new Date(Date.now() + 1000 * 60 * 60 * 60 * 2);
             const hash = createHash(userToSetHash);
-            cookies.set('user-hash', hash, { expires });
+            cookies.set('user-hash', hash, { expires: COOKIES_EXPIRES });
         }
         res.status(200).json(controllerResponse);
     }

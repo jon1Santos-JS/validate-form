@@ -1,3 +1,4 @@
 declare interface ServerResponse {
-    serverResponse: boolean | string;
+    serverResponse: boolean;
+    body: string;
 }

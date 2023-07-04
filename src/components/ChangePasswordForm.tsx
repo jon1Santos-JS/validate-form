@@ -42,11 +42,8 @@ export default function ChangePasswordForm({
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
-        if (typeof parsedResponse.serverResponse !== 'string') {
-            if (!parsedResponse.serverResponse) return;
-            router.reload();
-            return;
-        }
+        if (!parsedResponse.serverResponse) return;
+        router.reload();
     }
 }
 

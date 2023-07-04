@@ -15,12 +15,11 @@ export default function App({ Component, pageProps }: AppProps) {
         });
         const parsedResponse: ServerResponse = await response.json();
         setUserStateLoading(false);
-        if (typeof parsedResponse.serverResponse !== 'string') {
-            setHasUser(parsedResponse.serverResponse);
+        setHasUser(parsedResponse.serverResponse);
+        if (parsedResponse.serverResponse) {
+            setUser(parsedResponse.body);
             return;
         }
-        setUser(parsedResponse.serverResponse);
-        setHasUser(true);
     }, []);
 
     useEffect(() => {

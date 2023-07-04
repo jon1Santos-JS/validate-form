@@ -1,5 +1,7 @@
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
 
+export const HASH_ERROR_RESPONSE = 'invalid hash';
+
 export function createHash<T>(value: T) {
     const salt = genSaltSync(10);
     const stringifiedValue = JSON.stringify(value);
@@ -7,13 +9,13 @@ export function createHash<T>(value: T) {
     return hash;
 }
 
-export async function ReturnUserByHash(
+export async function returnUserByHash(
     browserHash: string | undefined,
     users: UserFromClientType[],
 ) {
     const validation = { isValid: false, user: {} };
     if (!browserHash) {
-        console.log('invalid hash');
+        console.log(HASH_ERROR_RESPONSE);
         return false;
     }
     if (users.length === 1) {

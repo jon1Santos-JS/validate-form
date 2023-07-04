@@ -1,7 +1,7 @@
 export default function useValidate() {
     const validateAllInputs = (formInputs: FormInputsType) => {
-        const inputsNames = Object.keys(formInputs);
-        const inputErrors = inputsNames.map((inputName) => {
+        const inputsKeys = Object.keys(formInputs);
+        const inputErrors = inputsKeys.map((inputName) => {
             return preValidate(inputName, formInputs);
         });
         const validations = inputErrors.map((error) => {

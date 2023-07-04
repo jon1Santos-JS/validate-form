@@ -40,14 +40,11 @@ export default function SignInForm({
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
         setUserStateLoading(false);
-        if (typeof parsedResponse.serverResponse !== 'string') {
-            setHasUser(false);
-            return;
-        }
-        if (parsedResponse.serverResponse)
+        setHasUser(parsedResponse.serverResponse);
+        if (parsedResponse.serverResponse) {
             window.location.assign('/dashboard-page');
-        setHasUser(true);
-        setUser(parsedResponse.serverResponse);
+            setUser(parsedResponse.body);
+        }
     }
 }
 

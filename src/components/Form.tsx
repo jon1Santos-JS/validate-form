@@ -4,14 +4,16 @@ import InputHandlerContext from '@/context/InputHandlerContext';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    onSubmitInputs: <T>(formContent: T) => Promise<void>;
+    onSubmitInputs: <T>(formContent: T) => Promise<string | undefined | void>;
     legend?: string;
+    alternativeErrors?: string[];
 }
 
 const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
     const { inputs, setShowInputsMessage, updateInputsToSubmit } =
         useContext(InputHandlerContext);
     const [showMessage, setShowMessage] = useState<boolean>(false);
+    const [message, setMessage] = useState('Invalid form');
     const { validateAllInputs } = useValidate();
 
     useEffect(() => {
@@ -58,7 +60,7 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
 
     function renderError() {
         if (!showMessage) return null;
-        return <div className="notification is-danger">{'Invalid form'}</div>;
+        return <div className="notification is-danger">{message}</div>;
     }
 
     async function handleClick(
@@ -67,9 +69,15 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
         e.preventDefault();
         if (!validateAllInputs(inputs)) {
             const inputsToSubmit = updateInputsToSubmit();
+            if (showMessage) return; // TO MITIGATE THE AMOUNT OF REQUISITIONS
+            const response = await onSubmitInputs(inputsToSubmit);
+            if (typeof response === 'string') {
+                setMessage(response);
+                setShowMessage(true);
+                return;
+            }
             setShowInputsMessage(false);
             setShowMessage(false);
-            await onSubmitInputs(inputsToSubmit);
             return;
         }
         setShowMessage(true);

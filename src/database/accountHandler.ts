@@ -47,10 +47,9 @@ export class MiniDBAccountHandler {
 
     async updateUsername(user: ChangeUsernameFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
-        const isThereNewUsername = this.#authUsername(user.newUsername.value);
+        const hasUsername = this.#authUsername(user.newUsername.value);
         const currentUserAccount = this.#authUsername(user.username.value);
-        if (isThereNewUsername || !currentUserAccount)
-            return SERVER_ERROR_RESPONSE;
+        if (hasUsername || !currentUserAccount) return SERVER_ERROR_RESPONSE;
         const response = await this.#changeUsername(user);
         const newUserAccount = {
             username: user.newUsername,
