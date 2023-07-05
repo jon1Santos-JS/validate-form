@@ -19,6 +19,16 @@
       "password": {
         "value": "asd123"
       }
+    },
+    {
+      "ID": 3,
+      "constraint": "user",
+      "username": {
+        "value": "joaosin"
+      },
+      "password": {
+        "value": "asd123"
+      }
     }
   ],
   "limit": 10

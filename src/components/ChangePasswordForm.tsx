@@ -10,31 +10,38 @@ export default function ChangePasswordForm({
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
 
-    return (
-        <InputsHandler preInputs={preInputs}>
-            <Form legend="Change Password" onSubmitInputs={onSubmitInputs}>
-                <Input
-                    label="Password"
-                    inputType="password"
-                    fieldName="password"
-                />
-                <Input
-                    label="New Password"
-                    inputType="password"
-                    fieldName="newPassword"
-                />
-                <Input
-                    label="Confirm New Password"
-                    inputType="password"
-                    fieldName="confirmNewPassword"
-                />
-            </Form>
-        </InputsHandler>
-    );
+    return <>{renderContent()}</>;
 
-    async function onSubmitInputs<T>(formContent: T) {
+    function renderContent() {
+        if (user === (process.env.NEXT_PUBLIC_ADMIN_USERNAME as string))
+            return null;
+
+        return (
+            <InputsHandler preInputs={preInputs}>
+                <Form legend="Change Password" onSubmitInputs={onSubmitInputs}>
+                    <Input
+                        label="Password"
+                        inputType="password"
+                        fieldName="password"
+                    />
+                    <Input
+                        label="New Password"
+                        inputType="password"
+                        fieldName="newPassword"
+                    />
+                    <Input
+                        label="Confirm New Password"
+                        inputType="password"
+                        fieldName="confirmNewPassword"
+                    />
+                </Form>
+            </InputsHandler>
+        );
+    }
+
+    async function onSubmitInputs<T>(contentToSubmit: T) {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
-        const handledBody = { username: { value: user }, ...formContent };
+        const handledBody = { username: { value: user }, ...contentToSubmit };
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

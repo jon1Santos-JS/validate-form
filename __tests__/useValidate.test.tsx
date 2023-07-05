@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { useEffect } from 'react';
 import { act, render } from '@testing-library/react';
 
-interface CustomHookWrapperPropsType {
+interface CustomComponentWrapperPropsType {
     inputs?: FormInputsType;
     fieldName?: string;
     setIsolatedResult?: (newValue: string[]) => void;
@@ -54,21 +54,21 @@ test('testing preValidate function from the useValidate hook', async () => {
     let isolatedResult: string[] = [];
     act(() => {
         render(
-            <CustomHookWrapper
+            <CustomComponentWrapper
                 inputs={inputs}
                 fieldName={'username'}
                 setIsolatedResult={(newValue) => (isolatedResult = newValue)}
             />,
         );
         render(
-            <CustomHookWrapper
+            <CustomComponentWrapper
                 inputs={inputs}
                 fieldName={'password'}
                 setIsolatedResult={(newValue) => (isolatedResult = newValue)}
             />,
         );
         render(
-            <CustomHookWrapper
+            <CustomComponentWrapper
                 inputs={inputs}
                 fieldName={'confirmPassword'}
                 setIsolatedResult={(newValue) => (isolatedResult = newValue)}
@@ -83,7 +83,7 @@ test('testing validateAllInputs function from the useValidate hook', async () =>
 
     act(() => {
         render(
-            <CustomHookWrapper
+            <CustomComponentWrapper
                 inputs={inputs}
                 setResult={(newValue) => (result = newValue)}
             />,
@@ -92,12 +92,12 @@ test('testing validateAllInputs function from the useValidate hook', async () =>
     expect(result).toBe(false);
 });
 
-const CustomHookWrapper = ({
+const CustomComponentWrapper = ({
     inputs,
     fieldName,
     setResult,
     setIsolatedResult,
-}: CustomHookWrapperPropsType) => {
+}: CustomComponentWrapperPropsType) => {
     const { validateAllInputs, preValidate } = useValidate();
 
     useEffect(() => {

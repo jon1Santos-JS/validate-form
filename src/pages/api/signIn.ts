@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { HASH_ERROR_RESPONSE, createHash, returnUserByHash } from '@/lib/hash';
+import { createHash, returnUserByHash } from '@/lib/hash';
 import { getUserStateController, signInController } from '@/lib/controllers';
 import Cookies from 'cookies';
 import { ADMIN_ACCOUNT, COOKIES_EXPIRES } from '@/database/miniDB';
@@ -11,32 +11,29 @@ export default async function handler(
     const cookies = new Cookies(req, res);
     if (req.method === 'GET') {
         const browserHash = cookies.get('user-hash');
-        if (!browserHash) {
-            res.status(200).json({
-                serverResponse: false,
-                body: HASH_ERROR_RESPONSE,
-            });
-            return;
-        }
         const controllerResponse = await getUserStateController();
-
         if (controllerResponse.serverResponse) {
             const DBusers = controllerResponse.body;
-            let user = await returnUserByHash(browserHash, DBusers);
-            if (!user) {
-                // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
-                user = await returnUserByHash(browserHash, [ADMIN_ACCOUNT]);
+            let hashResponse = await returnUserByHash(browserHash, DBusers);
+
+            // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
+            if (!hashResponse.isValid) {
+                hashResponse = await returnUserByHash(
+                    browserHash,
+                    ADMIN_ACCOUNT,
+                );
             }
-            if (!user) {
+
+            if (!hashResponse.isValid) {
                 res.status(200).json({
-                    serverResponse: false,
-                    body: 'User was not found by hash',
+                    serverResponse: hashResponse.isValid,
+                    body: hashResponse.message,
                 });
                 return;
             }
             res.status(200).json({
-                serverResponse: true,
-                body: user.username.value,
+                serverResponse: hashResponse.isValid,
+                body: (hashResponse.user as UserFromClientType).username.value,
             });
             return;
         }

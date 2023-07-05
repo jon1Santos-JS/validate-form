@@ -2,9 +2,13 @@ import useValidate from '@/hooks/useValidate';
 import React, { useContext, useEffect, useState } from 'react';
 import InputHandlerContext from '@/context/InputHandlerContext';
 
+const FORM_ERROR = 'Invalid form';
+
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    onSubmitInputs: <T>(formContent: T) => Promise<string | undefined | void>;
+    onSubmitInputs: <T>(
+        contentToSubmit: T,
+    ) => Promise<string | undefined | void>;
     legend?: string;
     alternativeErrors?: string[];
 }
@@ -13,7 +17,7 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
     const { inputs, setShowInputsMessage, updateInputsToSubmit } =
         useContext(InputHandlerContext);
     const [showMessage, setShowMessage] = useState<boolean>(false);
-    const [message, setMessage] = useState('Invalid form');
+    const [message, setMessage] = useState(FORM_ERROR);
     const { validateAllInputs } = useValidate();
 
     useEffect(() => {
@@ -80,6 +84,7 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
             setShowMessage(false);
             return;
         }
+        setMessage(FORM_ERROR);
         setShowMessage(true);
         setShowInputsMessage(true);
     }

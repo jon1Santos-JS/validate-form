@@ -48,18 +48,7 @@ export default function InputsHandler({
     }
 }
 
-function onOmitFormInputsFields(preInputs: PreFormInputsType) {
-    const mainFieldsToOmit = Object.keys(preInputs).filter((key) =>
-        key.includes('confirm'),
-    );
-    const secondaryFieldsToOmit = ['required', 'validations', 'errors'];
-    const handledInputs: unknown = onOmitFields(
-        preInputs,
-        mainFieldsToOmit,
-        secondaryFieldsToOmit,
-    );
-    return handledInputs as FormInputsTypeToSubmit;
-}
+// AUXILIARY FUNCTIONS
 
 function onAddFormInputsFields(inputs: PreFormInputsType) {
     const inputsWithError = addErrorInput(inputs);
@@ -80,6 +69,19 @@ function onAddFormInputsFields(inputs: PreFormInputsType) {
     }
 
     return inputsWithValue as FormInputsType;
+}
+
+function onOmitFormInputsFields(preInputs: PreFormInputsType) {
+    const mainFieldsToOmit = Object.keys(preInputs).filter((key) =>
+        key.includes('confirm'),
+    );
+    const secondaryFieldsToOmit = ['required', 'validations', 'errors'];
+    const handledInputs: unknown = onOmitFields(
+        preInputs,
+        mainFieldsToOmit,
+        secondaryFieldsToOmit,
+    );
+    return handledInputs as FormInputsTypeToSubmit;
 }
 
 function onOmitFields<T extends object>(

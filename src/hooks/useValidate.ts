@@ -12,9 +12,9 @@ export default function useValidate() {
         const validation = validations.find(
             (validation) => validation === true,
         );
-        const conditional = validation === undefined ? false : validation;
+        const findConditional = validation === undefined ? false : validation;
 
-        return conditional;
+        return findConditional;
     };
 
     const preValidate = (fieldName: string, formInputs: FormInputsType) => {
@@ -38,7 +38,6 @@ export default function useValidate() {
                 currentInput.errors.push(currentInput.required);
                 return currentInput.errors;
             }
-
             currentInput.errors.push('This field is required');
             return currentInput.errors;
         }

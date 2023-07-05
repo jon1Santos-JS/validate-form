@@ -11,8 +11,13 @@ export default function ChangePasswordForm({
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
 
-    return (
-        <>
+    return <>{renderContent()}</>;
+
+    function renderContent() {
+        if (user === (process.env.NEXT_PUBLIC_ADMIN_USERNAME as string))
+            return null;
+
+        return (
             <InputsHandler preInputs={preInputs}>
                 <Form legend="Change Username" onSubmitInputs={onSubmitInputs}>
                     <Input
@@ -22,12 +27,12 @@ export default function ChangePasswordForm({
                     />
                 </Form>
             </InputsHandler>
-        </>
-    );
+        );
+    }
 
-    async function onSubmitInputs<T>(formContent: T) {
+    async function onSubmitInputs<T>(contentToSubmit: T) {
         const action = process.env.NEXT_PUBLIC_CHANGE_USERNAME_LINK as string;
-        const handledBody = { username: { value: user }, ...formContent };
+        const handledBody = { username: { value: user }, ...contentToSubmit };
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

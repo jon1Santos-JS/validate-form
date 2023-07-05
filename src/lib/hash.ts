@@ -1,6 +1,6 @@
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
 
-export const HASH_ERROR_RESPONSE = 'invalid hash';
+export const HASH_DEFAULT_ERROR = 'invalid hash';
 
 export function createHash<T>(value: T) {
     const salt = genSaltSync(10);
@@ -11,25 +11,34 @@ export function createHash<T>(value: T) {
 
 export async function returnUserByHash(
     browserHash: string | undefined,
-    users: UserFromClientType[],
+    users: UserFromClientType[] | UserFromClientType,
 ) {
-    const validation = { isValid: false, user: {} };
+    const validation = {
+        isValid: false,
+        user: {},
+        message: HASH_DEFAULT_ERROR,
+    };
     if (!browserHash) {
-        console.log(HASH_ERROR_RESPONSE);
-        return false;
+        console.log(HASH_DEFAULT_ERROR);
+        return validation;
     }
-    if (users.length === 1) {
-        if (compareSync(JSON.stringify(users[0]), browserHash)) {
-            return (validation.user = users[0]);
-        }
-        return false;
+    validation.message = 'User was not found';
+    const usersList = users as UserFromClientType[];
+    if (usersList.length > 1) {
+        usersList.forEach((user) => {
+            const stringifiedUser = JSON.stringify(user);
+            if (compareSync(stringifiedUser, browserHash)) {
+                validation.user = user;
+                validation.isValid = true;
+            }
+        });
+        return validation;
     }
-    users.forEach((user) => {
-        const stringifiedUser = JSON.stringify(user);
-        if (compareSync(stringifiedUser, browserHash)) {
-            validation.user = user;
-        }
-    });
 
-    return validation.user as UserFromClientType;
+    const admin = usersList;
+    if (compareSync(JSON.stringify(admin), browserHash)) {
+        validation.user = admin;
+        validation.isValid = true;
+    }
+    return validation;
 }

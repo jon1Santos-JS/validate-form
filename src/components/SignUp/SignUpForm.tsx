@@ -36,12 +36,12 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         </div>
     );
 
-    async function onSubmitInputs<T>(formContent: T) {
+    async function onSubmitInputs<T>(contentToSubmit: T) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formContent),
+            body: JSON.stringify(contentToSubmit),
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();

@@ -6,7 +6,6 @@ interface InputProps {
     label: string;
     inputType: string;
     fieldName: string;
-    alternativeErrors?: string[];
 }
 
 const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
@@ -22,7 +21,7 @@ const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
 
     useEffect(() => {
         if (!inputs[fieldName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
-        setShowMessage(false); // RESET THE MESSAGE AS THE ERRORS LIST POP AN ERROR OFF
+        setShowMessage(false); // RESET THE MESSAGE AS THE ERROR LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);

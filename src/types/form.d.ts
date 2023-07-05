@@ -1,3 +1,5 @@
+// TYPES TO CUSTOMIZE
+
 declare interface FetchOptionsType {
     method: MethodTypes;
     headers?: { [key: string]: string };
@@ -20,6 +22,8 @@ declare interface PreFormInputPropsType {
     value?: string;
 }
 
+// *NECESSARY TYPES TO VALIDATE
+
 declare interface FormInputsType {
     [key: string]: FormInputPropsType;
 }
@@ -29,15 +33,17 @@ declare interface FormInputPropsType extends PreFormInputPropsType {
     value: string;
 }
 
+declare interface Validation {
+    coditional: boolean | RegExpMatchArray | null;
+    message: string;
+}
+
+// TYPES TO SUBMIT FORM
+
 declare interface FormInputsTypeToSubmit {
     [key: string]: FormInputPropsTypeToSubmit;
 }
 
 declare interface FormInputPropsTypeToSubmit extends PreFormInputPropsType {
     value: string;
-}
-
-declare interface Validation {
-    coditional: boolean | RegExpMatchArray | null;
-    message: string;
 }
