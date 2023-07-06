@@ -17,8 +17,11 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
+        const db = client.db('users');
         // Send a ping to confirm a successful connection
-        console.log(client.db('test').collection('users').find({}));
+        const collection = db.collection('users');
+        const docs = await collection.find().toArray();
+        return docs;
     } catch (err: unknown) {
         console.log(err);
     } finally {
@@ -31,8 +34,8 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    await run();
-    res.status(200).send('foi');
+    const getDocs = await run();
+    res.status(200).json(getDocs);
 }
 
 export const config = {
