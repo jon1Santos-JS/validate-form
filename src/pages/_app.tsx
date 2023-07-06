@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import '../styles/sass/index.scss';
 import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
+import axios from 'axios';
 
 export default function App({ Component, pageProps }: AppProps) {
     const [user, setUser] = useState('');
@@ -26,11 +27,39 @@ export default function App({ Component, pageProps }: AppProps) {
         fetchData();
     }, [fetchData]);
 
+    //VALIDATE-ADMIN
+    //pXq8ssDYmOneTCdUAnbN2YgcpGnus7WGviMOTmYu4QcRB91BbpLAhLoQQPVi0sqe
+
     useEffect(() => {
         async function test() {
-            const response = await fetch('api/testConnection');
-            const parsedResponse = await response.json();
-            console.log(parsedResponse);
+            const data = JSON.stringify({
+                collection: 'users',
+                database: 'users',
+                dataSource: 'AtlasCluster',
+                projection: {
+                    _id: 1,
+                },
+            });
+
+            const config = {
+                method: 'post',
+                url: 'https://sa-east-1.aws.data.mongodb-api.com/app/data-yqzgt/endpoint/data/v1',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Request-Headers': '*',
+                    'api-key':
+                        'pXq8ssDYmOneTCdUAnbN2YgcpGnus7WGviMOTmYu4QcRB91BbpLAhLoQQPVi0sqe',
+                },
+                data: data,
+            };
+
+            axios(config)
+                .then(function (response) {
+                    console.log(JSON.stringify(response.data));
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
         test();
     }, []);

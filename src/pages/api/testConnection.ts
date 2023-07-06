@@ -18,8 +18,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         // Send a ping to confirm a successful connection
-        await client.db('admin').command({ ping: 1 });
-        console.log(client.db().collection('users').find({}));
+        console.log(client.db('test').collection('users').find({}));
     } catch (err: unknown) {
         console.log(err);
     } finally {
