@@ -9,12 +9,12 @@ export const INITIAL_STATE: MiniDBState = {
 export const DB_ADMIN_ACCOUNT: UserFromDataBaseType = {
     ID: 1,
     constraint: 'admin',
-    username: { value: process.env.ADMIN_USERNAME as string },
-    password: { value: process.env.ADMIN_PASSWORD as string },
+    username: { value: process.env.ADMINS_USERNAME as string },
+    password: { value: process.env.ADMINS_PASSWORD as string },
 };
-export const ADMIN_ACCOUNT: AccountFromClientType = {
-    username: { value: process.env.ADMIN_USERNAME as string },
-    password: { value: process.env.ADMIN_PASSWORD as string },
+export const ADMINS_ACCOUNT: AccountFromClientType = {
+    username: { value: process.env.ADMINS_USERNAME as string },
+    password: { value: process.env.ADMINS_PASSWORD as string },
 };
 
 export const COOKIES_EXPIRES = new Date(Date.now() + HOUR * 2);
