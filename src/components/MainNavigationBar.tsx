@@ -8,28 +8,23 @@ export default function MainNavigationBar({
     setUser,
     isUserStateLoading,
 }: MainNavigationBarProps) {
-    return (
-        <div className="o-navigation-bar">
-            <div className="navigation-container">
-                {renderAlternativeContent()}
-            </div>
-        </div>
-    );
+    return <>{renderAlternativeContent()}</>;
 
     function renderAlternativeContent() {
-        if (isUserStateLoading()) return null;
+        while (isUserStateLoading()) return null;
 
         return (
-            <>
-                {!hasUser() && <Link href="/">Home</Link>}
-                {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
-                {hasUser() && <Link href="/dashboard-page">Profile</Link>}
-                {hasUser() && (
-                    <div className="c-button" onClick={signOutUser}>
-                        Sign out
-                    </div>
-                )}
-            </>
+            <div className="o-navigation-bar">
+                <div className="navigation-container">
+                    {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
+                    {hasUser() && <Link href="/dashboard-page">Profile</Link>}
+                    {hasUser() && (
+                        <div className="c-button" onClick={signOutUser}>
+                            Sign out
+                        </div>
+                    )}
+                </div>
+            </div>
         );
     }
 
