@@ -22,22 +22,19 @@ export default async function handler(
                     browserHash,
                     ADMINS_ACCOUNT,
                 );
-            }
-
-            if (!hashResponse.isValid) {
-                res.status(500).json({
+                res.status(200).json({
                     serverResponse: hashResponse.isValid,
                     body: hashResponse.message,
                 });
                 return;
             }
+
             res.status(200).json({
                 serverResponse: hashResponse.isValid,
                 body: (hashResponse.user as UserFromClientType).username.value,
             });
             return;
         }
-        res.status(500).send('internal error');
     }
     if (req.method === 'POST') {
         const user: AccountFromClientType = req.body;
