@@ -40,7 +40,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     setHasUser={onUpdateHasUser}
                     user={user}
                     setUser={onUpdateUser}
-                    isUserStateLoading={() => userStateLoading}
+                    isUserStateLoading={userStateLoading}
                     setUserStateLoading={onUpdateState}
                 />
                 <Component
@@ -48,7 +48,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     setHasUser={onUpdateHasUser}
                     user={user}
                     setUser={onUpdateUser}
-                    isUserStateLoading={() => userStateLoading}
+                    isUserStateLoading={userStateLoading}
                     setUserStateLoading={onUpdateState}
                     {...pageProps}
                 />

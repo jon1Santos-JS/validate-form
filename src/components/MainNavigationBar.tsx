@@ -11,11 +11,12 @@ export default function MainNavigationBar({
     return <>{renderAlternativeContent()}</>;
 
     function renderAlternativeContent() {
-        while (isUserStateLoading()) return null;
+        if (isUserStateLoading) return null;
 
         return (
             <div className="o-navigation-bar">
                 <div className="navigation-container">
+                    {!hasUser() && <Link href="/">Home</Link>}
                     {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
                     {hasUser() && <Link href="/dashboard-page">Profile</Link>}
                     {hasUser() && (

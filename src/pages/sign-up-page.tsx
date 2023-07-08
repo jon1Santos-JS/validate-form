@@ -12,8 +12,8 @@ export default function SignUpPage({
     return <>{renderContent()}</>;
 
     function renderContent() {
-        if (isUserStateLoading()) return null;
-        if (!isUserStateLoading() && hasUser()) {
+        if (isUserStateLoading) return null;
+        if (!isUserStateLoading && hasUser()) {
             router.push('/');
             return null;
         }

@@ -9,6 +9,6 @@ declare interface HandlerUserStateProps {
     setHasUser: (value: boolean) => void;
     user: string;
     setUser: SetUserType;
-    isUserStateLoading: () => boolean;
+    isUserStateLoading: boolean;
     setUserStateLoading: (value: boolean) => void;
 }
