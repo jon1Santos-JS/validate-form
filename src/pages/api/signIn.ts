@@ -25,7 +25,7 @@ export default async function handler(
             }
 
             if (!hashResponse.isValid) {
-                res.status(200).json({
+                res.status(500).json({
                     serverResponse: hashResponse.isValid,
                     body: hashResponse.message,
                 });
@@ -37,8 +37,7 @@ export default async function handler(
             });
             return;
         }
-
-        return;
+        res.status(500).send('internal error');
     }
     if (req.method === 'POST') {
         const user: AccountFromClientType = req.body;
