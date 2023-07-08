@@ -35,6 +35,8 @@ export default async function handler(
             });
             return;
         }
+
+        return;
     }
     if (req.method === 'POST') {
         const user: AccountFromClientType = req.body;
@@ -43,7 +45,6 @@ export default async function handler(
             const hash = createHash(user);
             cookies.set('user-hash', hash, {
                 expires: COOKIES_EXPIRES,
-                sameSite: 'none',
             });
         }
         res.status(200).json(controllerResponse);

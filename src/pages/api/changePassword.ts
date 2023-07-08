@@ -20,7 +20,6 @@ export default async function handler(
             const hash = createHash(userToSetHash);
             cookies.set('user-hash', hash, {
                 expires: COOKIES_EXPIRES,
-                sameSite: 'none',
             });
         }
         res.status(200).json(controllerResponse);
