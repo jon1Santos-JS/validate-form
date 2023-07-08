@@ -44,7 +44,10 @@ export default async function handler(
         const controllerResponse = await signInController(user);
         if (controllerResponse.serverResponse) {
             const hash = createHash(user);
-            cookies.set('user-hash', hash, { expires: COOKIES_EXPIRES });
+            cookies.set('user-hash', hash, {
+                expires: COOKIES_EXPIRES,
+                sameSite: 'none',
+            });
         }
         res.status(200).json(controllerResponse);
     }

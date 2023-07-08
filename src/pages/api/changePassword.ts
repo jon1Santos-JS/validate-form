@@ -18,7 +18,10 @@ export default async function handler(
                 password: { value: user.newPassword.value },
             };
             const hash = createHash(userToSetHash);
-            cookies.set('user-hash', hash, { expires: COOKIES_EXPIRES });
+            cookies.set('user-hash', hash, {
+                expires: COOKIES_EXPIRES,
+                sameSite: 'none',
+            });
         }
         res.status(200).json(controllerResponse);
     }
