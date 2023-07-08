@@ -15,10 +15,9 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const db = client.db('accounts');
-        // Send a ping to confirm a successful connection
+
         const collection = db.collection('users');
         const docs = await collection.find().toArray();
         return docs;

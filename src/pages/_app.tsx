@@ -1,4 +1,5 @@
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import '../styles/sass/index.scss';
 import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
@@ -31,6 +32,9 @@ export default function App({ Component, pageProps }: AppProps) {
     return (
         <>
             <div className="o-app">
+                <Head>
+                    <link rel="icon" href="data:,"></link>
+                </Head>
                 <MainNavigationBar
                     hasUser={() => hasUser}
                     setHasUser={onUpdateHasUser}
