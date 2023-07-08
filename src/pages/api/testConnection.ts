@@ -2,7 +2,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const uri =
-    'mongodb+srv://admins:admins@atlascluster.rc4ew.mongodb.net/?retryWrites=true&w=majority';
+    'mongodb+srv://joaosantos58981:HExPSBU0gf4NsKZC@cluster0.jtc0ysv.mongodb.net/?retryWrites=true&w=majority';
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -17,7 +17,7 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
-        const db = client.db('users');
+        const db = client.db('accounts');
         // Send a ping to confirm a successful connection
         const collection = db.collection('users');
         const docs = await collection.find().toArray();

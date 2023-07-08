@@ -1,3 +1,5 @@
+const EMPTY_INPUT_ERROR_RESPONSE = 'This field is required';
+
 export default function useValidate() {
     const validateAllInputs = (formInputs: FormInputsType) => {
         const inputsKeys = Object.keys(formInputs);
@@ -38,7 +40,7 @@ export default function useValidate() {
                 currentInput.errors.push(currentInput.required);
                 return currentInput.errors;
             }
-            currentInput.errors.push('This field is required');
+            currentInput.errors.push(EMPTY_INPUT_ERROR_RESPONSE);
             return currentInput.errors;
         }
         if (!currentInput.value) return currentInput.errors;
@@ -46,8 +48,8 @@ export default function useValidate() {
         currentInput
             .validations(currentInput.value, formInputs)
             .map((validation) => {
-                if (validation.coditional)
-                    currentInput.errors.push(validation.message);
+                const message = validation.message ? validation.message : '';
+                if (validation.coditional) currentInput.errors.push(message);
             });
         return currentInput.errors;
     }

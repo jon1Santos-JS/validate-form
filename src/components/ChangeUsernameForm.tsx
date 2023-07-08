@@ -22,7 +22,7 @@ export default function ChangePasswordForm({
                 <Form legend="Change Username" onSubmitInputs={onSubmitInputs}>
                     <Input
                         label="New Username"
-                        inputType="password"
+                        inputType="text"
                         fieldName="newUsername"
                     />
                 </Form>

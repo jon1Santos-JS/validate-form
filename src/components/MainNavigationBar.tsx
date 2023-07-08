@@ -21,8 +21,7 @@ export default function MainNavigationBar({
 
         return (
             <>
-                <Link href="/">Home</Link>
-                {!hasUser() && <Link href="/sign-in-page">Sign in</Link>}
+                {!hasUser() && <Link href="/">Home</Link>}
                 {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
                 {hasUser() && <Link href="/dashboard-page">Profile</Link>}
                 {hasUser() && (
@@ -40,6 +39,6 @@ export default function MainNavigationBar({
         await fetch(action, options);
         setUser('');
         setHasUser(false);
-        window.location.assign('/sign-in-page');
+        window.location.assign('/');
     }
 }

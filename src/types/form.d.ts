@@ -35,7 +35,7 @@ declare interface FormInputPropsType extends PreFormInputPropsType {
 
 declare interface Validation {
     coditional: boolean | RegExpMatchArray | null;
-    message: string;
+    message?: string;
 }
 
 // TYPES TO SUBMIT FORM

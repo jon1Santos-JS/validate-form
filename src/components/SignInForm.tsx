@@ -4,6 +4,8 @@ import InputsHandler from './InputsHandler';
 
 type SignInFormProps = HandlerUserStateProps;
 
+const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
+
 export default function SignInForm({
     setUser,
     setHasUser,
@@ -41,10 +43,11 @@ export default function SignInForm({
         const parsedResponse: ServerResponse = await response.json();
         setUserStateLoading(false);
         setHasUser(parsedResponse.serverResponse);
-        if (parsedResponse.serverResponse) {
-            window.location.assign('/dashboard-page');
-            setUser(parsedResponse.body);
+        if (!parsedResponse.serverResponse) {
+            return SIGN_IN_ERROR_RESPONSE;
         }
+        window.location.assign('/dashboard-page');
+        setUser(parsedResponse.body);
     }
 }
 
@@ -53,22 +56,19 @@ const preInputs: PreFormInputsType = {
         validations: (currentInputValue: string) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Username incorrect',
             },
             {
                 coditional: !currentInputValue.match(/^[A-Za-z]+$/),
-                message: 'Username incorrect',
             },
         ],
-        required: 'Username incorrect',
+        required: true,
     },
     password: {
         validations: (currentInputValue) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Password incorrect',
             },
         ],
-        required: 'Password incorrect',
+        required: true,
     },
 };

@@ -26,16 +26,6 @@ export default function App({ Component, pageProps }: AppProps) {
         fetchData();
     }, [fetchData]);
 
-    useEffect(() => {
-        async function test() {
-            const response = await fetch('api/testConnection');
-            const parsedReponse = await response.json();
-            console.log(parsedReponse);
-        }
-
-        test();
-    }, []);
-
     if (pageProps.statusCode === 404) return <Component {...pageProps} />;
 
     return (
