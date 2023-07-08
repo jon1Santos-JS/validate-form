@@ -15,7 +15,6 @@ export default function App({ Component, pageProps }: AppProps) {
             method: 'GET',
         });
         const parsedResponse: ServerResponse = await response.json();
-        setUserStateLoading(false);
         setHasUser(parsedResponse.serverResponse);
         if (parsedResponse.serverResponse) {
             setUser(parsedResponse.body);
@@ -24,6 +23,7 @@ export default function App({ Component, pageProps }: AppProps) {
     }, []);
 
     useEffect(() => {
+        setUserStateLoading(false);
         fetchData();
     }, [fetchData]);
 
