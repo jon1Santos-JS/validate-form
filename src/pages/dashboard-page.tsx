@@ -1,5 +1,6 @@
 import ChangePasswordForm from '@/components/ChangePasswordForm';
 import ChangeUsernameForm from '@/components/ChangeUsernameForm';
+import PerfilImage from '@/components/PerfilImage';
 import { useRouter } from 'next/router';
 
 type DashBoardPageProps = HandlerUserStateProps;
@@ -20,11 +21,13 @@ export default function DashBoardPage({
             router.push('/');
             return null;
         }
+        const message = `welcome to dashboard page ${user}, and thank you to test our validate hook`;
 
         return (
             <div className="o-dashboard-page">
-                <div>{`welcome to dashboard page ${user}`}</div>
+                <div>{message}</div>
                 <div>
+                    <PerfilImage />
                     <ChangePasswordForm
                         hasUser={hasUser}
                         user={user}
