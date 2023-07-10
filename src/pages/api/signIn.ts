@@ -21,29 +21,31 @@ export default async function handler(
         const controllerResponse = await getUserStateController();
         if (controllerResponse.serverResponse) {
             const DBusers = controllerResponse.body;
-            let hashResponse = await returnUserByHash(browserHash, DBusers);
-
-            // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
-            if (!hashResponse.isValid) {
-                hashResponse = await returnUserByHash(
-                    browserHash,
-                    ADMINS_ACCOUNT,
-                );
-                res.status(200).json({
-                    serverResponse: hashResponse.isValid,
-                    body: hashResponse.message,
-                });
-                return;
-            }
+            const hashResponse = await returnUserByHash(browserHash, DBusers);
+            const conditional = hashResponse.isValid
+                ? hashResponse.user
+                : hashResponse.message;
 
             res.status(200).json({
                 serverResponse: hashResponse.isValid,
-                body: (hashResponse.user as UserFromClientType).username.value,
+                body: conditional,
             });
             return;
         }
 
-        return;
+        // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
+        const hashResponse = await returnUserByHash(
+            browserHash,
+            ADMINS_ACCOUNT,
+        );
+        const conditional = hashResponse.isValid
+            ? hashResponse.user
+            : hashResponse.message;
+
+        res.status(200).json({
+            serverResponse: hashResponse.isValid,
+            body: conditional,
+        });
     }
     if (req.method === 'POST') {
         const user: AccountFromClientType = req.body;

@@ -9,10 +9,7 @@ export function createHash<T>(value: T) {
     return hash;
 }
 
-export async function returnUserByHash(
-    browserHash: string,
-    users: UserFromClientType[] | UserFromClientType,
-) {
+export async function returnUserByHash(browserHash: string, users: unknown) {
     const validation = {
         isValid: false,
         user: {},
@@ -24,16 +21,16 @@ export async function returnUserByHash(
         usersList.forEach((user) => {
             const stringifiedUser = JSON.stringify(user);
             if (compareSync(stringifiedUser, browserHash)) {
-                validation.user = user;
+                validation.user = user.username.value;
                 validation.isValid = true;
             }
         });
         return validation;
     }
 
-    const admin = usersList;
+    const admin = users as UserFromClientType;
     if (compareSync(JSON.stringify(admin), browserHash)) {
-        validation.user = admin;
+        validation.user = admin.username.value;
         validation.isValid = true;
     }
     return validation;
