@@ -11,6 +11,13 @@ export default async function handler(
     const cookies = new Cookies(req, res);
     if (req.method === 'GET') {
         const browserHash = cookies.get('user-hash');
+        if (!browserHash) {
+            res.status(200).json({
+                serverResponse: false,
+                body: 'invalid hash',
+            });
+            return;
+        }
         const controllerResponse = await getUserStateController();
         if (controllerResponse.serverResponse) {
             const DBusers = controllerResponse.body;
