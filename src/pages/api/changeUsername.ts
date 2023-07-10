@@ -25,6 +25,7 @@ export default async function handler(
         const cookies = new Cookies(req, res);
         cookies.set('user-hash', hash, {
             expires: COOKIES_EXPIRES,
+            sameSite: 'lax',
         });
         res.status(200).json({
             serverResponse: true,

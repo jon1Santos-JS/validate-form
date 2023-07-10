@@ -54,6 +54,7 @@ export default async function handler(
             const hash = createHash(user);
             cookies.set('user-hash', hash, {
                 expires: COOKIES_EXPIRES,
+                sameSite: 'lax',
             });
         }
         res.status(200).json(controllerResponse);
