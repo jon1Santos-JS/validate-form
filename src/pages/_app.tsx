@@ -1,7 +1,7 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import '../styles/sass/index.scss';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -9,18 +9,20 @@ export default function App({ Component, pageProps }: AppProps) {
     const [hasUser, setHasUser] = useState(false);
     const [userStateLoading, setUserStateLoading] = useState(true);
 
-    const fetchData = useCallback(async () => {
-        const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
-        const response = await fetch(action, {
-            method: 'GET',
-        });
-        const parsedResponse: ServerResponse = await response.json();
-        setHasUser(parsedResponse.serverResponse);
-        setUserStateLoading(false);
-        if (parsedResponse.serverResponse) {
-            setUser(parsedResponse.body);
-            return;
-        }
+    const fetchData = useMemo(() => {
+        return async () => {
+            const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
+            const response = await fetch(action, {
+                method: 'GET',
+            });
+            const parsedResponse: ServerResponse = await response.json();
+            setHasUser(parsedResponse.serverResponse);
+            setUserStateLoading(false);
+            if (parsedResponse.serverResponse) {
+                setUser(parsedResponse.body);
+                return;
+            }
+        };
     }, []);
 
     useEffect(() => {
