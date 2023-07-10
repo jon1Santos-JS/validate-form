@@ -10,7 +10,7 @@ export function createHash<T>(value: T) {
 }
 
 export async function returnUserByHash(
-    browserHash: string | undefined,
+    browserHash: string,
     users: UserFromClientType[] | UserFromClientType,
 ) {
     const validation = {
@@ -18,10 +18,6 @@ export async function returnUserByHash(
         user: {},
         message: HASH_DEFAULT_ERROR,
     };
-    if (!browserHash) {
-        console.log(HASH_DEFAULT_ERROR);
-        return validation;
-    }
     validation.message = 'User was not found';
     const usersList = users as UserFromClientType[];
     if (usersList.length > 1) {

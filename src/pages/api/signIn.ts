@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createHash, returnUserByHash } from '@/lib/hash';
+import { HASH_DEFAULT_ERROR, createHash, returnUserByHash } from '@/lib/hash';
 import { getUserStateController, signInController } from '@/lib/controllers';
 import Cookies from 'cookies';
 import { ADMINS_ACCOUNT, COOKIES_EXPIRES } from '@/database/miniDB';
@@ -14,7 +14,7 @@ export default async function handler(
         if (!browserHash) {
             res.status(200).json({
                 serverResponse: false,
-                body: 'invalid hash',
+                body: HASH_DEFAULT_ERROR,
             });
             return;
         }
