@@ -1,4 +1,4 @@
-const HOUR = 1000 * 60 * 60 * 60;
+const HOUR = 1000 * 60 * 60;
 export const SERVER_ERROR_RESPONSE = 'internal server error';
 export const MINI_DB_FILE_PATH_NAME = 'miniDBFile.json';
 

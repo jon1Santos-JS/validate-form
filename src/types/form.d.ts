@@ -20,6 +20,7 @@ declare interface PreFormInputPropsType {
     required?: boolean | string;
     errors?: string[];
     value?: string;
+    files?: FileList | null;
 }
 
 // *NECESSARY TYPES TO VALIDATE

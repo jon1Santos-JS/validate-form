@@ -6,10 +6,18 @@ interface InputProps {
     label: string;
     inputType: string;
     fieldName: string;
+    inputName?: string;
+    inputAccept?: string;
 }
 
-const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
-    const { inputs, showInputMessagesFromOutside, updateInputValue } =
+const Input: React.FC<InputProps> = ({
+    label,
+    inputType,
+    fieldName,
+    inputName,
+    inputAccept,
+}) => {
+    const { inputs, showInputMessagesFromOutside, onChangeInput } =
         useContext(InputHandlerContext);
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
@@ -45,13 +53,24 @@ const Input: React.FC<InputProps> = ({ label, inputType, fieldName }) => {
             <input
                 id={label}
                 className="input"
-                onChange={(e) => updateInputValue(e.target.value, fieldName)}
+                name={inputName && inputName}
+                accept={inputAccept && inputAccept}
+                onChange={onGetValues}
                 value={inputs[fieldName].value}
                 type={inputType}
             />
             {renderErrors()}
         </div>
     );
+
+    function onGetValues(e: React.ChangeEvent<HTMLInputElement>) {
+        const handledValues = {
+            fieldName: fieldName,
+            value: e.target.value,
+            files: e.target.files ? e.target.files : null,
+        };
+        onChangeInput(handledValues);
+    }
 
     function renderErrors() {
         if (!showMessage) return null;

@@ -1,9 +1,15 @@
 import React from 'react';
 
+export interface onChangeInputsProps {
+    fieldName: string;
+    value: string;
+    files: FileList | null;
+}
+
 interface InputHandlerContextType {
     showInputMessagesFromOutside: boolean;
     inputs: FormInputsType;
-    updateInputValue: (value: string, fieldName: string) => void;
+    onChangeInput: (props: onChangeInputsProps) => void;
     updateInputsToSubmit: () => FormInputsTypeToSubmit;
     setShowInputsMessage: (value: boolean) => void;
 }
@@ -12,6 +18,6 @@ export default React.createContext<InputHandlerContextType>({
     showInputMessagesFromOutside: false,
     inputs: {},
     updateInputsToSubmit: () => ({}),
-    updateInputValue: () => 1,
+    onChangeInput: () => 1,
     setShowInputsMessage: () => 1,
 });

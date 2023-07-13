@@ -5,9 +5,18 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    const user: AccountFromClientType = req.body;
-    const controllerResponse = await signUpController(user);
-    res.status(200).json(controllerResponse);
+    switch (req.method) {
+        case 'POST': {
+            const user: AccountFromClientType = req.body;
+            const controllerResponse = await signUpController(user);
+            res.status(200).json(controllerResponse);
+            break;
+        }
+        default: {
+            res.status(405).json({ serverResponse: 'Method Not Allowed' });
+            break;
+        }
+    }
 }
 
 export const config = {

@@ -1,14 +1,35 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
+import InputsHandler from './InputsHandler';
+import Form from './Form';
+import Input from './Input';
+
+const EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
 export default function PerfilImage() {
-    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        const file = e.target.files[0];
-        console.log(file);
+    const [file, setFile] = useState<File | null>(null);
 
-        const formData = new FormData();
+    return (
+        <div>
+            <h4>Upload image</h4>
+            <InputsHandler preInputs={preInputs}>
+                <Form onSubmitInputs={onSubmitInputs}>
+                    <Input
+                        label="image"
+                        fieldName="imageInput"
+                        inputType="file"
+                        inputName="image"
+                        inputAccept="image/*"
+                    />
+                </Form>
+            </InputsHandler>
+        </div>
+    );
+
+    async function onSubmitInputs<T>(contentToSubmit: T) {
+        console.log(contentToSubmit.files);
+        if (!file) return;
+        const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file);
-
         const response = await fetch('/api/testConnection', {
             method: 'POST',
             body: formData,
@@ -19,12 +40,25 @@ export default function PerfilImage() {
         } else {
             console.error('Error uploading image.');
         }
-    };
+    }
+}
 
-    return (
-        <div>
-            <h4>Image Upload</h4>
-            <input type="file" onChange={handleFileUpload} accept="image/*" />
-        </div>
+const preInputs: PreFormInputsType = {
+    imageInput: {
+        validations: (currentInputValue: string) => [
+            {
+                coditional: !onCheckExtensions(currentInputValue),
+                message: `Allowed extensions: .png, .jpg, .jpeg`,
+            },
+        ],
+        required: true,
+    },
+};
+
+function onCheckExtensions(text: string) {
+    const validate = { value: false };
+    EXTENSIONS.forEach((extension) =>
+        text.includes(extension) ? (validate.value = true) : null,
     );
+    return validate.value;
 }

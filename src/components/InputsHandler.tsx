@@ -1,4 +1,6 @@
-import InputHandlerContext from '@/context/InputHandlerContext';
+import InputHandlerContext, {
+    onChangeInputsProps,
+} from '@/context/InputHandlerContext';
 import { useState } from 'react';
 import _ from 'lodash';
 
@@ -20,7 +22,7 @@ export default function InputsHandler({
             value={{
                 showInputMessagesFromOutside,
                 inputs,
-                updateInputValue,
+                onChangeInput,
                 updateInputsToSubmit,
                 setShowInputsMessage,
             }}
@@ -29,14 +31,19 @@ export default function InputsHandler({
         </InputHandlerContext.Provider>
     );
 
-    function updateInputValue(value: string, fieldName: string) {
+    function onChangeInput({ fieldName, value, files }: onChangeInputsProps) {
+        const staticProps = {
+            validations: inputs[fieldName].validations,
+            errors: inputs[fieldName].errors,
+            required: inputs[fieldName].required,
+        };
+
         setInputs({
             ...inputs,
             [fieldName]: {
-                validations: inputs[fieldName].validations,
+                ...staticProps,
                 value: value,
-                errors: inputs[fieldName].errors,
-                required: inputs[fieldName].required,
+                files: files,
             },
         });
     }

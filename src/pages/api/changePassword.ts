@@ -8,22 +8,29 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    if (req.method === 'POST') {
-        const user: ChangePasswordFromClientType = req.body;
-        const controllerResponse = await changePasswordController(user);
-        if (controllerResponse.serverResponse) {
-            const cookies = new Cookies(req, res);
-            const userToSetHash = {
-                username: { value: user.username.value },
-                password: { value: user.newPassword.value },
-            };
-            const hash = createHash(userToSetHash);
-            cookies.set('user-hash', hash, {
-                expires: COOKIES_EXPIRES,
-                sameSite: 'lax',
-            });
+    switch (req.method) {
+        case 'POST': {
+            const user: ChangePasswordFromClientType = req.body;
+            const controllerResponse = await changePasswordController(user);
+            if (controllerResponse.serverResponse) {
+                const cookies = new Cookies(req, res);
+                const userToSetHash = {
+                    username: { value: user.username.value },
+                    password: { value: user.newPassword.value },
+                };
+                const hash = createHash(userToSetHash);
+                cookies.set('user-hash', hash, {
+                    expires: COOKIES_EXPIRES,
+                    sameSite: 'lax',
+                });
+            }
+            res.status(200).json(controllerResponse);
+            break;
         }
-        res.status(200).json(controllerResponse);
+        default: {
+            res.status(405).json({ serverResponse: 'Method Not Allowed' });
+            break;
+        }
     }
 }
 

@@ -1,65 +1,42 @@
+import { imageHandler } from '@/lib/imageHandle';
+import multer from 'multer';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import path from 'path';
-import fs from 'fs';
-import { IncomingForm } from 'formidable';
+import { Request, Response } from 'express';
 
-interface File {
-    /**
-     * The size of the uploaded file in bytes. If the file is still being uploaded (see `'fileBegin'`
-     * event), this property says how many bytes of the file have been written to disk yet.
-     */
-    size: number;
+type NextApiRequestWithFormData = NextApiRequest &
+    Request & {
+        files: unknown[];
+    };
 
-    /**
-     * The path this file is being written to. You can modify this in the `'fileBegin'` event in case
-     * you are unhappy with the way formidable generates a temporary path for your files.
-     */
-    filepath: string;
-
-    /**
-     * The name this file had according to the uploading client.
-     */
-    originalFilename: string | null;
-}
+type NextApiResponseCustom = NextApiResponse & Response;
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse,
+    req: NextApiRequestWithFormData,
+    res: NextApiResponseCustom,
 ) {
-    if (req.method === 'POST') {
-        const form = new IncomingForm();
-
-        form.parse(req, (err, fields, files) => {
-            if (err) {
-                res.status(500).json({ message: 'Error uploading file.' });
-                return;
-            }
-
-            const uploadedFile: File = files.file;
-            const tempPath = uploadedFile.filepath;
-            const targetPath = path.join(
-                process.cwd(),
-                'public/uploads',
-                uploadedFile.originalFilename,
-            );
-
-            fs.rename(tempPath, targetPath, (err) => {
+    switch (req.method) {
+        case 'POST': {
+            const upload = multer(imageHandler.getConfig).single('image');
+            upload(req, res, (err) => {
                 if (err) {
-                    res.status(500).json({
-                        message: 'Error moving file to target location.',
-                    });
-                    return;
+                    console.log(err);
+                    res.status(500).json({ error: 'Upload failed' });
                 }
-
-                res.status(200).json({
-                    message: 'File uploaded successfully!',
-                });
             });
-        });
-    } else {
-        res.status(405).json({ message: 'Method Not Allowed' });
+            res.status(200).json({ message: 'Upload successful' });
+            break;
+        }
+        default:
+            res.status(405).json({ message: 'Method Not Allowed' });
+            break;
     }
 }
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
 
 // import { MongoClient, ServerApiVersion } from 'mongodb';
 
@@ -90,9 +67,3 @@ export default async function handler(
 //         await client.close();
 //     }
 // }
-
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
