@@ -12,16 +12,23 @@ declare interface PreFormInputsType {
     [key: string]: PreFormInputPropsType;
 }
 
-declare interface PreFormInputPropsType {
+declare interface PreFormInputPropsType extends InputsAttributesType {
     validations?: (
         currentInput: string,
         formInputs: FormInputsType,
     ) => Validation[];
     required?: boolean | string;
     errors?: string[];
-    value?: string;
-    files?: FileList | null;
 }
+
+declare interface InputsAttributesType {
+    value?: string;
+    files?: FileList | string;
+}
+
+declare type AttributesType = string | FileList;
+
+declare type InputsAttributesFields = 'files';
 
 // *NECESSARY TYPES TO VALIDATE
 
@@ -39,7 +46,7 @@ declare interface Validation {
     message?: string;
 }
 
-// TYPES TO SUBMIT FORM
+// FORM TO SUBMIT
 
 declare interface FormInputsTypeToSubmit {
     [key: string]: FormInputPropsTypeToSubmit;

@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
@@ -6,12 +6,12 @@ import Input from './Input';
 const EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
 export default function PerfilImage() {
-    const [file, setFile] = useState<File | null>(null);
+    const [file] = useState<File | null>(null);
 
     return (
         <div>
             <h4>Upload image</h4>
-            <InputsHandler preInputs={preInputs}>
+            <InputsHandler preInputs={preInputs} inputsAttributes={['files']}>
                 <Form onSubmitInputs={onSubmitInputs}>
                     <Input
                         label="image"
@@ -25,8 +25,7 @@ export default function PerfilImage() {
         </div>
     );
 
-    async function onSubmitInputs<T>(contentToSubmit: T) {
-        console.log(contentToSubmit.files);
+    async function onSubmitInputs() {
         if (!file) return;
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file);

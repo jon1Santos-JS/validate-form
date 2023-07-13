@@ -8,6 +8,7 @@ interface InputProps {
     fieldName: string;
     inputName?: string;
     inputAccept?: string;
+    attributes?: InputsAttributesFields[];
 }
 
 const Input: React.FC<InputProps> = ({
@@ -16,9 +17,14 @@ const Input: React.FC<InputProps> = ({
     fieldName,
     inputName,
     inputAccept,
+    attributes,
 }) => {
-    const { inputs, showInputMessagesFromOutside, onChangeInput } =
-        useContext(InputHandlerContext);
+    const {
+        inputs,
+        showInputMessagesFromOutside,
+        onChangeInputValue,
+        onChangeInput,
+    } = useContext(InputHandlerContext);
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
@@ -64,12 +70,24 @@ const Input: React.FC<InputProps> = ({
     );
 
     function onGetValues(e: React.ChangeEvent<HTMLInputElement>) {
-        const handledValues = {
+        const handledRequiredAttributes = {
             fieldName: fieldName,
             value: e.target.value,
-            files: e.target.files ? e.target.files : null,
         };
-        onChangeInput(handledValues);
+        onChangeInputValue(handledRequiredAttributes);
+
+        // if (!attributes) return;
+
+        // attributes.map((attribute) => {
+        //     const handledValue = e.target[attribute] ? e.target[attribute] : '';
+        //     const handledNullValue = handledValue === null ? '' : handledValue;
+        //     const handledAttribute = {
+        //         fieldName: fieldName,
+        //         attribute: attribute,
+        //         value: handledNullValue,
+        //     };
+        //     onChangeInput(handledAttribute);
+        // });
     }
 
     function renderErrors() {

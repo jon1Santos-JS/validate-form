@@ -1,14 +1,8 @@
-import { imageHandler } from '@/lib/imageHandle';
-import multer from 'multer';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { Request, Response } from 'express';
-
-type NextApiRequestWithFormData = NextApiRequest &
-    Request & {
-        files: unknown[];
-    };
-
-type NextApiResponseCustom = NextApiResponse & Response;
+import {
+    NextApiRequestWithFormData,
+    NextApiResponseCustom,
+    imageHandler,
+} from '@/lib/imageHandler';
 
 export default async function handler(
     req: NextApiRequestWithFormData,
@@ -16,13 +10,7 @@ export default async function handler(
 ) {
     switch (req.method) {
         case 'POST': {
-            const upload = multer(imageHandler.getConfig).single('image');
-            upload(req, res, (err) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).json({ error: 'Upload failed' });
-                }
-            });
+            imageHandler.uploadImage(req, res);
             res.status(200).json({ message: 'Upload successful' });
             break;
         }

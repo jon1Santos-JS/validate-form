@@ -11,13 +11,23 @@ interface FormProps {
     ) => Promise<string | undefined | void>;
     legend?: string;
     alternativeErrors?: string[];
+    formDefaultError?: string;
+    formSubmitError?: string;
 }
 
-const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
+const Form: React.FC<FormProps> = ({
+    children,
+    onSubmitInputs,
+    legend,
+    formDefaultError,
+    formSubmitError,
+}) => {
     const { inputs, setShowInputsMessage, updateInputsToSubmit } =
         useContext(InputHandlerContext);
     const [showMessage, setShowMessage] = useState<boolean>(false);
-    const [message, setMessage] = useState(FORM_ERROR);
+    const [message, setMessage] = useState(
+        formDefaultError ? formDefaultError : FORM_ERROR,
+    );
     const { validateAllInputs } = useValidate();
 
     useEffect(() => {
@@ -76,7 +86,7 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
             if (showMessage) return; // TO MITIGATE THE AMOUNT OF REQUISITIONS
             const response = await onSubmitInputs(inputsToSubmit);
             if (typeof response === 'string') {
-                setMessage(response);
+                setMessage(formSubmitError ? formSubmitError : FORM_ERROR); // TO SET SUBMIT ERROR
                 setShowMessage(true);
                 return;
             }
@@ -84,7 +94,6 @@ const Form: React.FC<FormProps> = ({ children, onSubmitInputs, legend }) => {
             setShowMessage(false);
             return;
         }
-        setMessage(FORM_ERROR);
         setShowMessage(true);
         setShowInputsMessage(true);
     }

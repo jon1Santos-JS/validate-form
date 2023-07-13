@@ -1,5 +1,6 @@
 import InputHandlerContext, {
     onChangeInputsProps,
+    onChangeInputsValueProp,
 } from '@/context/InputHandlerContext';
 import { useState } from 'react';
 import _ from 'lodash';
@@ -7,6 +8,7 @@ import _ from 'lodash';
 interface InputHandlerPropsTypes {
     preInputs: PreFormInputsType;
     children: JSX.Element[] | JSX.Element;
+    inputsAttributes?: InputsAttributesFields[];
 }
 
 export default function InputsHandler({
@@ -22,6 +24,7 @@ export default function InputsHandler({
             value={{
                 showInputMessagesFromOutside,
                 inputs,
+                onChangeInputValue,
                 onChangeInput,
                 updateInputsToSubmit,
                 setShowInputsMessage,
@@ -31,25 +34,45 @@ export default function InputsHandler({
         </InputHandlerContext.Provider>
     );
 
-    function onChangeInput({ fieldName, value, files }: onChangeInputsProps) {
+    function onChangeInputValue({ fieldName, value }: onChangeInputsValueProp) {
+        const staticProps = {};
+
+        setInputs({
+            ...inputs,
+            [fieldName]: {
+                validations: inputs[fieldName].validations,
+                errors: inputs[fieldName].errors,
+                required: inputs[fieldName].required,
+                value: value,
+            },
+        });
+    }
+
+    function onChangeInput({
+        fieldName,
+        attribute,
+        value,
+    }: onChangeInputsProps) {
         const staticProps = {
             validations: inputs[fieldName].validations,
             errors: inputs[fieldName].errors,
             required: inputs[fieldName].required,
+            value: inputs[fieldName].value,
         };
 
         setInputs({
             ...inputs,
             [fieldName]: {
                 ...staticProps,
-                value: value,
-                files: files,
+                [attribute]: value,
             },
         });
     }
+
     function updateInputsToSubmit() {
         return onOmitFormInputsFields(inputs);
     }
+
     function setShowInputsMessage(value: boolean) {
         setShowInputMessages(value);
     }
@@ -58,24 +81,17 @@ export default function InputsHandler({
 // AUXILIARY FUNCTIONS
 
 function onAddFormInputsFields(inputs: PreFormInputsType) {
-    const inputsWithError = addErrorInput(inputs);
-    const inputsWithValue = addValueInput(inputsWithError);
+    const handledInputs = onAddRequiredInputs();
 
-    function addErrorInput(handledInputs: PreFormInputsType) {
-        for (const i in handledInputs) {
-            handledInputs[i].errors = [];
+    function onAddRequiredInputs() {
+        for (const i in inputs) {
+            inputs[i].errors = [];
+            inputs[i].value = '';
         }
-        return handledInputs;
+        return inputs;
     }
 
-    function addValueInput(handledInputs: PreFormInputsType) {
-        for (const i in handledInputs) {
-            handledInputs[i].value = '';
-        }
-        return handledInputs;
-    }
-
-    return inputsWithValue as FormInputsType;
+    return handledInputs as FormInputsType;
 }
 
 function onOmitFormInputsFields(preInputs: PreFormInputsType) {

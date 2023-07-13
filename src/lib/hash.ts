@@ -9,18 +9,20 @@ export function createHash<T>(value: T) {
     return hash;
 }
 
-export async function returnUserByHash(browserHash: string, users: unknown) {
+export async function returnUserByHash(
+    browserHash: string,
+    users: UserFromClientType[],
+) {
     const validation = {
         isValid: false,
         user: {},
         message: HASH_DEFAULT_ERROR,
     };
     validation.message = 'User was not found';
-    const usersList = users as UserFromClientType[];
+    const usersList = users;
     if (usersList.length > 1) {
         usersList.forEach((user) => {
-            const stringifiedUser = JSON.stringify(user);
-            if (compareSync(stringifiedUser, browserHash)) {
+            if (compareSync(JSON.stringify(user), browserHash)) {
                 validation.user = user.username.value;
                 validation.isValid = true;
             }
@@ -28,7 +30,7 @@ export async function returnUserByHash(browserHash: string, users: unknown) {
         return validation;
     }
 
-    const admin = users as UserFromClientType;
+    const admin = users[0];
     if (compareSync(JSON.stringify(admin), browserHash)) {
         validation.user = admin.username.value;
         validation.isValid = true;

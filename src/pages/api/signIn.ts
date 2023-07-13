@@ -39,10 +39,9 @@ export default async function handler(
                 }
 
                 // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
-                const hashResponse = await returnUserByHash(
-                    browserHash,
+                const hashResponse = await returnUserByHash(browserHash, [
                     ADMINS_ACCOUNT,
-                );
+                ]);
                 const conditional = hashResponse.isValid
                     ? hashResponse.user
                     : hashResponse.message;
