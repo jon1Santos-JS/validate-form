@@ -28,19 +28,22 @@ const Input: React.FC<InputProps> = ({
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
+    const [currentInputValue, setCurrentInputValue] = useState(
+        inputs[fieldName].value,
+    );
 
     useEffect(() => {
         setErrorList(preValidate(fieldName, inputs));
     }, [fieldName, inputs, preValidate]);
 
     useEffect(() => {
-        if (!inputs[fieldName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
+        if (!currentInputValue) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
         setShowMessage(false); // RESET THE MESSAGE AS THE ERROR LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
-    }, [errorList, fieldName, inputs]);
+    }, [errorList, fieldName, currentInputValue]);
 
     useEffect(() => {
         if (!showMessage) setShowMessage(showInputMessagesFromOutside);
@@ -74,10 +77,11 @@ const Input: React.FC<InputProps> = ({
             fieldName: fieldName,
             value: e.target.value,
         };
+        setCurrentInputValue(e.target.value);
         onChangeInputValue(handledRequiredAttributes);
 
         // if (!attributes) return;
-
+        // console.log('passed');
         // attributes.map((attribute) => {
         //     const handledValue = e.target[attribute] ? e.target[attribute] : '';
         //     const handledNullValue = handledValue === null ? '' : handledValue;

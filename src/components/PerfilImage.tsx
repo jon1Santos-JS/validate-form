@@ -11,7 +11,7 @@ export default function PerfilImage() {
     return (
         <div>
             <h4>Upload image</h4>
-            <InputsHandler preInputs={preInputs} inputsAttributes={['files']}>
+            <InputsHandler preInputs={preInputs}>
                 <Form onSubmitInputs={onSubmitInputs}>
                     <Input
                         label="image"
@@ -25,7 +25,8 @@ export default function PerfilImage() {
         </div>
     );
 
-    async function onSubmitInputs() {
+    async function onSubmitInputs<T>(content: T) {
+        console.log(content);
         if (!file) return;
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file);

@@ -26,7 +26,7 @@ declare interface InputsAttributesType {
     files?: FileList | string;
 }
 
-declare type AttributesType = string | FileList;
+declare type AttributesType = null | FileList;
 
 declare type InputsAttributesFields = 'files';
 

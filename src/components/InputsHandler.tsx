@@ -8,7 +8,6 @@ import _ from 'lodash';
 interface InputHandlerPropsTypes {
     preInputs: PreFormInputsType;
     children: JSX.Element[] | JSX.Element;
-    inputsAttributes?: InputsAttributesFields[];
 }
 
 export default function InputsHandler({
@@ -35,8 +34,6 @@ export default function InputsHandler({
     );
 
     function onChangeInputValue({ fieldName, value }: onChangeInputsValueProp) {
-        const staticProps = {};
-
         setInputs({
             ...inputs,
             [fieldName]: {
@@ -53,17 +50,13 @@ export default function InputsHandler({
         attribute,
         value,
     }: onChangeInputsProps) {
-        const staticProps = {
-            validations: inputs[fieldName].validations,
-            errors: inputs[fieldName].errors,
-            required: inputs[fieldName].required,
-            value: inputs[fieldName].value,
-        };
-
         setInputs({
             ...inputs,
             [fieldName]: {
-                ...staticProps,
+                validations: inputs[fieldName].validations,
+                errors: inputs[fieldName].errors,
+                required: inputs[fieldName].required,
+                value: inputs[fieldName].value,
                 [attribute]: value,
             },
         });
