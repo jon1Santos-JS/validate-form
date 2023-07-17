@@ -1,13 +1,5 @@
 // TYPES TO CUSTOMIZE
 
-declare interface FetchOptionsType {
-    method: MethodTypes;
-    headers?: { [key: string]: string };
-    body?: string;
-}
-
-declare type MethodTypes = 'GET' | 'DELETE' | 'POST';
-
 declare interface PreFormInputsType {
     [key: string]: PreFormInputPropsType;
 }
@@ -23,12 +15,17 @@ declare interface PreFormInputPropsType extends InputsAttributesType {
 
 declare interface InputsAttributesType {
     value?: string;
-    files?: FileList | string;
+    files?: FileType;
 }
 
-declare type AttributesType = null | FileList;
+declare type FileType = FileList | undefined | null;
 
-declare type InputsAttributesFields = 'files';
+declare interface Validation {
+    coditional: boolean | RegExpMatchArray | null;
+    message?: string;
+}
+
+declare type InputsAttributesFields = 'files' | 'value';
 
 // *NECESSARY TYPES TO VALIDATE
 
@@ -38,12 +35,7 @@ declare interface FormInputsType {
 
 declare interface FormInputPropsType extends PreFormInputPropsType {
     errors: string[];
-    value: string;
-}
-
-declare interface Validation {
-    coditional: boolean | RegExpMatchArray | null;
-    message?: string;
+    value?: string;
 }
 
 // FORM TO SUBMIT

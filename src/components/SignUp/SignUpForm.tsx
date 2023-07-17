@@ -19,16 +19,19 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                             label="Username"
                             inputType="text"
                             fieldName="username"
+                            attributes={['value']}
                         />
                         <Input
                             label="Password"
                             inputType="password"
                             fieldName="password"
+                            attributes={['value']}
                         />
                         <Input
                             label="Confirm Password"
                             inputType="password"
                             fieldName="confirmPassword"
+                            attributes={['value']}
                         />
                     </Form>
                 </InputsHandler>

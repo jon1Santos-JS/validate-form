@@ -6,9 +6,9 @@ interface InputProps {
     label: string;
     inputType: string;
     fieldName: string;
+    attributes: InputsAttributesFields[];
     inputName?: string;
     inputAccept?: string;
-    attributes?: InputsAttributesFields[];
 }
 
 const Input: React.FC<InputProps> = ({
@@ -19,31 +19,24 @@ const Input: React.FC<InputProps> = ({
     inputAccept,
     attributes,
 }) => {
-    const {
-        inputs,
-        showInputMessagesFromOutside,
-        onChangeInputValue,
-        onChangeInput,
-    } = useContext(InputHandlerContext);
+    const { inputs, showInputMessagesFromOutside, onChangeInput } =
+        useContext(InputHandlerContext);
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
-    const [currentInputValue, setCurrentInputValue] = useState(
-        inputs[fieldName].value,
-    );
 
     useEffect(() => {
         setErrorList(preValidate(fieldName, inputs));
     }, [fieldName, inputs, preValidate]);
 
     useEffect(() => {
-        if (!currentInputValue) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
+        if (!inputs[fieldName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
         setShowMessage(false); // RESET THE MESSAGE AS THE ERROR LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
-    }, [errorList, fieldName, currentInputValue]);
+    }, [errorList, fieldName, inputs]);
 
     useEffect(() => {
         if (!showMessage) setShowMessage(showInputMessagesFromOutside);
@@ -65,7 +58,6 @@ const Input: React.FC<InputProps> = ({
                 name={inputName && inputName}
                 accept={inputAccept && inputAccept}
                 onChange={onGetValues}
-                value={inputs[fieldName].value}
                 type={inputType}
             />
             {renderErrors()}
@@ -73,25 +65,14 @@ const Input: React.FC<InputProps> = ({
     );
 
     function onGetValues(e: React.ChangeEvent<HTMLInputElement>) {
-        const handledRequiredAttributes = {
-            fieldName: fieldName,
-            value: e.target.value,
-        };
-        setCurrentInputValue(e.target.value);
-        onChangeInputValue(handledRequiredAttributes);
-
-        // if (!attributes) return;
-        // console.log('passed');
-        // attributes.map((attribute) => {
-        //     const handledValue = e.target[attribute] ? e.target[attribute] : '';
-        //     const handledNullValue = handledValue === null ? '' : handledValue;
-        //     const handledAttribute = {
-        //         fieldName: fieldName,
-        //         attribute: attribute,
-        //         value: handledNullValue,
-        //     };
-        //     onChangeInput(handledAttribute);
-        // });
+        attributes.map((attribute) => {
+            const handledAttribute = {
+                fieldName: fieldName,
+                attribute: attribute,
+                value: e.target[attribute],
+            };
+            onChangeInput(handledAttribute);
+        });
     }
 
     function renderErrors() {

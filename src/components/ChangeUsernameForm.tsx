@@ -24,6 +24,7 @@ export default function ChangePasswordForm({
                         label="New Username"
                         inputType="text"
                         fieldName="newUsername"
+                        attributes={['value']}
                     />
                 </Form>
             </InputsHandler>

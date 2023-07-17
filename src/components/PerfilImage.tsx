@@ -3,7 +3,8 @@ import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
 
-const EXTENSIONS = ['.jpg', '.png', '.jpeg'];
+const AVOIDED_IMAGE_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
+const DEFAULT_FORM_ERROR = 'Invalid image';
 
 export default function PerfilImage() {
     const [file] = useState<File | null>(null);
@@ -12,13 +13,17 @@ export default function PerfilImage() {
         <div>
             <h4>Upload image</h4>
             <InputsHandler preInputs={preInputs}>
-                <Form onSubmitInputs={onSubmitInputs}>
+                <Form
+                    onSubmitInputs={onSubmitInputs}
+                    formDefaultError={DEFAULT_FORM_ERROR}
+                >
                     <Input
                         label="image"
                         fieldName="imageInput"
                         inputType="file"
                         inputName="image"
                         inputAccept="image/*"
+                        attributes={['value', 'files']}
                     />
                 </Form>
             </InputsHandler>
@@ -51,13 +56,12 @@ const preInputs: PreFormInputsType = {
                 message: `Allowed extensions: .png, .jpg, .jpeg`,
             },
         ],
-        required: true,
     },
 };
 
 function onCheckExtensions(text: string) {
     const validate = { value: false };
-    EXTENSIONS.forEach((extension) =>
+    AVOIDED_IMAGE_EXTENSIONS.forEach((extension) =>
         text.includes(extension) ? (validate.value = true) : null,
     );
     return validate.value;

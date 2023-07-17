@@ -25,11 +25,13 @@ export default function SignInForm({
                             label="Username"
                             inputType="text"
                             fieldName="username"
+                            attributes={['value']}
                         />
                         <Input
                             label="Password"
                             inputType="password"
                             fieldName="password"
+                            attributes={['value']}
                         />
                     </Form>
                 </InputsHandler>

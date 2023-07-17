@@ -23,16 +23,19 @@ export default function ChangePasswordForm({
                         label="Password"
                         inputType="password"
                         fieldName="password"
+                        attributes={['value']}
                     />
                     <Input
                         label="New Password"
                         inputType="password"
                         fieldName="newPassword"
+                        attributes={['value']}
                     />
                     <Input
                         label="Confirm New Password"
                         inputType="password"
                         fieldName="confirmNewPassword"
+                        attributes={['value']}
                     />
                 </Form>
             </InputsHandler>

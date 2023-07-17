@@ -1,9 +1,6 @@
-import InputHandlerContext, {
-    onChangeInputsProps,
-    onChangeInputsValueProp,
-} from '@/context/InputHandlerContext';
 import { useState } from 'react';
 import _ from 'lodash';
+import InputHandlerContext from '@/context/InputHandlerContext';
 
 interface InputHandlerPropsTypes {
     preInputs: PreFormInputsType;
@@ -23,7 +20,6 @@ export default function InputsHandler({
             value={{
                 showInputMessagesFromOutside,
                 inputs,
-                onChangeInputValue,
                 onChangeInput,
                 updateInputsToSubmit,
                 setShowInputsMessage,
@@ -33,32 +29,22 @@ export default function InputsHandler({
         </InputHandlerContext.Provider>
     );
 
-    function onChangeInputValue({ fieldName, value }: onChangeInputsValueProp) {
-        setInputs({
-            ...inputs,
-            [fieldName]: {
-                validations: inputs[fieldName].validations,
-                errors: inputs[fieldName].errors,
-                required: inputs[fieldName].required,
-                value: value,
-            },
-        });
-    }
-
     function onChangeInput({
         fieldName,
         attribute,
         value,
     }: onChangeInputsProps) {
-        setInputs({
-            ...inputs,
-            [fieldName]: {
-                validations: inputs[fieldName].validations,
-                errors: inputs[fieldName].errors,
-                required: inputs[fieldName].required,
-                value: inputs[fieldName].value,
+        setInputs((prevInputs) => {
+            // GETTING THE OBJECT  WITH THE NEWPROP ADDED INTO THE SPECIFIC FIELD (fieldName)
+            const updatedInput = {
+                ...prevInputs[fieldName],
                 [attribute]: value,
-            },
+            };
+            // RETURNED ALL INPUTS WITH THE SPECIFIC FIELD UPTATED
+            return {
+                ...prevInputs,
+                [fieldName]: updatedInput,
+            };
         });
     }
 
