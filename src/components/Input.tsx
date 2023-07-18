@@ -6,7 +6,7 @@ interface InputProps {
     label: string;
     inputType: string;
     fieldName: string;
-    attributes: InputsAttributesFields[];
+    attributes: InputsAttributesFields<ComplementaryAttributesType>;
     inputName?: string;
     inputAccept?: string;
 }
