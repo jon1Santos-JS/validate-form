@@ -43,7 +43,7 @@ const Input: React.FC<InputProps> = ({
     }, [showInputMessagesFromOutside, showMessage]);
 
     useEffect(() => {
-        const currentTimer = setMessageWithTimer(false, 2750);
+        const currentTimer = setMessageWithTimer(false, 3000);
         return () => clearTimeout(currentTimer);
     }, [showMessage]);
 

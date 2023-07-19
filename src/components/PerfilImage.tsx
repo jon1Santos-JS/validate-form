@@ -3,7 +3,7 @@ import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
 
-const AVOIDED_IMAGE_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
+const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
 
 export default function PerfilImage() {
@@ -30,8 +30,10 @@ export default function PerfilImage() {
         </div>
     );
 
-    async function onSubmitInputs<T>(content: T) {
-        console.log(content);
+    async function onSubmitInputs(
+        contentToSubmit: HandledContent<typeof preInputs>,
+    ) {
+        console.log(contentToSubmit.imageInput);
         if (!file) return;
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file);
@@ -48,12 +50,12 @@ export default function PerfilImage() {
     }
 }
 
-const preInputs: PreFormInputsType = {
+const preInputs = {
     imageInput: {
         validations: (currentInputValue: string) => [
             {
                 coditional: !onCheckExtensions(currentInputValue),
-                message: `Allowed extensions: .png, .jpg, .jpeg`,
+                message: `Allowed extensions: ${ALLOWED_EXTENSIONS.join(', ')}`,
             },
         ],
     },
@@ -61,7 +63,7 @@ const preInputs: PreFormInputsType = {
 
 function onCheckExtensions(text: string) {
     const validate = { value: false };
-    AVOIDED_IMAGE_EXTENSIONS.forEach((extension) =>
+    ALLOWED_EXTENSIONS.forEach((extension) =>
         text.includes(extension) ? (validate.value = true) : null,
     );
     return validate.value;

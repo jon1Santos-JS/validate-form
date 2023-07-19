@@ -6,8 +6,8 @@ const FORM_ERROR = 'Invalid form';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    onSubmitInputs: <T>(
-        contentToSubmit: T,
+    onSubmitInputs: (
+        contentToSubmit: FormInputsTypeToSubmit,
     ) => Promise<string | undefined | void>;
     legend?: string;
     alternativeErrors?: string[];

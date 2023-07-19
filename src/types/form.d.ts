@@ -4,13 +4,14 @@ declare interface PreFormInputsType {
     [key: string]: PreFormInputPropsType;
 }
 
-declare interface PreFormInputPropsType extends InputsAttributesType {
+declare interface PreFormInputPropsType {
     validations?: (
         currentInput: string,
         formInputs: FormInputsType,
     ) => Validation[];
     required?: boolean | string;
     errors?: string[];
+    value?: string;
 }
 
 declare interface Validation {
@@ -19,13 +20,6 @@ declare interface Validation {
 }
 
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
-
-declare interface InputsAttributesType {
-    value?: string;
-    files?: FileType;
-}
-
-declare type FileType = FileList | undefined | null;
 
 declare type ComplementaryAttributesType = 'files';
 
@@ -52,5 +46,12 @@ declare interface FormInputsTypeToSubmit {
 }
 
 declare interface FormInputPropsTypeToSubmit extends PreFormInputPropsType {
-    value: string;
+    files?: FileType;
+    value?: string;
 }
+
+declare type HandledContent<T> = Partial<
+    Record<keyof T, FormInputPropsTypeToSubmit>
+>;
+
+declare type FileType = FileList | undefined | null;
