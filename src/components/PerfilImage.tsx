@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
@@ -7,8 +6,6 @@ const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
 
 export default function PerfilImage() {
-    const [file] = useState<File | null>(null);
-
     return (
         <div>
             <h4>Upload image</h4>
@@ -35,7 +32,7 @@ export default function PerfilImage() {
     ) {
         if (!contentToSubmit.imageInput?.files) return;
         const formData = new FormData(); // multipart/form-data format to send to API;
-        formData.append('image', contentToSubmit.imageInput?.files);
+        formData.append('image', contentToSubmit.imageInput?.files[0]);
         const response = await fetch('/api/testConnection', {
             method: 'POST',
             body: formData,
