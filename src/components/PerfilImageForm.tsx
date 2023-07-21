@@ -16,7 +16,7 @@ export default function PerfilImage() {
                 >
                     <Input
                         label="image"
-                        fieldName="imageInput"
+                        objectifiedName="imageInput"
                         inputType="file"
                         inputName="image"
                         inputAccept="image/*"

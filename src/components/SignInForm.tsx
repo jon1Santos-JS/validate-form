@@ -24,13 +24,13 @@ export default function SignInForm({
                         <Input
                             label="Username"
                             inputType="text"
-                            fieldName="username"
+                            objectifiedName="username"
                             attributes={['value']}
                         />
                         <Input
                             label="Password"
                             inputType="password"
-                            fieldName="password"
+                            objectifiedName="password"
                             attributes={['value']}
                         />
                     </Form>

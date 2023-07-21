@@ -1,10 +1,10 @@
 declare interface onChangeInputsValueProp {
-    fieldName: string;
+    objectifiedName: string;
     value: string;
 }
 
 declare interface onChangeInputsProps {
-    fieldName: string;
+    objectifiedName: string;
     attribute: InputsAttributesFields;
     value: T;
 }

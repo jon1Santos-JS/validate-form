@@ -5,7 +5,7 @@ import React, { useState, useEffect, useContext } from 'react';
 interface InputProps {
     label: string;
     inputType: string;
-    fieldName: string;
+    objectifiedName: string;
     attributes: InputsAttributesFields<ComplementaryAttributesType>;
     inputName?: string;
     inputAccept?: string;
@@ -14,7 +14,7 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({
     label,
     inputType,
-    fieldName,
+    objectifiedName,
     inputName,
     inputAccept,
     attributes,
@@ -26,17 +26,17 @@ const Input: React.FC<InputProps> = ({
     const [errorList, setErrorList] = useState<string[]>([]);
 
     useEffect(() => {
-        setErrorList(preValidate(fieldName, inputs));
-    }, [fieldName, inputs, preValidate]);
+        setErrorList(preValidate(objectifiedName, inputs));
+    }, [objectifiedName, inputs, preValidate]);
 
     useEffect(() => {
-        if (!inputs[fieldName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
+        if (!inputs[objectifiedName].value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
         setShowMessage(false); // RESET THE MESSAGE AS THE ERROR LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
-    }, [errorList, fieldName, inputs]);
+    }, [errorList, objectifiedName, inputs]);
 
     useEffect(() => {
         if (!showMessage) setShowMessage(showInputMessagesFromOutside);
@@ -67,7 +67,7 @@ const Input: React.FC<InputProps> = ({
     function onGetValues(e: React.ChangeEvent<HTMLInputElement>) {
         attributes.map((attribute) => {
             const handledAttribute = {
-                fieldName: fieldName,
+                objectifiedName: objectifiedName,
                 attribute: attribute,
                 value: e.target[attribute],
             };

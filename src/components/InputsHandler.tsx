@@ -30,20 +30,20 @@ export default function InputsHandler({
     );
 
     function onChangeInput({
-        fieldName,
+        objectifiedName,
         attribute,
         value,
     }: onChangeInputsProps) {
         setInputs((prevInputs) => {
-            // GETTING THE OBJECT  WITH THE NEWPROP ADDED INTO THE SPECIFIC FIELD (fieldName)
+            // GETTING THE OBJECT  WITH THE NEWPROP ADDED INTO THE SPECIFIC FIELD (objectifiedName)
             const updatedInput = {
-                ...prevInputs[fieldName],
+                ...prevInputs[objectifiedName],
                 [attribute]: value,
             };
             // RETURNED ALL INPUTS WITH THE SPECIFIC FIELD UPTATED
             return {
                 ...prevInputs,
-                [fieldName]: updatedInput,
+                [objectifiedName]: updatedInput,
             };
         });
     }
