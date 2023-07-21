@@ -1,6 +1,6 @@
 import ChangePasswordForm from '@/components/ChangePasswordForm';
 import ChangeUsernameForm from '@/components/ChangeUsernameForm';
-import PerfilImage from '@/components/PerfilImage';
+import PerfilImage from '@/components/PerfilImageForm';
 import { useRouter } from 'next/router';
 
 type DashBoardPageProps = HandlerUserStateProps;

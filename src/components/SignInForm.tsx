@@ -39,12 +39,12 @@ export default function SignInForm({
         </div>
     );
 
-    async function onSubmitInputs<T>(contentToSubmit: T) {
+    async function onSubmitInputs<T>(inputs: T) {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(contentToSubmit),
+            body: JSON.stringify(inputs),
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
