@@ -33,10 +33,9 @@ export default function PerfilImage() {
     async function onSubmitInputs(
         contentToSubmit: HandledContent<typeof preInputs>,
     ) {
-        console.log(contentToSubmit.imageInput);
-        if (!file) return;
+        if (!contentToSubmit.imageInput?.files) return;
         const formData = new FormData(); // multipart/form-data format to send to API;
-        formData.append('image', file);
+        formData.append('image', contentToSubmit.imageInput?.files);
         const response = await fetch('/api/testConnection', {
             method: 'POST',
             body: formData,

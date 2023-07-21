@@ -58,7 +58,7 @@ export default function SignInForm({
     }
 }
 
-const preInputs: PreFormInputsType = {
+const preInputs = {
     username: {
         validations: (currentInputValue: string) => [
             {
@@ -71,7 +71,7 @@ const preInputs: PreFormInputsType = {
         required: true,
     },
     password: {
-        validations: (currentInputValue) => [
+        validations: (currentInputValue: string) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
             },

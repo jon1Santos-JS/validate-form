@@ -45,9 +45,9 @@ declare interface FormInputsTypeToSubmit {
     [key: string]: FormInputPropsTypeToSubmit;
 }
 
-declare interface FormInputPropsTypeToSubmit extends PreFormInputPropsType {
+declare interface FormInputPropsTypeToSubmit {
     files?: FileType;
-    value?: string;
+    value: string;
 }
 
 declare type HandledContent<T> = Partial<

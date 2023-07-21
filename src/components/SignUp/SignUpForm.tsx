@@ -57,9 +57,9 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
     }
 }
 
-const preInputs: PreFormInputsType = {
+const preInputs = {
     username: {
-        validations: (currentInputValue) => [
+        validations: (currentInputValue: string) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Username must has 6 characters at least',
@@ -72,7 +72,10 @@ const preInputs: PreFormInputsType = {
         required: true,
     },
     password: {
-        validations: (currentInputValue, formInputs) => [
+        validations: (
+            currentInputValue: string,
+            formInputs: PreFormInputsType,
+        ) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password must has 6 characters at least',
@@ -86,7 +89,10 @@ const preInputs: PreFormInputsType = {
         required: true,
     },
     confirmPassword: {
-        validations: (currentInputValue, formInputs) => [
+        validations: (
+            currentInputValue: string,
+            formInputs: PreFormInputsType,
+        ) => [
             {
                 coditional: currentInputValue !== formInputs['password'].value,
                 message: 'This field has to be equal to the password',
