@@ -7,7 +7,7 @@ interface InputHandlerPropsTypes {
     children: JSX.Element[] | JSX.Element;
 }
 
-const INPUT_FIELDS_TO_OMIT = ['required', 'validations', 'errors'];
+const INPUTS_FIELDS_TO_OMIT = ['required', 'validations', 'errors'];
 
 export default function InputsHandler({
     preInputs,
@@ -79,7 +79,7 @@ function onOmitFormInputsFields(preInputs: PreFormInputsType) {
     const mainFieldsToOmit = Object.keys(preInputs).filter((key) =>
         key.includes('confirm'),
     );
-    const secondaryFieldsToOmit = INPUT_FIELDS_TO_OMIT;
+    const secondaryFieldsToOmit = INPUTS_FIELDS_TO_OMIT;
     const handledInputs: unknown = onOmitFields(
         preInputs,
         mainFieldsToOmit,
