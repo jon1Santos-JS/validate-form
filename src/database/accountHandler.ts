@@ -1,10 +1,8 @@
 import { onCreateConstraint, onCreateID } from '@/lib/inputHandler';
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
-import { MiniDBHandler } from './miniDBHandler';
+import { miniDBHandler } from './miniDBHandler';
 
-export class MiniDBAccountHandler {
-    #DB = new MiniDBHandler();
-
+class MiniDBAccountHandler {
     async signIn(userAccount: AccountFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(userAccount)) {
@@ -66,7 +64,7 @@ export class MiniDBAccountHandler {
 
     async #onInitDB() {
         try {
-            await this.#DB.init();
+            await miniDBHandler.init();
             return;
         } catch {
             return SERVER_ERROR_RESPONSE;
@@ -112,7 +110,7 @@ export class MiniDBAccountHandler {
             }
             return account;
         });
-        const handleResponse = await this.#DB.handleDB(
+        const handleResponse = await miniDBHandler.handleDB(
             'refresh',
             'MiniDBAccountHandler - changePassword',
         );
@@ -132,7 +130,7 @@ export class MiniDBAccountHandler {
             }
             return account;
         });
-        const handleResponse = await this.#DB.handleDB(
+        const handleResponse = await miniDBHandler.handleDB(
             'refresh',
             'MiniDBAccountHandler - changeUsername',
         );
@@ -144,7 +142,7 @@ export class MiniDBAccountHandler {
         const userAccountHandled: UserFromDataBaseType =
             this.#onHandleInputs(userAccount);
         DATABASE.state.accounts.push(userAccountHandled);
-        const response = await this.#DB.handleDB(
+        const response = await miniDBHandler.handleDB(
             'refresh',
             'MiniDBAccountHandler - createAccount',
         );
@@ -161,3 +159,5 @@ export class MiniDBAccountHandler {
         return accountWithID as UserFromDataBaseType;
     }
 }
+
+export const miniDBAccountHandler = new MiniDBAccountHandler();

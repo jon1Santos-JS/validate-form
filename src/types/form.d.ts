@@ -21,9 +21,9 @@ declare interface Validation {
 
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
 
-declare type ComplementaryAttributesType = 'files';
+declare type ComplementaryTargetPropsType = 'files';
 
-declare type InputsAttributesFields<T extends ComplementaryAttributesType> = [
+declare type InputsTargetPropsType<T extends ComplementaryTargetPropsType> = [
     'value',
     ...T[],
 ];
@@ -50,7 +50,7 @@ declare interface FormInputPropsTypeToSubmit {
     value: string;
 }
 
-declare type HandledContent<T> = Partial<
+declare type HandledInputs<T> = Partial<
     Record<keyof T, FormInputPropsTypeToSubmit>
 >;
 

@@ -6,7 +6,7 @@ import {
     SERVER_ERROR_RESPONSE,
 } from './miniDB';
 
-export class MiniDBHandler {
+class MiniDBHandler {
     async init() {
         const response = await this.#accessDB();
         if (response) return SERVER_ERROR_RESPONSE;
@@ -64,3 +64,5 @@ export class MiniDBHandler {
         return;
     }
 }
+
+export const miniDBHandler = new MiniDBHandler();

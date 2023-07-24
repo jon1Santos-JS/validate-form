@@ -1,6 +1,5 @@
 import Form from '../Form';
 import Input from '../Input';
-import { useRouter } from 'next/router';
 import InputsHandler from '../InputsHandler';
 
 interface SignUpFormPropsType {
@@ -8,8 +7,6 @@ interface SignUpFormPropsType {
 }
 
 export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
-    const router = useRouter();
-
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
@@ -19,19 +16,19 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                             label="Username"
                             inputType="text"
                             objectifiedName="username"
-                            attributes={['value']}
+                            targetProps={['value']}
                         />
                         <Input
                             label="Password"
                             inputType="password"
                             objectifiedName="password"
-                            attributes={['value']}
+                            targetProps={['value']}
                         />
                         <Input
                             label="Confirm Password"
                             inputType="password"
                             objectifiedName="confirmPassword"
-                            attributes={['value']}
+                            targetProps={['value']}
                         />
                     </Form>
                 </InputsHandler>
@@ -39,7 +36,7 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         </div>
     );
 
-    async function onSubmitInputs<T>(inputs: T) {
+    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const options = {
             method: 'POST',
@@ -50,7 +47,7 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         if (parsedResponse.serverResponse) {
-            router.push('/');
+            window.location.assign('/');
             return;
         }
         setResponse(true);

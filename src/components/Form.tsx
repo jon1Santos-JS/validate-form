@@ -6,8 +6,8 @@ const FORM_ERROR = 'Invalid form';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    onSubmitInputs: (
-        inputs: HandledContent<FormInputsTypeToSubmit>,
+    onSubmitInputs: <T>(
+        inputs: HandledInputs<T>,
     ) => Promise<string | undefined | void>;
     legend?: string;
     alternativeErrors?: string[];
@@ -83,7 +83,7 @@ const Form: React.FC<FormProps> = ({
         e.preventDefault();
         if (!validateAllInputs(inputs)) {
             const inputsToSubmit = updateInputsToSubmit();
-            if (showMessage) return; // TO MITIGATE THE AMOUNT OF REQUISITIONS
+            if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO MAKE THE REQUISITION
             const response = await onSubmitInputs(inputsToSubmit);
             if (typeof response === 'string') {
                 setMessage(formSubmitError ? formSubmitError : FORM_ERROR); // TO SET SUBMIT ERROR

@@ -2,7 +2,7 @@ import {
     NextApiRequestWithFormData,
     NextApiResponseCustom,
     imageHandler,
-} from '@/lib/imageHandler';
+} from '@/database/imageHandler';
 
 export default async function handler(
     req: NextApiRequestWithFormData,
@@ -10,6 +10,7 @@ export default async function handler(
 ) {
     switch (req.method) {
         case 'POST': {
+            imageHandler.refreshDirectory();
             imageHandler.uploadImage(req, res);
             res.status(200).json({ message: 'Upload successful' });
             break;

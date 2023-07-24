@@ -1,6 +1,7 @@
 import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
+import _ from 'lodash';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
@@ -20,17 +21,19 @@ export default function PerfilImage() {
                         inputType="file"
                         inputName="image"
                         inputAccept="image/*"
-                        attributes={['value', 'files']}
+                        targetProps={['value', 'files']}
                     />
                 </Form>
             </InputsHandler>
         </div>
     );
 
-    async function onSubmitInputs(inputs: HandledContent<typeof preInputs>) {
+    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         if (!inputs.imageInput?.files) return;
+        const file = inputs.imageInput?.files[0];
+        const fileName = handledName(inputs.imageInput.files[0].name);
         const formData = new FormData(); // multipart/form-data format to send to API;
-        formData.append('image', inputs.imageInput?.files[0]);
+        formData.append('image', file, fileName);
         const response = await fetch('/api/testConnection', {
             method: 'POST',
             body: formData,
@@ -61,4 +64,13 @@ function onCheckExtensions(text: string) {
         text.includes(extension) ? (validate.value = true) : null,
     );
     return validate.value;
+}
+
+function handledName(name: string) {
+    const handledName = _.deburr(name);
+    const noCedilha = handledName.replace(/[çÇ]/g, (match) =>
+        match === 'ç' ? 'c' : 'C',
+    );
+
+    return noCedilha;
 }

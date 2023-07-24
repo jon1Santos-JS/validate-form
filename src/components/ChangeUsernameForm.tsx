@@ -23,17 +23,17 @@ export default function ChangePasswordForm({
                     <Input
                         label="New Username"
                         inputType="text"
-                        fieldName="newUsername"
-                        attributes={['value']}
+                        objectifiedName="newUsername"
+                        targetProps={['value']}
                     />
                 </Form>
             </InputsHandler>
         );
     }
 
-    async function onSubmitInputs<T>(contentToSubmit: T) {
+    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         const action = process.env.NEXT_PUBLIC_CHANGE_USERNAME_LINK as string;
-        const handledBody = { username: { value: user }, ...contentToSubmit };
+        const handledBody = { username: { value: user }, ...inputs };
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -51,14 +51,14 @@ export default function ChangePasswordForm({
     }
 }
 
-const preInputs: PreFormInputsType = {
+const preInputs = {
     newUsername: {
-        validations: (currentInputValue) => [
+        validations: (currentInputValue: string) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Username incorrect',
+                message: 'Incorrect username',
             },
         ],
-        required: 'Username incorrect',
+        required: 'Incorrect username',
     },
 };

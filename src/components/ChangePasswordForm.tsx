@@ -22,29 +22,29 @@ export default function ChangePasswordForm({
                     <Input
                         label="Password"
                         inputType="password"
-                        fieldName="password"
-                        attributes={['value']}
+                        objectifiedName="password"
+                        targetProps={['value']}
                     />
                     <Input
                         label="New Password"
                         inputType="password"
-                        fieldName="newPassword"
-                        attributes={['value']}
+                        objectifiedName="newPassword"
+                        targetProps={['value']}
                     />
                     <Input
                         label="Confirm New Password"
                         inputType="password"
-                        fieldName="confirmNewPassword"
-                        attributes={['value']}
+                        objectifiedName="confirmNewPassword"
+                        targetProps={['value']}
                     />
                 </Form>
             </InputsHandler>
         );
     }
 
-    async function onSubmitInputs<T>(contentToSubmit: T) {
+    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
-        const handledBody = { username: { value: user }, ...contentToSubmit };
+        const handledBody = { username: { value: user }, ...inputs };
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -57,9 +57,9 @@ export default function ChangePasswordForm({
     }
 }
 
-const preInputs: PreFormInputsType = {
+const preInputs = {
     password: {
-        validations: (currentInputValue) => [
+        validations: (currentInputValue: string) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password incorrect',
@@ -68,7 +68,10 @@ const preInputs: PreFormInputsType = {
         required: 'Password incorrect',
     },
     newPassword: {
-        validations: (currentInputValue, formInputs) => [
+        validations: (
+            currentInputValue: string,
+            formInputs: PreFormInputsType,
+        ) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password must has 6 characters at least',
@@ -88,7 +91,10 @@ const preInputs: PreFormInputsType = {
         required: 'New password incorrect',
     },
     confirmNewPassword: {
-        validations: (currentInputValue, formInputs) => [
+        validations: (
+            currentInputValue: string,
+            formInputs: PreFormInputsType,
+        ) => [
             {
                 coditional:
                     currentInputValue !== formInputs['newPassword'].value,

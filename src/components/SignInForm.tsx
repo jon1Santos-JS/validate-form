@@ -25,13 +25,13 @@ export default function SignInForm({
                             label="Username"
                             inputType="text"
                             objectifiedName="username"
-                            attributes={['value']}
+                            targetProps={['value']}
                         />
                         <Input
                             label="Password"
                             inputType="password"
                             objectifiedName="password"
-                            attributes={['value']}
+                            targetProps={['value']}
                         />
                     </Form>
                 </InputsHandler>
@@ -39,7 +39,7 @@ export default function SignInForm({
         </div>
     );
 
-    async function onSubmitInputs<T>(inputs: T) {
+    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {
             method: 'POST',

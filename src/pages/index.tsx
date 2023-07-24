@@ -15,7 +15,7 @@ export default function SignInPage({
     function renderContent() {
         if (isUserStateLoading) return null;
         if (!isUserStateLoading && hasUser()) {
-            router.push('/');
+            router.push('/dashboard-page');
             return null;
         }
 

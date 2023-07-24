@@ -2,6 +2,7 @@ import multer from 'multer';
 import path from 'path';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { Request, Response } from 'express';
+import { mkdirSync, rmSync } from 'fs';
 
 export type NextApiRequestWithFormData = NextApiRequest &
     Request & {
@@ -10,8 +11,13 @@ export type NextApiRequestWithFormData = NextApiRequest &
 
 export type NextApiResponseCustom = NextApiResponse & Response;
 
-class uploadImage {
+class ImageHandler {
     #URL = path.resolve('./public/uploads/');
+
+    refreshDirectory() {
+        this.#deleteDirectory();
+        this.#createDirectory();
+    }
 
     uploadImage(req: NextApiRequestWithFormData, res: NextApiResponseCustom) {
         const upload = multer(this.#config).single('image');
@@ -37,19 +43,10 @@ class uploadImage {
         });
     };
 
-    #handledName(name: string) {
-        const noCedilha = name.replace(/[çÇ]/g, (match) =>
-            match === 'ç' ? 'c' : 'C',
-        );
-
-        return noCedilha;
-    }
-
     #storage = multer.diskStorage({
         destination: this.#URL,
         filename: (req, file, callback) => {
-            const handledName = this.#handledName(file.originalname);
-            callback(null, handledName);
+            callback(null, file.originalname);
         },
     });
 
@@ -57,6 +54,24 @@ class uploadImage {
         storage: this.#storage,
         fileFilter: this.#fileFilter,
     };
+
+    #deleteDirectory = async () => {
+        try {
+            await rmSync(this.#URL, { force: true, recursive: true });
+            console.log('directory has been deleted');
+        } catch (e) {
+            console.log('failed to delete directory: ', e);
+        }
+    };
+
+    #createDirectory = async () => {
+        try {
+            await mkdirSync(this.#URL);
+            console.log('directory has been created');
+        } catch (e) {
+            console.log('failed to create directory: ', e);
+        }
+    };
 }
 
-export const imageHandler = new uploadImage();
+export const imageHandler = new ImageHandler();

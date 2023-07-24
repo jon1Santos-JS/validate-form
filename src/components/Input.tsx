@@ -6,9 +6,9 @@ interface InputProps {
     label: string;
     inputType: string;
     objectifiedName: string;
-    attributes: InputsAttributesFields<ComplementaryAttributesType>;
     inputName?: string;
     inputAccept?: string;
+    targetProps: InputsTargetPropsType<ComplementaryTargetPropsType>;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -17,7 +17,7 @@ const Input: React.FC<InputProps> = ({
     objectifiedName,
     inputName,
     inputAccept,
-    attributes,
+    targetProps,
 }) => {
     const { inputs, showInputMessagesFromOutside, onChangeInput } =
         useContext(InputHandlerContext);
@@ -36,7 +36,7 @@ const Input: React.FC<InputProps> = ({
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
-    }, [errorList, objectifiedName, inputs]);
+    }, [errorList, inputs, objectifiedName]);
 
     useEffect(() => {
         if (!showMessage) setShowMessage(showInputMessagesFromOutside);
@@ -65,11 +65,11 @@ const Input: React.FC<InputProps> = ({
     );
 
     function onGetValues(e: React.ChangeEvent<HTMLInputElement>) {
-        attributes.map((attribute) => {
+        targetProps.map((props) => {
             const handledAttribute = {
                 objectifiedName: objectifiedName,
-                attribute: attribute,
-                value: e.target[attribute],
+                targetProps: props,
+                value: e.target[props],
             };
             onChangeInput(handledAttribute);
         });

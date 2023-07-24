@@ -33,14 +33,14 @@ export default function InputsHandler({
 
     function onChangeInput({
         objectifiedName,
-        attribute,
+        targetProps,
         value,
     }: onChangeInputsProps) {
         setInputs((prevInputs) => {
             // GETTING THE OBJECT  WITH THE NEWPROP ADDED INTO THE SPECIFIC FIELD (objectifiedName)
             const updatedInput = {
                 ...prevInputs[objectifiedName],
-                [attribute]: value,
+                [targetProps]: value,
             };
             // RETURNED ALL INPUTS WITH THE SPECIFIC FIELD UPTATED
             return {

@@ -5,6 +5,6 @@ declare interface onChangeInputsValueProp {
 
 declare interface onChangeInputsProps {
     objectifiedName: string;
-    attribute: InputsAttributesFields;
+    targetProps: InputsTargetPropsType;
     value: T;
 }
