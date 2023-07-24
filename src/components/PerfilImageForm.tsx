@@ -2,6 +2,8 @@ import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
 import _ from 'lodash';
+import Image from 'next/image';
+import defaultImage from '../../public/uploads/jeipeg.jpg';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
