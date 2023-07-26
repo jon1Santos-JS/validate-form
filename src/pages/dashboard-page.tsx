@@ -27,7 +27,12 @@ export default function DashBoardPage({
             <div className="o-dashboard-page">
                 <div>{message}</div>
                 <div>
-                    <PerfilImage />
+                    <PerfilImage
+                        hasUser={hasUser}
+                        isUserStateLoading={isUserStateLoading}
+                        user={user}
+                        {...restProps}
+                    />
                     <ChangePasswordForm
                         hasUser={hasUser}
                         user={user}

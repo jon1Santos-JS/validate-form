@@ -3,15 +3,20 @@ import Form from './Form';
 import Input from './Input';
 import _ from 'lodash';
 import Image from 'next/image';
-import defaultImage from '../../public/uploads/jeipeg.jpg';
+import { useState } from 'react';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
 
-export default function PerfilImage() {
+type PerfilImagePropsTypes = HandlerUserStateProps;
+
+export default function PerfilImage(props: PerfilImagePropsTypes) {
+    const [userImage, setUserImage] = useState('');
+
     return (
         <div>
             <h4>Upload image</h4>
+            {renderImage()}
             <InputsHandler preInputs={preInputs}>
                 <Form
                     onSubmitInputs={onSubmitInputs}
@@ -36,16 +41,33 @@ export default function PerfilImage() {
         const fileName = handledName(inputs.imageInput.files[0].name);
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file, fileName);
-        const response = await fetch('/api/testConnection', {
-            method: 'POST',
-            body: formData,
-        });
+        const response = await fetch(
+            `https://api.imgbb.com/1/upload?expiration=600&key=${
+                process.env.NEXT_PUBLIC_IMGBB_API_KEY as string
+            }`,
+            {
+                method: 'POST',
+                body: formData,
+            },
+        );
 
         if (response.ok) {
-            console.log('Image uploaded successfully!');
-        } else {
-            console.error('Error uploading image.');
+            const image = await response.json();
+            setUserImage(image.data.url);
         }
+    }
+
+    function renderImage() {
+        return (
+            <>
+                <Image
+                    src={userImage}
+                    alt="test image"
+                    width={200}
+                    height={200}
+                />
+            </>
+        );
     }
 }
 
