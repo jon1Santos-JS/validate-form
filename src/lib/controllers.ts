@@ -52,3 +52,18 @@ export async function changeUsernameController(
     }
     return { serverResponse: true, body: response };
 }
+
+export async function changeUserImg(user: UserWithImgType) {
+    const response = await miniDBAccountHandler.updateUserImage(
+        user.userName,
+        user.userImg,
+    );
+    if (typeof response === 'string') {
+        console.log('controller error to change user image: ', response);
+        return {
+            serverResponse: false,
+            body: 'Error when try to update the image',
+        };
+    }
+    return { serverResponse: true, body: 'User image has been updated' };
+}

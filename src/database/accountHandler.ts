@@ -62,6 +62,18 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
+    async updateUserImage(user: string, img: string) {
+        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
+        const currentUserAccount = this.#authUsername(user);
+        if (!currentUserAccount) return SERVER_ERROR_RESPONSE;
+        const response = await this.#changeUserImg(user, img);
+        if (!response) {
+            console.log('User image has been updated');
+            return;
+        }
+        return SERVER_ERROR_RESPONSE;
+    }
+
     async #onInitDB() {
         try {
             await miniDBHandler.init();
@@ -106,6 +118,7 @@ class MiniDBAccountHandler {
                     constraint: account.constraint,
                     username: { value: userAccount.username.value },
                     password: { value: userAccount.newPassword.value },
+                    userImage: account.userImage,
                 };
             }
             return account;
@@ -126,6 +139,7 @@ class MiniDBAccountHandler {
                     constraint: account.constraint,
                     username: { value: user.newUsername.value },
                     password: { value: account.password.value },
+                    userImage: account.userImage,
                 };
             }
             return account;
@@ -142,6 +156,27 @@ class MiniDBAccountHandler {
         const userAccountHandled: UserFromDataBaseType =
             this.#onHandleInputs(userAccount);
         DATABASE.state.accounts.push(userAccountHandled);
+        const response = await miniDBHandler.handleDB(
+            'refresh',
+            'MiniDBAccountHandler - createAccount',
+        );
+        if (!response) return;
+        return SERVER_ERROR_RESPONSE;
+    }
+
+    async #changeUserImg(user: string, img: string) {
+        DATABASE.state.accounts = DATABASE.state.accounts.map((account) => {
+            if (account.username.value === user) {
+                return {
+                    ID: account.ID,
+                    constraint: account.constraint,
+                    username: { value: account.username.value },
+                    password: { value: account.password.value },
+                    userImage: img,
+                };
+            }
+            return account;
+        });
         const response = await miniDBHandler.handleDB(
             'refresh',
             'MiniDBAccountHandler - createAccount',

@@ -12,6 +12,7 @@ declare interface UserFromDataBaseType {
     constraint: ConstraintsType;
     username: { value: string };
     password: { value: string };
+    userImage: string;
 }
 
 declare type ConstraintsType = 'user' | 'admin';

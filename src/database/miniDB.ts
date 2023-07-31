@@ -11,6 +11,7 @@ export const DB_ADMIN_ACCOUNT: UserFromDataBaseType = {
     constraint: 'admin',
     username: { value: process.env.NEXT_PUBLIC_ADMINS_USERNAME as string },
     password: { value: process.env.NEXT_PUBLIC_ADMINS_PASSWORD as string },
+    userImage: '',
 };
 export const ADMINS_ACCOUNT: AccountFromClientType = {
     username: { value: process.env.NEXT_PUBLIC_ADMINS_USERNAME as string },
