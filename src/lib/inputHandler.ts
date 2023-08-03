@@ -14,6 +14,14 @@ export function onCreateConstraint(
     return userWithConstraint;
 }
 
+export function onCreateUserImg(userAccount: UserFromClientType) {
+    const userWithImg = {
+        ...userAccount,
+        userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
+    };
+    return userWithImg;
+}
+
 export function onOmitDBInputFields(userAccount: UserFromDataBaseType[]) {
     const handledAccount = userAccount.map((user) => ({
         username: { value: user.username.value },

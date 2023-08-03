@@ -35,4 +35,8 @@ declare interface ChangePasswordFromClientType extends UserFromClientType {
     newPassword: { value: string };
 }
 
+declare interface UserWithImgType {
+    userName: string;
+    userImg: string;
+}
 declare type HandleDBComandType = 'reset' | 'refresh' | 'getUsers';

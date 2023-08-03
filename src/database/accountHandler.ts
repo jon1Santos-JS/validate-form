@@ -1,4 +1,8 @@
-import { onCreateConstraint, onCreateID } from '@/lib/inputHandler';
+import {
+    onCreateConstraint,
+    onCreateID,
+    onCreateUserImg,
+} from '@/lib/inputHandler';
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
 import { miniDBHandler } from './miniDBHandler';
 
@@ -62,11 +66,11 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    async updateUserImage(user: string, img: string) {
+    async updateUserImage({ userName, userImg }: UserWithImgType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
-        const currentUserAccount = this.#authUsername(user);
+        const currentUserAccount = this.#authUsername(userName);
         if (!currentUserAccount) return SERVER_ERROR_RESPONSE;
-        const response = await this.#changeUserImg(user, img);
+        const response = await this.#changeUserImg({ userName, userImg });
         if (!response) {
             console.log('User image has been updated');
             return;
@@ -164,15 +168,15 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    async #changeUserImg(user: string, img: string) {
+    async #changeUserImg({ userName, userImg }: UserWithImgType) {
         DATABASE.state.accounts = DATABASE.state.accounts.map((account) => {
-            if (account.username.value === user) {
+            if (account.username.value === userName) {
                 return {
                     ID: account.ID,
                     constraint: account.constraint,
                     username: { value: account.username.value },
                     password: { value: account.password.value },
-                    userImage: img,
+                    userImage: userImg,
                 };
             }
             return account;
@@ -191,7 +195,8 @@ class MiniDBAccountHandler {
             accountWithConstraint,
             DATABASE.state.accounts.length,
         );
-        return accountWithID as UserFromDataBaseType;
+        const accountWithImg = onCreateUserImg(accountWithID);
+        return accountWithImg as UserFromDataBaseType;
     }
 }
 

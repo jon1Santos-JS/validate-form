@@ -76,7 +76,7 @@ export default function PerfilImage({
     }
 
     async function onUpdateUserImageDB(img: string) {
-        const handledUser: UserWithImgType = {
+        const handledUser = {
             userName: user,
             userImg: img,
         };
@@ -85,7 +85,10 @@ export default function PerfilImage({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledUser),
         };
-        await fetch(process.env.NEXT_PUBLIC_CHANGE_USER_IMG as string, options);
+        await fetch(
+            process.env.NEXT_PUBLIC_CHANGE_USER_IMG_LINK as string,
+            options,
+        );
     }
 }
 

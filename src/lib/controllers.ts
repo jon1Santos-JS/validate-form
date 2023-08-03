@@ -52,10 +52,7 @@ export async function changeUsernameController(
 }
 
 export async function changeUserImg(user: UserWithImgType) {
-    const response = await miniDBAccountHandler.updateUserImage(
-        user.userName,
-        user.userImg,
-    );
+    const response = await miniDBAccountHandler.updateUserImage(user);
     if (typeof response === 'string') {
         console.log('controller error to change user image: ', response);
         return {

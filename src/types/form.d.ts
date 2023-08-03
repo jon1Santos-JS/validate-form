@@ -41,11 +41,6 @@ declare type HandledInputs<T> = Partial<
 
 declare type FileType = FileList | undefined | null;
 
-declare interface UserWithImgType {
-    userName: string;
-    userImg: string;
-}
-
 // FORM INPUT'S FIELDS TO SUBMIT
 
 declare interface FormInputsTypeToSubmit {
