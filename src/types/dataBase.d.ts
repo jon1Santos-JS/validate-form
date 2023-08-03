@@ -21,7 +21,7 @@ declare interface UserFromClientType {
     username: { value: string };
 }
 
-declare interface AccountFromClientType {
+declare interface UserFromClientType {
     username: { value: string };
     password: { value: string };
 }
@@ -31,7 +31,7 @@ declare interface ChangeUsernameFromClientType {
     newUsername: { value: string };
 }
 
-declare interface ChangePasswordFromClientType extends AccountFromClientType {
+declare interface ChangePasswordFromClientType extends UserFromClientType {
     newPassword: { value: string };
 }
 

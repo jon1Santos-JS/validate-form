@@ -1,7 +1,4 @@
-export function onCreateID(
-    userAccount: AccountFromClientType,
-    currentID: number,
-) {
+export function onCreateID(userAccount: UserFromClientType, currentID: number) {
     const inputWithID = {
         ID: currentID + 1,
         ...userAccount,
@@ -10,7 +7,7 @@ export function onCreateID(
 }
 
 export function onCreateConstraint(
-    userAccount: AccountFromClientType,
+    userAccount: UserFromClientType,
     constraint: ConstraintsType,
 ) {
     const userWithConstraint = { constraint: constraint, ...userAccount };
@@ -22,5 +19,5 @@ export function onOmitDBInputFields(userAccount: UserFromDataBaseType[]) {
         username: { value: user.username.value },
         password: { value: user.password.value },
     }));
-    return handledAccount as AccountFromClientType[];
+    return handledAccount as UserFromClientType[];
 }

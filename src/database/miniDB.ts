@@ -13,7 +13,7 @@ export const DB_ADMIN_ACCOUNT: UserFromDataBaseType = {
     password: { value: process.env.NEXT_PUBLIC_ADMINS_PASSWORD as string },
     userImage: '',
 };
-export const ADMINS_ACCOUNT: AccountFromClientType = {
+export const ADMINS_ACCOUNT: UserFromClientType = {
     username: { value: process.env.NEXT_PUBLIC_ADMINS_USERNAME as string },
     password: { value: process.env.NEXT_PUBLIC_ADMINS_PASSWORD as string },
 };

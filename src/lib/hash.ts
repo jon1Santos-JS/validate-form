@@ -1,4 +1,7 @@
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
+import { getUserStateController } from './controllers';
+import { onOmitDBInputFields } from './inputHandler';
+import { ADMINS_ACCOUNT } from '@/database/miniDB';
 
 export const HASH_DEFAULT_ERROR = 'invalid hash';
 
@@ -10,30 +13,50 @@ export function createHash<T>(value: T) {
 }
 
 export async function returnUserByHash(
-    browserHash: string,
-    users: UserFromClientType[],
-) {
+    browserHash: string | undefined,
+): Promise<{
+    serverResponse: boolean;
+    body: string;
+}> {
+    if (!browserHash) {
+        return {
+            serverResponse: false,
+            body: HASH_DEFAULT_ERROR,
+        };
+    }
     const validation = {
         isValid: false,
-        user: {},
-        message: HASH_DEFAULT_ERROR,
+        user: '',
+        message: 'User was not found',
     };
-    validation.message = 'User was not found';
-    const usersList = users;
-    if (usersList.length > 1) {
-        usersList.forEach((user) => {
+    const controllerResponse = await getUserStateController();
+    if (typeof controllerResponse.body === 'string')
+        return {
+            serverResponse: validation.isValid,
+            body: controllerResponse.body,
+        };
+    const usersFromDB = controllerResponse.body;
+    const handledUsers = onOmitDBInputFields(usersFromDB);
+    if (handledUsers.length > 1) {
+        handledUsers.forEach((user) => {
             if (compareSync(JSON.stringify(user), browserHash)) {
                 validation.user = user.username.value;
                 validation.isValid = true;
             }
         });
-        return validation;
+    } else {
+        // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
+        if (compareSync(JSON.stringify(ADMINS_ACCOUNT), browserHash)) {
+            validation.user = ADMINS_ACCOUNT.username.value;
+            validation.isValid = true;
+        }
     }
 
-    const admin = users[0];
-    if (compareSync(JSON.stringify(admin), browserHash)) {
-        validation.user = admin.username.value;
-        validation.isValid = true;
-    }
-    return validation;
+    const conditional = validation.isValid
+        ? validation.user
+        : validation.message;
+    return {
+        serverResponse: validation.isValid,
+        body: conditional,
+    };
 }

@@ -3,7 +3,7 @@ import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
 import { miniDBHandler } from './miniDBHandler';
 
 class MiniDBAccountHandler {
-    async signIn(userAccount: AccountFromClientType) {
+    async signIn(userAccount: UserFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(userAccount)) {
             console.log('account was not found');
@@ -13,7 +13,7 @@ class MiniDBAccountHandler {
         return userAccount;
     }
 
-    async signUp(userAccount: AccountFromClientType) {
+    async signUp(userAccount: UserFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (this.#authUsername(userAccount.username.value)) {
             console.log('account already exist');
@@ -84,7 +84,7 @@ class MiniDBAccountHandler {
     }
 
     // DONT NEED 'TO REFRESH DB (async)' WHEN THE 'INIT FUNCTION' HAVE BEEN CALLED BY PUBLIC FUNCTIONS
-    #authAccount(userAccount: AccountFromClientType) {
+    #authAccount(userAccount: UserFromClientType) {
         const account = DATABASE.state.accounts.find((DBAccount) => {
             if (
                 DBAccount.username.value !== userAccount.username.value ||
@@ -152,7 +152,7 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    async #createAccount(userAccount: AccountFromClientType) {
+    async #createAccount(userAccount: UserFromClientType) {
         const userAccountHandled: UserFromDataBaseType =
             this.#onHandleInputs(userAccount);
         DATABASE.state.accounts.push(userAccountHandled);
@@ -185,7 +185,7 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    #onHandleInputs(userAccount: AccountFromClientType) {
+    #onHandleInputs(userAccount: UserFromClientType) {
         const accountWithConstraint = onCreateConstraint(userAccount, 'user');
         const accountWithID = onCreateID(
             accountWithConstraint,

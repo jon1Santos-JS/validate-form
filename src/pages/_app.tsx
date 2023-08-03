@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
     const [hasUser, setHasUser] = useState(false);
     const [userStateLoading, setUserStateLoading] = useState(true);
 
-    const fetchData = useCallback(async () => {
+    const onCheckUserState = useCallback(async () => {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const response = await fetch(action, {
             method: 'GET',
@@ -24,8 +24,8 @@ export default function App({ Component, pageProps }: AppProps) {
     }, []);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        onCheckUserState();
+    }, [onCheckUserState]);
 
     if (pageProps.statusCode === 404) return <Component {...pageProps} />;
 
