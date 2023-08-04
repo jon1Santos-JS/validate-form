@@ -1,19 +1,21 @@
 import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
-import _ from 'lodash';
 import Image from 'next/image';
 import { useState } from 'react';
+import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
 
 type PerfilImagePropsTypes = HandlerUserStateProps;
 
-export default function PerfilImage(props: PerfilImagePropsTypes) {
-    const [userImage, setUserImage] = useState(
-        process.env.NEXT_PUBLIC_PERFIL_DEFAULT_IMAGE as string,
-    );
+export default function PerfilImage({
+    user,
+    isUserStateLoading,
+}: PerfilImagePropsTypes) {
+    const [userImage, setUserImage] = useState('');
+    const { handledName } = useStringHandler();
 
     return (
         <div>
@@ -37,27 +39,8 @@ export default function PerfilImage(props: PerfilImagePropsTypes) {
         </div>
     );
 
-    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
-        if (!inputs.imageInput?.files) return;
-        const file = inputs.imageInput?.files[0];
-        const fileName = handledName(inputs.imageInput.files[0].name);
-        const formData = new FormData(); // multipart/form-data format to send to API;
-        formData.append('image', file, fileName);
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_IMGBB_API_LINK}&key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
-            {
-                method: 'POST',
-                body: formData,
-            },
-        );
-
-        if (response.ok) {
-            const image = await response.json();
-            setUserImage(image.data.url);
-        }
-    }
-
     function renderImage() {
+        if (isUserStateLoading || userImage === '') return null;
         return (
             <>
                 <Image
@@ -70,32 +53,56 @@ export default function PerfilImage(props: PerfilImagePropsTypes) {
             </>
         );
     }
+
+    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
+        if (!inputs.imageInput?.files) return;
+        const file = inputs.imageInput?.files[0];
+        const fileName = handledName(inputs.imageInput.files[0].name);
+        const formData = new FormData(); // multipart/form-data format to send to API;
+        formData.append('image', file, fileName);
+        const fetchOptions: FetchOptionsType = {
+            method: 'POST',
+            body: formData,
+        };
+        const imgApiResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_IMGBB_API as string}expiration=600&key=${
+                process.env.NEXT_PUBLIC_IMGBB_API_KEY as string
+            }`,
+            fetchOptions,
+        );
+        if (!imgApiResponse.ok) return;
+        const image = await imgApiResponse.json();
+        setUserImage(image.data.url);
+        onUpdateUserImageDB(image.data.url);
+    }
+
+    async function onUpdateUserImageDB(img: string) {
+        const handledUser = {
+            userName: user,
+            userImg: img,
+        };
+        const options: FetchOptionsType = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(handledUser),
+        };
+        await fetch(
+            process.env.NEXT_PUBLIC_CHANGE_USER_IMG_LINK as string,
+            options,
+        );
+    }
 }
 
 const preInputs = {
     imageInput: {
         validations: (currentInputValue: string) => [
             {
-                coditional: !onCheckExtensions(currentInputValue),
+                coditional: !onCheckExtensions(
+                    ALLOWED_EXTENSIONS,
+                    currentInputValue,
+                ),
                 message: `Allowed extensions: ${ALLOWED_EXTENSIONS.join(', ')}`,
             },
         ],
     },
 };
-
-function onCheckExtensions(text: string) {
-    const validate = { value: false };
-    ALLOWED_EXTENSIONS.forEach((extension) =>
-        text.includes(extension) ? (validate.value = true) : null,
-    );
-    return validate.value;
-}
-
-function handledName(name: string) {
-    const handledName = _.deburr(name);
-    const noCedilha = handledName.replace(/[çÇ]/g, (match) =>
-        match === 'ç' ? 'c' : 'C',
-    );
-
-    return noCedilha;
-}

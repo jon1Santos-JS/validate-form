@@ -1,19 +1,17 @@
 import { miniDBAccountHandler } from '@/database/accountHandler';
 import { miniDBHandler } from '@/database/miniDBHandler';
-import { onOmitDBInputFields } from './inputHandler';
 import { SERVER_ERROR_RESPONSE } from '@/database/miniDB';
 
 export async function getUserStateController() {
     const response = await miniDBHandler.handleDB('getUsers');
     if (typeof response === 'string') {
         console.log('controller error to get users: ', response);
-        return { serverResponse: undefined, body: SERVER_ERROR_RESPONSE };
+        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
     }
-    const users = onOmitDBInputFields(response as UserFromDataBaseType[]);
-    return { serverResponse: true, body: users };
+    return { serverResponse: true, body: response as UserFromDataBaseType[] };
 }
 
-export async function signInController(userAccount: AccountFromClientType) {
+export async function signInController(userAccount: UserFromClientType) {
     const response = await miniDBAccountHandler.signIn(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to sign in user: ', response);
@@ -22,7 +20,7 @@ export async function signInController(userAccount: AccountFromClientType) {
     return { serverResponse: true, body: userAccount.username.value };
 }
 
-export async function signUpController(userAccount: AccountFromClientType) {
+export async function signUpController(userAccount: UserFromClientType) {
     const response = await miniDBAccountHandler.signUp(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to sign up user: ', response);
@@ -51,4 +49,16 @@ export async function changeUsernameController(
         return { serverResponse: false, body: 'This username is already used' };
     }
     return { serverResponse: true, body: response };
+}
+
+export async function changeUserImg(user: UserWithImgType) {
+    const response = await miniDBAccountHandler.updateUserImage(user);
+    if (typeof response === 'string') {
+        console.log('controller error to change user image: ', response);
+        return {
+            serverResponse: false,
+            body: 'Error when try to update the image',
+        };
+    }
+    return { serverResponse: true, body: 'User image has been updated' };
 }

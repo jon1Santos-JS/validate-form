@@ -23,6 +23,7 @@ export default async function handler(
             }
             const newAccountFromDB = controllerResponse.body;
             const hash = createHash(newAccountFromDB);
+            const newUsername = newAccountFromDB.username.value;
             const cookies = new Cookies(req, res);
             cookies.set('user-hash', hash, {
                 expires: COOKIES_EXPIRES,
@@ -30,7 +31,7 @@ export default async function handler(
             });
             res.status(200).json({
                 serverResponse: true,
-                body: newAccountFromDB.username.value,
+                body: newUsername,
             });
             break;
         }

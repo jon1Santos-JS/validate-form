@@ -7,7 +7,7 @@ export default async function handler(
 ) {
     switch (req.method) {
         case 'POST': {
-            const user: AccountFromClientType = req.body;
+            const user: UserFromClientType = req.body;
             const controllerResponse = await signUpController(user);
             res.status(200).json(controllerResponse);
             break;

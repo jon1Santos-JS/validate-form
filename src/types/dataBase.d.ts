@@ -12,6 +12,7 @@ declare interface UserFromDataBaseType {
     constraint: ConstraintsType;
     username: { value: string };
     password: { value: string };
+    userImage: string;
 }
 
 declare type ConstraintsType = 'user' | 'admin';
@@ -20,7 +21,7 @@ declare interface UserFromClientType {
     username: { value: string };
 }
 
-declare interface AccountFromClientType {
+declare interface UserFromClientType {
     username: { value: string };
     password: { value: string };
 }
@@ -30,8 +31,12 @@ declare interface ChangeUsernameFromClientType {
     newUsername: { value: string };
 }
 
-declare interface ChangePasswordFromClientType extends AccountFromClientType {
+declare interface ChangePasswordFromClientType extends UserFromClientType {
     newPassword: { value: string };
 }
 
+declare interface UserWithImgType {
+    userName: string;
+    userImg: string;
+}
 declare type HandleDBComandType = 'reset' | 'refresh' | 'getUsers';

@@ -1,18 +1,14 @@
-import {
-    NextApiRequestWithFormData,
-    NextApiResponseCustom,
-    imageHandler,
-} from '@/database/imageHandler';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { changeUserImg } from '@/lib/controllers';
 
 export default async function handler(
-    req: NextApiRequestWithFormData,
-    res: NextApiResponseCustom,
+    req: NextApiRequest,
+    res: NextApiResponse,
 ) {
     switch (req.method) {
         case 'POST': {
-            imageHandler.refreshDirectory();
-            imageHandler.uploadImage(req, res);
-            res.status(200).json({ message: 'Upload successful' });
+            const response = await changeUserImg(req.body as UserWithImgType);
+            res.status(200).json(response);
             break;
         }
         default:
@@ -23,7 +19,7 @@ export default async function handler(
 
 export const config = {
     api: {
-        bodyParser: false,
+        bodyParser: '1mb',
     },
 };
 

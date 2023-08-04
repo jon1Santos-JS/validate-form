@@ -1,9 +1,13 @@
-import { onCreateConstraint, onCreateID } from '@/lib/inputHandler';
+import {
+    onCreateConstraint,
+    onCreateID,
+    onCreateUserImg,
+} from '@/lib/inputHandler';
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
 import { miniDBHandler } from './miniDBHandler';
 
 class MiniDBAccountHandler {
-    async signIn(userAccount: AccountFromClientType) {
+    async signIn(userAccount: UserFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(userAccount)) {
             console.log('account was not found');
@@ -13,7 +17,7 @@ class MiniDBAccountHandler {
         return userAccount;
     }
 
-    async signUp(userAccount: AccountFromClientType) {
+    async signUp(userAccount: UserFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (this.#authUsername(userAccount.username.value)) {
             console.log('account already exist');
@@ -62,6 +66,18 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
+    async updateUserImage({ userName, userImg }: UserWithImgType) {
+        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
+        const currentUserAccount = this.#authUsername(userName);
+        if (!currentUserAccount) return SERVER_ERROR_RESPONSE;
+        const response = await this.#changeUserImg({ userName, userImg });
+        if (!response) {
+            console.log('User image has been updated');
+            return;
+        }
+        return SERVER_ERROR_RESPONSE;
+    }
+
     async #onInitDB() {
         try {
             await miniDBHandler.init();
@@ -72,7 +88,7 @@ class MiniDBAccountHandler {
     }
 
     // DONT NEED 'TO REFRESH DB (async)' WHEN THE 'INIT FUNCTION' HAVE BEEN CALLED BY PUBLIC FUNCTIONS
-    #authAccount(userAccount: AccountFromClientType) {
+    #authAccount(userAccount: UserFromClientType) {
         const account = DATABASE.state.accounts.find((DBAccount) => {
             if (
                 DBAccount.username.value !== userAccount.username.value ||
@@ -106,6 +122,7 @@ class MiniDBAccountHandler {
                     constraint: account.constraint,
                     username: { value: userAccount.username.value },
                     password: { value: userAccount.newPassword.value },
+                    userImage: account.userImage,
                 };
             }
             return account;
@@ -126,6 +143,7 @@ class MiniDBAccountHandler {
                     constraint: account.constraint,
                     username: { value: user.newUsername.value },
                     password: { value: account.password.value },
+                    userImage: account.userImage,
                 };
             }
             return account;
@@ -138,7 +156,7 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    async #createAccount(userAccount: AccountFromClientType) {
+    async #createAccount(userAccount: UserFromClientType) {
         const userAccountHandled: UserFromDataBaseType =
             this.#onHandleInputs(userAccount);
         DATABASE.state.accounts.push(userAccountHandled);
@@ -150,13 +168,35 @@ class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    #onHandleInputs(userAccount: AccountFromClientType) {
+    async #changeUserImg({ userName, userImg }: UserWithImgType) {
+        DATABASE.state.accounts = DATABASE.state.accounts.map((account) => {
+            if (account.username.value === userName) {
+                return {
+                    ID: account.ID,
+                    constraint: account.constraint,
+                    username: { value: account.username.value },
+                    password: { value: account.password.value },
+                    userImage: userImg,
+                };
+            }
+            return account;
+        });
+        const response = await miniDBHandler.handleDB(
+            'refresh',
+            'MiniDBAccountHandler - createAccount',
+        );
+        if (!response) return;
+        return SERVER_ERROR_RESPONSE;
+    }
+
+    #onHandleInputs(userAccount: UserFromClientType) {
         const accountWithConstraint = onCreateConstraint(userAccount, 'user');
         const accountWithID = onCreateID(
             accountWithConstraint,
             DATABASE.state.accounts.length,
         );
-        return accountWithID as UserFromDataBaseType;
+        const accountWithImg = onCreateUserImg(accountWithID);
+        return accountWithImg as UserFromDataBaseType;
     }
 }
 
