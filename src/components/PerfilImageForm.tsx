@@ -11,7 +11,9 @@ const DEFAULT_FORM_ERROR = 'Invalid image';
 type PerfilImagePropsTypes = HandlerUserStateProps;
 
 export default function PerfilImage(props: PerfilImagePropsTypes) {
-    const [userImage, setUserImage] = useState('');
+    const [userImage, setUserImage] = useState(
+        process.env.NEXT_PUBLIC_PERFIL_DEFAULT_IMAGE as string,
+    );
 
     return (
         <div>
@@ -42,9 +44,7 @@ export default function PerfilImage(props: PerfilImagePropsTypes) {
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file, fileName);
         const response = await fetch(
-            `https://api.imgbb.com/1/upload?expiration=600&key=${
-                process.env.NEXT_PUBLIC_IMGBB_API_KEY as string
-            }`,
+            `${process.env.NEXT_PUBLIC_IMGBB_API_LINK}&key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
             {
                 method: 'POST',
                 body: formData,
@@ -65,6 +65,7 @@ export default function PerfilImage(props: PerfilImagePropsTypes) {
                     alt="test image"
                     width={200}
                     height={200}
+                    priority={true}
                 />
             </>
         );
