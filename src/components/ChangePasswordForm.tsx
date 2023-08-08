@@ -13,7 +13,9 @@ export default function ChangePasswordForm({
     return <>{renderContent()}</>;
 
     function renderContent() {
-        if (user === (process.env.NEXT_PUBLIC_ADMIN_USERNAME as string))
+        if (
+            user.username === (process.env.NEXT_PUBLIC_ADMIN_USERNAME as string)
+        )
             return null;
 
         return (
@@ -44,7 +46,7 @@ export default function ChangePasswordForm({
 
     async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
-        const handledBody = { username: { value: user }, ...inputs };
+        const handledBody = { username: { value: user.username }, ...inputs };
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

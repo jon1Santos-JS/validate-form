@@ -21,11 +21,3 @@ export function onCreateUserImg(userAccount: UserFromClientType) {
     };
     return userWithImg;
 }
-
-export function onOmitDBInputFields(userAccount: UserFromDataBaseType[]) {
-    const handledAccount = userAccount.map((user) => ({
-        username: { value: user.username.value },
-        password: { value: user.password.value },
-    }));
-    return handledAccount as UserFromClientType[];
-}
