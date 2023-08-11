@@ -14,10 +14,14 @@ class MiniDBHandler {
         return;
     }
 
-    async handleDB(command: HandleDBComandType, caller?: string) {
-        if (command === 'refresh')
+    async handleDB<T extends HandleDBComandType>(command: T, caller?: string) {
+        if (command === 'refresh') {
             return await this.#createAndRefreshDB(caller);
-        if (command === 'getUsers') return await this.#getUsers();
+        }
+        if (command === 'getUsers') {
+            return await this.#getUsers();
+        }
+        return;
     }
 
     async #getUsers() {

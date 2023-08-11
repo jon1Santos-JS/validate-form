@@ -30,11 +30,13 @@ export async function returnUserByHash(
         message: 'User was not found',
     };
     const controllerResponse = await getUserStateController();
+    // NO DATABASE
     if (typeof controllerResponse.body === 'string')
         return {
             serverResponse: validation.isValid,
             body: controllerResponse.body,
         };
+    // DATABASE
     const usersFromDB = controllerResponse.body;
     const handledUsers = onOmitDBInputFields(usersFromDB);
     if (handledUsers.length > 1) {
@@ -45,7 +47,6 @@ export async function returnUserByHash(
             }
         });
     } else {
-        // IF THERE'S NO DATABASE USERS, IT'S COMPARING ADMIN'S ACCOUNT TO HASH
         if (compareSync(JSON.stringify(ADMINS_ACCOUNT), browserHash)) {
             validation.user = ADMINS_ACCOUNT.username.value;
             validation.isValid = true;
