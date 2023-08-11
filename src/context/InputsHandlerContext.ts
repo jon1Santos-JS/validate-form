@@ -1,14 +1,14 @@
 import React from 'react';
 
-interface InputHandlerContextType {
+interface InputsHandlerContextType {
     showInputMessagesFromOutside: boolean;
     inputs: FormInputsType;
-    onChangeInput: (props: onChangeInputsProps) => void;
+    onChangeInput: <T>(props: onChangeInputsProps<T>) => void;
     updateInputsToSubmit: () => FormInputsTypeToSubmit;
     setShowInputsMessage: (value: boolean) => void;
 }
 
-export default React.createContext<InputHandlerContextType>({
+export default React.createContext<InputsHandlerContextType>({
     showInputMessagesFromOutside: false,
     inputs: {},
     updateInputsToSubmit: () => ({}),

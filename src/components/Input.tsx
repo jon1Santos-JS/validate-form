@@ -1,25 +1,25 @@
-import InputHandlerContext from '@/context/InputHandlerContext';
+import InputHandlerContext from '@/context/InputsHandlerContext';
 import useValidate from '@/hooks/useValidate';
 import React, { useState, useEffect, useContext } from 'react';
 
 interface InputProps {
     label: string;
     inputType: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     objectifiedName: string;
     inputName?: string;
     inputAccept?: string;
-    targetProps: InputsTargetPropsType<ComplementaryTargetPropsType>;
 }
 
 const Input: React.FC<InputProps> = ({
     label,
     inputType,
+    onChange,
     objectifiedName,
     inputName,
     inputAccept,
-    targetProps,
 }) => {
-    const { inputs, showInputMessagesFromOutside, onChangeInput } =
+    const { inputs, showInputMessagesFromOutside } =
         useContext(InputHandlerContext);
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
@@ -63,17 +63,6 @@ const Input: React.FC<InputProps> = ({
             {renderErrors()}
         </div>
     );
-
-    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-        targetProps.map((props) => {
-            const handledAttribute = {
-                objectifiedName: objectifiedName,
-                targetProps: props,
-                value: e.target[props],
-            };
-            onChangeInput(handledAttribute);
-        });
-    }
 
     function renderErrors() {
         if (!showMessage) return null;

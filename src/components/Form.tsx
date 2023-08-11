@@ -1,6 +1,6 @@
 import useValidate from '@/hooks/useValidate';
 import React, { useContext, useEffect, useState } from 'react';
-import InputHandlerContext from '@/context/InputHandlerContext';
+import InputHandlerContext from '@/context/InputsHandlerContext';
 
 const FORM_ERROR = 'Invalid form';
 

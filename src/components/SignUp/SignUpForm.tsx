@@ -1,12 +1,20 @@
+import InputsHandlerContext from '@/context/InputsHandlerContext';
 import Form from '../Form';
 import Input from '../Input';
 import InputsHandler from '../InputsHandler';
+import { useContext, useEffect } from 'react';
 
 interface SignUpFormPropsType {
     setResponse: (data: boolean) => void;
 }
 
 export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
+    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
+
+    useEffect(() => {
+        console.log(inputs);
+    }, [inputs]);
+
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
@@ -15,26 +23,50 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
                         <Input
                             label="Username"
                             inputType="text"
+                            onChange={onchangeUsername}
                             objectifiedName="username"
-                            targetProps={['value']}
                         />
                         <Input
                             label="Password"
                             inputType="password"
+                            onChange={onchangePassword}
                             objectifiedName="password"
-                            targetProps={['value']}
                         />
                         <Input
                             label="Confirm Password"
                             inputType="password"
+                            onChange={onchangeConfirmPassword}
                             objectifiedName="confirmPassword"
-                            targetProps={['value']}
                         />
                     </Form>
                 </InputsHandler>
             </div>
         </div>
     );
+
+    function onchangeUsername(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'username',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+    }
+
+    function onchangePassword(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'password',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+    }
+
+    function onchangeConfirmPassword(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'confirmPassword',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+    }
 
     async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;

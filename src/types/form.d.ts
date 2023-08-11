@@ -30,11 +30,6 @@ declare interface FormInputPropsType extends PreFormInputPropsType {
     value?: string;
 }
 
-declare type InputsTargetPropsType<T extends ComplementaryTargetPropsType> = [
-    'value',
-    ...T[],
-];
-
 declare type HandledInputs<T> = Partial<
     Record<keyof T, FormInputPropsTypeToSubmit>
 >;
@@ -49,7 +44,7 @@ declare interface FormInputsTypeToSubmit {
 
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
 
-declare type ComplementaryTargetPropsType = 'files' | 'accessKey';
+declare type TargetPropsType = 'value' | 'files' | 'accessKey';
 
 declare interface FormInputPropsTypeToSubmit {
     files?: FileType;

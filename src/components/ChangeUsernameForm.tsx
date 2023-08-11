@@ -2,6 +2,8 @@ import Form from './Form';
 import Input from './Input';
 import InputsHandler from './InputsHandler';
 import { useRouter } from 'next/router';
+import InputsHandlerContext from '@/context/InputsHandlerContext';
+import { useContext } from 'react';
 
 type ChangePasswordFormPropsTypes = HandlerUserStateProps;
 
@@ -10,6 +12,7 @@ export default function ChangePasswordForm({
     setUser,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
+    const { onChangeInput } = useContext(InputsHandlerContext);
 
     return <>{renderContent()}</>;
 
@@ -25,12 +28,20 @@ export default function ChangePasswordForm({
                     <Input
                         label="New Username"
                         inputType="text"
+                        onChange={onChangeUsername}
                         objectifiedName="newUsername"
-                        targetProps={['value']}
                     />
                 </Form>
             </InputsHandler>
         );
+    }
+
+    function onChangeUsername(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'newUsername',
+            targetProp: 'value',
+            value: e.target.value,
+        });
     }
 
     async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {

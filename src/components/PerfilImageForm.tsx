@@ -3,6 +3,8 @@ import Form from './Form';
 import Input from './Input';
 import Image from 'next/image';
 import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
+import InputsHandlerContext from '@/context/InputsHandlerContext';
+import { useContext } from 'react';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
@@ -14,6 +16,7 @@ export default function PerfilImage({
     isUserStateLoading,
 }: PerfilImagePropsTypes) {
     const { handledName } = useStringHandler();
+    const { onChangeInput } = useContext(InputsHandlerContext);
 
     return (
         <div>
@@ -30,12 +33,26 @@ export default function PerfilImage({
                         inputType="file"
                         inputName="image"
                         inputAccept="image/*"
-                        targetProps={['value', 'files']}
+                        onChange={onchange}
                     />
                 </Form>
             </InputsHandler>
         </div>
     );
+
+    function onchange(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'imageInput',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+
+        onChangeInput({
+            objectifiedName: 'imageInput',
+            targetProp: 'files',
+            value: e.target.files,
+        });
+    }
 
     function renderImage() {
         if (isUserStateLoading || !user.userImage) return null;

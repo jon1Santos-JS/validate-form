@@ -3,8 +3,8 @@ declare interface onChangeInputsValueProp {
     value: string;
 }
 
-declare interface onChangeInputsProps {
+declare interface onChangeInputsProps<T> {
     objectifiedName: string;
-    targetProps: InputsTargetPropsType;
+    targetProp: TargetPropsType;
     value: T;
 }

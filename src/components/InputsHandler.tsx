@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import InputHandlerContext from '@/context/InputHandlerContext';
+import InputHandlerContext from '@/context/InputsHandlerContext';
 import { Lodash } from '@/lib/lodashAdapter';
 
 interface InputHandlerPropsTypes {
@@ -31,16 +31,16 @@ export default function InputsHandler({
         </InputHandlerContext.Provider>
     );
 
-    function onChangeInput({
+    function onChangeInput<T>({
         objectifiedName,
-        targetProps,
+        targetProp,
         value,
-    }: onChangeInputsProps) {
+    }: onChangeInputsProps<T>) {
         setInputs((prevInputs) => {
             // GETTING THE OBJECT  WITH THE NEWPROP ADDED INTO THE SPECIFIC FIELD (objectifiedName)
             const updatedInput = {
                 ...prevInputs[objectifiedName],
-                [targetProps]: value,
+                [targetProp]: value,
             };
             // RETURNED ALL INPUTS WITH THE SPECIFIC FIELD UPTATED
             return {

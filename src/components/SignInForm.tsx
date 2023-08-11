@@ -1,6 +1,8 @@
+import InputsHandlerContext from '@/context/InputsHandlerContext';
 import Form from './Form';
 import Input from './Input';
 import InputsHandler from './InputsHandler';
+import { useContext } from 'react';
 
 type SignInFormProps = HandlerUserStateProps;
 
@@ -11,6 +13,8 @@ export default function SignInForm({
     setHasUser,
     setUserStateLoading,
 }: SignInFormProps) {
+    const { onChangeInput } = useContext(InputsHandlerContext);
+
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
@@ -25,19 +29,35 @@ export default function SignInForm({
                             label="Username"
                             inputType="text"
                             objectifiedName="username"
-                            targetProps={['value']}
+                            onChange={onchangeUsername}
                         />
                         <Input
                             label="Password"
                             inputType="password"
                             objectifiedName="password"
-                            targetProps={['value']}
+                            onChange={onchangePassword}
                         />
                     </Form>
                 </InputsHandler>
             </div>
         </div>
     );
+
+    function onchangeUsername(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'username',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+    }
+
+    function onchangePassword(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'password',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+    }
 
     async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;

@@ -1,7 +1,9 @@
+import InputsHandlerContext from '@/context/InputsHandlerContext';
 import Form from './Form';
 import Input from './Input';
 import InputsHandler from './InputsHandler';
 import { useRouter } from 'next/router';
+import { useContext } from 'react';
 
 type ChangePasswordFormPropsTypes = HandlerUserStateProps;
 
@@ -9,6 +11,7 @@ export default function ChangePasswordForm({
     user,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
+    const { onChangeInput } = useContext(InputsHandlerContext);
 
     return <>{renderContent()}</>;
 
@@ -24,24 +27,50 @@ export default function ChangePasswordForm({
                     <Input
                         label="Password"
                         inputType="password"
+                        onChange={onchangePassword}
                         objectifiedName="password"
-                        targetProps={['value']}
                     />
                     <Input
                         label="New Password"
                         inputType="password"
+                        onChange={onchangeNewPassword}
                         objectifiedName="newPassword"
-                        targetProps={['value']}
                     />
                     <Input
                         label="Confirm New Password"
                         inputType="password"
+                        onChange={onchangeConfirmNewPassword}
                         objectifiedName="confirmNewPassword"
-                        targetProps={['value']}
                     />
                 </Form>
             </InputsHandler>
         );
+    }
+
+    function onchangePassword(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'password',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+    }
+
+    function onchangeNewPassword(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'newPassword',
+            targetProp: 'value',
+            value: e.target.value,
+        });
+    }
+
+    function onchangeConfirmNewPassword(
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) {
+        onChangeInput({
+            objectifiedName: 'confirmNewPassword',
+            targetProp: 'value',
+            value: e.target.value,
+        });
     }
 
     async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
