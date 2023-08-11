@@ -57,14 +57,14 @@ const Input: React.FC<InputProps> = ({
                 className="input"
                 name={inputName && inputName}
                 accept={inputAccept && inputAccept}
-                onChange={onGetValues}
+                onChange={onChange}
                 type={inputType}
             />
             {renderErrors()}
         </div>
     );
 
-    function onGetValues(e: React.ChangeEvent<HTMLInputElement>) {
+    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
         targetProps.map((props) => {
             const handledAttribute = {
                 objectifiedName: objectifiedName,
