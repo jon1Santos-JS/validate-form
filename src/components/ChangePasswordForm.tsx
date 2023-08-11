@@ -1,7 +1,6 @@
 import InputsHandlerContext from '@/context/InputsHandlerContext';
 import Form from './Form';
 import Input from './Input';
-import InputsHandler from './InputsHandler';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 
@@ -11,7 +10,7 @@ export default function ChangePasswordForm({
     user,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
-    const { onChangeInput } = useContext(InputsHandlerContext);
+    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
 
     return <>{renderContent()}</>;
 
@@ -22,28 +21,26 @@ export default function ChangePasswordForm({
             return null;
 
         return (
-            <InputsHandler preInputs={preInputs}>
-                <Form legend="Change Password" onSubmitInputs={onSubmitInputs}>
-                    <Input
-                        label="Password"
-                        inputType="password"
-                        onChange={onchangePassword}
-                        objectifiedName="password"
-                    />
-                    <Input
-                        label="New Password"
-                        inputType="password"
-                        onChange={onchangeNewPassword}
-                        objectifiedName="newPassword"
-                    />
-                    <Input
-                        label="Confirm New Password"
-                        inputType="password"
-                        onChange={onchangeConfirmNewPassword}
-                        objectifiedName="confirmNewPassword"
-                    />
-                </Form>
-            </InputsHandler>
+            <Form legend="Change Password" onSubmitInputs={onSubmitInputs}>
+                <Input
+                    label="Password"
+                    inputType="password"
+                    onChange={onchangePassword}
+                    objectifiedName="password"
+                />
+                <Input
+                    label="New Password"
+                    inputType="password"
+                    onChange={onchangeNewPassword}
+                    objectifiedName="newPassword"
+                />
+                <Input
+                    label="Confirm New Password"
+                    inputType="password"
+                    onChange={onchangeConfirmNewPassword}
+                    objectifiedName="confirmNewPassword"
+                />
+            </Form>
         );
     }
 
@@ -73,9 +70,12 @@ export default function ChangePasswordForm({
         });
     }
 
-    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
+    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
-        const handledBody = { username: { value: user.username }, ...inputs };
+        const handledBody = {
+            username: { value: user.username },
+            ...handledInputs,
+        };
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -88,7 +88,7 @@ export default function ChangePasswordForm({
     }
 }
 
-const preInputs = {
+export const CHANGE_PASSWORD_FORM_INPUTS_STATE = {
     password: {
         validations: (currentInputValue: string) => [
             {

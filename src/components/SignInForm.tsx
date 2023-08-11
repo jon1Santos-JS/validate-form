@@ -1,7 +1,6 @@
 import InputsHandlerContext from '@/context/InputsHandlerContext';
 import Form from './Form';
 import Input from './Input';
-import InputsHandler from './InputsHandler';
 import { useContext } from 'react';
 
 type SignInFormProps = HandlerUserStateProps;
@@ -13,32 +12,30 @@ export default function SignInForm({
     setHasUser,
     setUserStateLoading,
 }: SignInFormProps) {
-    const { onChangeInput } = useContext(InputsHandlerContext);
+    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
 
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
-                <InputsHandler preInputs={preInputs}>
-                    <Form
-                        legend="SignIn"
-                        onSubmitInputs={onSubmitInputs}
-                        formDefaultError={SIGN_IN_ERROR_RESPONSE}
-                        formSubmitError={SIGN_IN_ERROR_RESPONSE}
-                    >
-                        <Input
-                            label="Username"
-                            inputType="text"
-                            objectifiedName="username"
-                            onChange={onchangeUsername}
-                        />
-                        <Input
-                            label="Password"
-                            inputType="password"
-                            objectifiedName="password"
-                            onChange={onchangePassword}
-                        />
-                    </Form>
-                </InputsHandler>
+                <Form
+                    legend="SignIn"
+                    onSubmitInputs={onSubmitInputs}
+                    formDefaultError={SIGN_IN_ERROR_RESPONSE}
+                    formSubmitError={SIGN_IN_ERROR_RESPONSE}
+                >
+                    <Input
+                        label="Username"
+                        inputType="text"
+                        objectifiedName="username"
+                        onChange={onchangeUsername}
+                    />
+                    <Input
+                        label="Password"
+                        inputType="password"
+                        objectifiedName="password"
+                        onChange={onchangePassword}
+                    />
+                </Form>
             </div>
         </div>
     );
@@ -59,12 +56,12 @@ export default function SignInForm({
         });
     }
 
-    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
+    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(inputs),
+            body: JSON.stringify(handledInputs),
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
@@ -78,7 +75,7 @@ export default function SignInForm({
     }
 }
 
-const preInputs = {
+export const SIGN_IN_FORM_STATE_INPUTS = {
     username: {
         validations: (currentInputValue: string) => [
             {

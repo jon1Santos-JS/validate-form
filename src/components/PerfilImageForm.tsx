@@ -1,4 +1,3 @@
-import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
 import Image from 'next/image';
@@ -11,36 +10,34 @@ const DEFAULT_FORM_ERROR = 'Invalid image';
 
 type PerfilImagePropsTypes = HandlerUserStateProps;
 
-export default function PerfilImage({
+export default function PerfilImageForm({
     user,
     isUserStateLoading,
 }: PerfilImagePropsTypes) {
     const { handledName } = useStringHandler();
-    const { onChangeInput } = useContext(InputsHandlerContext);
+    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
 
     return (
         <div>
             <h4>Upload image</h4>
             {renderImage()}
-            <InputsHandler preInputs={preInputs}>
-                <Form
-                    onSubmitInputs={onSubmitInputs}
-                    formDefaultError={DEFAULT_FORM_ERROR}
-                >
-                    <Input
-                        label="image"
-                        objectifiedName="imageInput"
-                        inputType="file"
-                        inputName="image"
-                        inputAccept="image/*"
-                        onChange={onchange}
-                    />
-                </Form>
-            </InputsHandler>
+            <Form
+                onSubmitInputs={onSubmitInputs}
+                formDefaultError={DEFAULT_FORM_ERROR}
+            >
+                <Input
+                    label="image"
+                    objectifiedName="imageInput"
+                    inputType="file"
+                    inputName="image"
+                    inputAccept="image/*"
+                    onChange={onChangeImage}
+                />
+            </Form>
         </div>
     );
 
-    function onchange(e: React.ChangeEvent<HTMLInputElement>) {
+    function onChangeImage(e: React.ChangeEvent<HTMLInputElement>) {
         onChangeInput({
             objectifiedName: 'imageInput',
             targetProp: 'value',
@@ -68,10 +65,10 @@ export default function PerfilImage({
         );
     }
 
-    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
-        if (!inputs.imageInput?.files) return;
-        const file = inputs.imageInput?.files[0];
-        const fileName = handledName(inputs.imageInput.files[0].name);
+    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
+        if (!handledInputs.imageInput?.files) return;
+        const file = handledInputs.imageInput?.files[0];
+        const fileName = handledName(handledInputs.imageInput.files[0].name);
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file, fileName);
         const fetchOptions: FetchOptionsType = {
@@ -107,7 +104,7 @@ export default function PerfilImage({
     }
 }
 
-const preInputs = {
+export const PERFIL_IMAGE_FORM_INPUTS_STATE = {
     imageInput: {
         validations: (currentInputValue: string) => [
             {

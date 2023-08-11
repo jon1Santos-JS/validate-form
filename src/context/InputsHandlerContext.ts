@@ -12,6 +12,6 @@ export default React.createContext<InputsHandlerContextType>({
     showInputMessagesFromOutside: false,
     inputs: {},
     updateInputsToSubmit: () => ({}),
-    onChangeInput: () => 1,
-    setShowInputsMessage: () => 1,
+    onChangeInput: () => undefined,
+    setShowInputsMessage: () => undefined,
 });

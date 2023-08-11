@@ -1,8 +1,7 @@
 import InputsHandlerContext from '@/context/InputsHandlerContext';
 import Form from '../Form';
 import Input from '../Input';
-import InputsHandler from '../InputsHandler';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 interface SignUpFormPropsType {
     setResponse: (data: boolean) => void;
@@ -11,35 +10,29 @@ interface SignUpFormPropsType {
 export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
     const { onChangeInput, inputs } = useContext(InputsHandlerContext);
 
-    useEffect(() => {
-        console.log(inputs);
-    }, [inputs]);
-
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
-                <InputsHandler preInputs={preInputs}>
-                    <Form legend="SignUp" onSubmitInputs={onSubmitInputs}>
-                        <Input
-                            label="Username"
-                            inputType="text"
-                            onChange={onchangeUsername}
-                            objectifiedName="username"
-                        />
-                        <Input
-                            label="Password"
-                            inputType="password"
-                            onChange={onchangePassword}
-                            objectifiedName="password"
-                        />
-                        <Input
-                            label="Confirm Password"
-                            inputType="password"
-                            onChange={onchangeConfirmPassword}
-                            objectifiedName="confirmPassword"
-                        />
-                    </Form>
-                </InputsHandler>
+                <Form legend="SignUp" onSubmitInputs={onSubmitInputs}>
+                    <Input
+                        label="Username"
+                        inputType="text"
+                        onChange={onchangeUsername}
+                        objectifiedName="username"
+                    />
+                    <Input
+                        label="Password"
+                        inputType="password"
+                        onChange={onchangePassword}
+                        objectifiedName="password"
+                    />
+                    <Input
+                        label="Confirm Password"
+                        inputType="password"
+                        onChange={onchangeConfirmPassword}
+                        objectifiedName="confirmPassword"
+                    />
+                </Form>
             </div>
         </div>
     );
@@ -68,12 +61,12 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         });
     }
 
-    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
+    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(inputs),
+            body: JSON.stringify(handledInputs),
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();
@@ -86,7 +79,7 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
     }
 }
 
-const preInputs = {
+export const SIGN_UP_FORM_INPUTS_STATE = {
     username: {
         validations: (currentInputValue: string) => [
             {

@@ -1,6 +1,13 @@
-import ChangePasswordForm from '@/components/ChangePasswordForm';
-import ChangeUsernameForm from '@/components/ChangeUsernameForm';
-import PerfilImage from '@/components/PerfilImageForm';
+import ChangePasswordForm, {
+    CHANGE_PASSWORD_FORM_INPUTS_STATE,
+} from '@/components/ChangePasswordForm';
+import ChangeUsernameForm, {
+    CHANGE_USERNAME_FORM_INPUTS_STATE,
+} from '@/components/ChangeUsernameForm';
+import InputsHandler from '@/components/InputsHandler';
+import PerfilImageForm, {
+    PERFIL_IMAGE_FORM_INPUTS_STATE,
+} from '@/components/PerfilImageForm';
 import { useRouter } from 'next/router';
 
 type DashBoardPageProps = HandlerUserStateProps;
@@ -27,24 +34,34 @@ export default function DashBoardPage({
             <div className="o-dashboard-page">
                 <div>{message}</div>
                 <div>
-                    <PerfilImage
-                        hasUser={hasUser}
-                        isUserStateLoading={isUserStateLoading}
-                        user={user}
-                        {...restProps}
-                    />
-                    <ChangePasswordForm
-                        hasUser={hasUser}
-                        user={user}
-                        isUserStateLoading={isUserStateLoading}
-                        {...restProps}
-                    />
-                    <ChangeUsernameForm
-                        hasUser={hasUser}
-                        user={user}
-                        isUserStateLoading={isUserStateLoading}
-                        {...restProps}
-                    />
+                    <InputsHandler preInputs={PERFIL_IMAGE_FORM_INPUTS_STATE}>
+                        <PerfilImageForm
+                            hasUser={hasUser}
+                            isUserStateLoading={isUserStateLoading}
+                            user={user}
+                            {...restProps}
+                        />
+                    </InputsHandler>
+                    <InputsHandler
+                        preInputs={CHANGE_PASSWORD_FORM_INPUTS_STATE}
+                    >
+                        <ChangePasswordForm
+                            hasUser={hasUser}
+                            user={user}
+                            isUserStateLoading={isUserStateLoading}
+                            {...restProps}
+                        />
+                    </InputsHandler>
+                    <InputsHandler
+                        preInputs={CHANGE_USERNAME_FORM_INPUTS_STATE}
+                    >
+                        <ChangeUsernameForm
+                            hasUser={hasUser}
+                            user={user}
+                            isUserStateLoading={isUserStateLoading}
+                            {...restProps}
+                        />
+                    </InputsHandler>
                 </div>
             </div>
         );
