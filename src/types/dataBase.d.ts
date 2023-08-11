@@ -40,6 +40,3 @@ declare interface UserWithImgType {
     userImg: string;
 }
 declare type HandleDBComandType = 'refresh' | 'getUsers';
-
-// declare type HandledDBReturnType<T extends HandleDBComandType> =
-//     T extends 'refresh' ? 'internal server error' | undefined : undefined;

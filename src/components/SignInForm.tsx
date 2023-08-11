@@ -54,7 +54,7 @@ export default function SignInForm({
             return SIGN_IN_ERROR_RESPONSE;
         }
         window.location.assign('/dashboard-page');
-        setUser(parsedResponse.body);
+        setUser({ username: parsedResponse.body as string });
     }
 }
 

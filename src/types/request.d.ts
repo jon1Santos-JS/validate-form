@@ -8,5 +8,5 @@ declare interface FetchOptionsType {
 
 declare interface ServerResponse {
     serverResponse: boolean;
-    body: string;
+    body: string | UserType;
 }

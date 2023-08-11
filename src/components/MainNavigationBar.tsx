@@ -33,7 +33,7 @@ export default function MainNavigationBar({
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options = { method: 'DELETE' };
         await fetch(action, options);
-        setUser('');
+        setUser({ username: '' });
         setHasUser(false);
         window.location.assign('/');
     }

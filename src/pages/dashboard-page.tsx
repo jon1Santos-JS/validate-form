@@ -21,7 +21,7 @@ export default function DashBoardPage({
             router.push('/');
             return null;
         }
-        const message = `welcome to dashboard page ${user}, and thank you to test our validate hook`;
+        const message = `welcome to dashboard page ${user.username}, and thank you to test our validate hook`;
 
         return (
             <div className="o-dashboard-page">

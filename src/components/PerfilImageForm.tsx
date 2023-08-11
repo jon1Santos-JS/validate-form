@@ -2,7 +2,6 @@ import InputsHandler from './InputsHandler';
 import Form from './Form';
 import Input from './Input';
 import Image from 'next/image';
-import { useState } from 'react';
 import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
@@ -14,7 +13,6 @@ export default function PerfilImage({
     user,
     isUserStateLoading,
 }: PerfilImagePropsTypes) {
-    const [userImage, setUserImage] = useState('');
     const { handledName } = useStringHandler();
 
     return (
@@ -40,11 +38,11 @@ export default function PerfilImage({
     );
 
     function renderImage() {
-        if (isUserStateLoading || userImage === '') return null;
+        if (isUserStateLoading || !user.userImage) return null;
         return (
             <>
                 <Image
-                    src={userImage}
+                    src={user.userImage}
                     alt="test image"
                     width={200}
                     height={200}
@@ -72,13 +70,13 @@ export default function PerfilImage({
         );
         if (!imgApiResponse.ok) return;
         const image = await imgApiResponse.json();
-        setUserImage(image.data.url);
         onUpdateUserImageDB(image.data.url);
+        window.location.reload();
     }
 
     async function onUpdateUserImageDB(img: string) {
         const handledUser = {
-            userName: user,
+            userName: user.username,
             userImg: img,
         };
         const options: FetchOptionsType = {

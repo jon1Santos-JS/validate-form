@@ -32,11 +32,11 @@ class MiniDBAccountHandler {
     }
 
     async updatePassword(userAccount: ChangePasswordFromClientType) {
+        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         const currentUserAccount = {
             username: { value: userAccount.username.value },
             password: { value: userAccount.password.value },
         };
-        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(currentUserAccount))
             return SERVER_ERROR_RESPONSE;
         const response = await this.#changePassword(userAccount);

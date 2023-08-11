@@ -1,9 +1,10 @@
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
 import { getUserStateController } from './controllers';
-import { onOmitDBInputFields } from './inputHandler';
-import { ADMINS_ACCOUNT } from '@/database/miniDB';
+import { Lodash } from './lodashAdapter';
 
 export const HASH_DEFAULT_ERROR = 'invalid hash';
+
+const INPUTS_FIELDS_TO_OMIT = ['ID', 'constraint', 'userImage'];
 
 export function createHash<T>(value: T) {
     const salt = genSaltSync(10);
@@ -16,7 +17,7 @@ export async function returnUserByHash(
     browserHash: string | undefined,
 ): Promise<{
     serverResponse: boolean;
-    body: string;
+    body: string | UserType;
 }> {
     if (!browserHash) {
         return {
@@ -26,7 +27,7 @@ export async function returnUserByHash(
     }
     const validation = {
         isValid: false,
-        user: '',
+        user: { username: '' } as UserType,
         message: 'User was not found',
     };
     const controllerResponse = await getUserStateController();
@@ -38,17 +39,33 @@ export async function returnUserByHash(
         };
     // DATABASE
     const usersFromDB = controllerResponse.body;
-    const handledUsers = onOmitDBInputFields(usersFromDB);
-    if (handledUsers.length > 1) {
-        handledUsers.forEach((user) => {
-            if (compareSync(JSON.stringify(user), browserHash)) {
-                validation.user = user.username.value;
+    if (usersFromDB.length > 1) {
+        usersFromDB.forEach((user) => {
+            const userToCompare = Lodash.onOmitFields(
+                user,
+                INPUTS_FIELDS_TO_OMIT,
+            );
+            if (compareSync(JSON.stringify(userToCompare), browserHash)) {
+                const userToClient = {
+                    username: user.username.value,
+                    userImage: user.userImage,
+                };
+                validation.user = userToClient;
                 validation.isValid = true;
             }
         });
     } else {
-        if (compareSync(JSON.stringify(ADMINS_ACCOUNT), browserHash)) {
-            validation.user = ADMINS_ACCOUNT.username.value;
+        // IF THERE'S NO DATABASE USERS, IT IS COMPARING ADMIN'S ACCOUNT TO HASH
+        const uniqueUser = controllerResponse.body[0];
+        const userToCompare = Lodash.onOmitFields(
+            uniqueUser,
+            INPUTS_FIELDS_TO_OMIT,
+        );
+        if (compareSync(JSON.stringify(userToCompare), browserHash)) {
+            validation.user = {
+                username: uniqueUser.username.value,
+                userImage: uniqueUser.userImage,
+            };
             validation.isValid = true;
         }
     }

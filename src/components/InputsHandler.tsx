@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import _ from 'lodash';
 import InputHandlerContext from '@/context/InputHandlerContext';
+import { Lodash } from '@/lib/lodashAdapter';
 
 interface InputHandlerPropsTypes {
     preInputs: PreFormInputsType;
@@ -80,25 +80,10 @@ function onOmitFormInputsFields(preInputs: PreFormInputsType) {
         key.includes('confirm'),
     );
     const secondaryFieldsToOmit = INPUTS_FIELDS_TO_OMIT;
-    const handledInputs: unknown = onOmitFields(
+    const handledInputs: unknown = Lodash.onOmitFields(
         preInputs,
         mainFieldsToOmit,
         secondaryFieldsToOmit,
     );
     return handledInputs as FormInputsTypeToSubmit;
-}
-
-function onOmitFields<T extends object>(
-    inputs: T,
-    ...fieldsToOmit: string[][]
-) {
-    const handled = _.omit(inputs, fieldsToOmit[0]);
-    const handledFieldsToOmit = fieldsToOmit;
-    while (handledFieldsToOmit[0 + 1]) {
-        handledFieldsToOmit.shift();
-        for (const i in handled) {
-            handled[i] = onOmitFields(handled[i] as T, ...handledFieldsToOmit);
-        }
-    }
-    return handled as T[Extract<keyof T, string>];
 }

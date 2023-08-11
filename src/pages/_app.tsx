@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const [user, setUser] = useState('');
+    const [user, setUser] = useState<UserType>({ username: '' });
     const [hasUser, setHasUser] = useState(false);
     const [userStateLoading, setUserStateLoading] = useState(true);
 
@@ -17,7 +17,10 @@ export default function App({ Component, pageProps }: AppProps) {
         const parsedResponse: ServerResponse = await response.json();
         setHasUser(parsedResponse.serverResponse);
         setUserStateLoading(false);
-        if (parsedResponse.serverResponse) {
+        if (
+            parsedResponse.serverResponse &&
+            typeof parsedResponse.body !== 'string'
+        ) {
             setUser(parsedResponse.body);
             return;
         }
@@ -56,8 +59,8 @@ export default function App({ Component, pageProps }: AppProps) {
         </>
     );
 
-    function onUpdateUser(user: string) {
-        setUser(user);
+    function onUpdateUser({ username, userImage = user.userImage }: UserType) {
+        setUser({ username, userImage });
     }
 
     function onUpdateHasUser(value: boolean) {
