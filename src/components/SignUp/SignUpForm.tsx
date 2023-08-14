@@ -8,7 +8,7 @@ interface SignUpFormPropsType {
 }
 
 export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
-    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
+    const { onChangeInput } = useContext(InputsHandlerContext);
 
     return (
         <div className="o-sign-up-form">
@@ -61,7 +61,11 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         });
     }
 
-    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
+    async function onSubmitInputs(
+        handledInputs: FormInputsTypeToSubmit<
+            keyof typeof SIGN_UP_FORM_INPUTS_STATE
+        >,
+    ) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const options = {
             method: 'POST',
@@ -72,7 +76,7 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         if (parsedResponse.serverResponse) {
-            window.location.assign('/');
+            window.location.assign('/'); // USING ASSIGN JUST FOR THE SIMULATION
             return;
         }
         setResponse(true);

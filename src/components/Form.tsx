@@ -6,11 +6,10 @@ const FORM_ERROR = 'Invalid form';
 
 interface FormProps {
     children: JSX.Element[] | JSX.Element;
-    onSubmitInputs: <T>(
-        inputs: HandledInputs<T>,
+    onSubmitInputs: <T extends FormInputsTypeToSubmit<string>>(
+        handledInputs: T,
     ) => Promise<string | undefined | void>;
     legend?: string;
-    alternativeErrors?: string[];
     formDefaultError?: string;
     formSubmitError?: string;
 }
@@ -24,11 +23,11 @@ const Form: React.FC<FormProps> = ({
 }) => {
     const { inputs, setShowInputsMessage, updateInputsToSubmit } =
         useContext(InputHandlerContext);
+    const { validateAllInputs } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(
         formDefaultError ? formDefaultError : FORM_ERROR,
     );
-    const { validateAllInputs } = useValidate();
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
@@ -50,7 +49,7 @@ const Form: React.FC<FormProps> = ({
         <form className="c-form">
             <fieldset>
                 <legend>{legend}</legend>
-                {renderInputs()}
+                {renderElements()}
                 {renderError()}
                 <button
                     className="button is-primary"
@@ -62,7 +61,7 @@ const Form: React.FC<FormProps> = ({
         </form>
     );
 
-    function renderInputs() {
+    function renderElements() {
         const inputsElements = children as JSX.Element[];
         if (inputsElements?.length > 1) {
             return inputsElements.map((child) => (
@@ -83,7 +82,7 @@ const Form: React.FC<FormProps> = ({
         e.preventDefault();
         if (!validateAllInputs(inputs)) {
             const inputsToSubmit = updateInputsToSubmit();
-            if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO MAKE THE REQUISITION
+            if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
             const response = await onSubmitInputs(inputsToSubmit);
             if (typeof response === 'string') {
                 setMessage(formSubmitError ? formSubmitError : FORM_ERROR); // TO SET SUBMIT ERROR

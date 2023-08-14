@@ -10,7 +10,7 @@ export default function ChangePasswordForm({
     user,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
-    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
+    const { onChangeInput } = useContext(InputsHandlerContext);
 
     return <>{renderContent()}</>;
 
@@ -70,7 +70,11 @@ export default function ChangePasswordForm({
         });
     }
 
-    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
+    async function onSubmitInputs(
+        handledInputs: FormInputsTypeToSubmit<
+            keyof typeof CHANGE_PASSWORD_FORM_INPUTS_STATE
+        >,
+    ) {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
         const handledBody = {
             username: { value: user.username },

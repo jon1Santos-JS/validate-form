@@ -1,9 +1,10 @@
 import { miniDBAccountHandler } from '@/database/accountHandler';
-import { miniDBHandler } from '@/database/miniDBHandler';
 import { SERVER_ERROR_RESPONSE } from '@/database/miniDB';
+import MiniDBHandler from '@/database/miniDBHandler';
 
 export async function getUserStateController() {
-    const response = await miniDBHandler.handleDB('getUsers');
+    const DB = new MiniDBHandler();
+    const response = await DB.handleDB('getUsers');
     if (typeof response === 'string') {
         console.log('controller error to get users: ', response);
         return { serverResponse: false, body: SERVER_ERROR_RESPONSE };

@@ -30,17 +30,13 @@ declare interface FormInputPropsType extends PreFormInputPropsType {
     value?: string;
 }
 
-declare type HandledInputs<T> = Partial<
-    Record<keyof T, FormInputPropsTypeToSubmit>
->;
-
 declare type FileType = FileList | undefined | null;
 
 // FORM INPUT'S FIELDS TO SUBMIT
 
-declare interface FormInputsTypeToSubmit {
-    [key: string]: FormInputPropsTypeToSubmit;
-}
+declare type FormInputsTypeToSubmit<T extends string> = {
+    [key in T]: FormInputPropsTypeToSubmit;
+};
 
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
 

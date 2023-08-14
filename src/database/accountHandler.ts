@@ -4,9 +4,11 @@ import {
     onCreateUserImg,
 } from '@/lib/inputHandler';
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
-import { miniDBHandler } from './miniDBHandler';
+import MiniDBHandler from './miniDBHandler';
 
 class MiniDBAccountHandler {
+    #DB = new MiniDBHandler();
+
     async signIn(userAccount: UserFromClientType) {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(userAccount)) {
@@ -80,7 +82,7 @@ class MiniDBAccountHandler {
 
     async #onInitDB() {
         try {
-            await miniDBHandler.init();
+            await this.#DB.init();
             return;
         } catch {
             return SERVER_ERROR_RESPONSE;
@@ -127,7 +129,7 @@ class MiniDBAccountHandler {
             }
             return account;
         });
-        const handleResponse = await miniDBHandler.handleDB(
+        const handleResponse = await this.#DB.handleDB(
             'refresh',
             'MiniDBAccountHandler - changePassword',
         );
@@ -148,7 +150,7 @@ class MiniDBAccountHandler {
             }
             return account;
         });
-        const handleResponse = await miniDBHandler.handleDB(
+        const handleResponse = await this.#DB.handleDB(
             'refresh',
             'MiniDBAccountHandler - changeUsername',
         );
@@ -160,7 +162,7 @@ class MiniDBAccountHandler {
         const userAccountHandled: UserFromDataBaseType =
             this.#onHandleInputs(userAccount);
         DATABASE.state.accounts.push(userAccountHandled);
-        const response = await miniDBHandler.handleDB(
+        const response = await this.#DB.handleDB(
             'refresh',
             'MiniDBAccountHandler - createAccount',
         );
@@ -181,7 +183,7 @@ class MiniDBAccountHandler {
             }
             return account;
         });
-        const response = await miniDBHandler.handleDB(
+        const response = await this.#DB.handleDB(
             'refresh',
             'MiniDBAccountHandler - createAccount',
         );

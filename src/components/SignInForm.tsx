@@ -12,7 +12,7 @@ export default function SignInForm({
     setHasUser,
     setUserStateLoading,
 }: SignInFormProps) {
-    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
+    const { onChangeInput } = useContext(InputsHandlerContext);
 
     return (
         <div className="o-sign-in-form">
@@ -56,7 +56,11 @@ export default function SignInForm({
         });
     }
 
-    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
+    async function onSubmitInputs(
+        handledInputs: FormInputsTypeToSubmit<
+            keyof typeof SIGN_IN_FORM_STATE_INPUTS
+        >,
+    ) {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {
             method: 'POST',

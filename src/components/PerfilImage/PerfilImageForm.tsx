@@ -1,6 +1,5 @@
-import Form from './Form';
-import Input from './Input';
-import Image from 'next/image';
+import Form from '../Form';
+import Input from '../Input';
 import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
 import InputsHandlerContext from '@/context/InputsHandlerContext';
 import { useContext } from 'react';
@@ -8,19 +7,15 @@ import { useContext } from 'react';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
 
-type PerfilImagePropsTypes = HandlerUserStateProps;
+type PerfilImageFormPropsTypes = HandlerUserStateProps;
 
-export default function PerfilImageForm({
-    user,
-    isUserStateLoading,
-}: PerfilImagePropsTypes) {
+export default function PerfilImageForm({ user }: PerfilImageFormPropsTypes) {
     const { handledName } = useStringHandler();
-    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
+    const { onChangeInput } = useContext(InputsHandlerContext);
 
     return (
-        <div>
+        <>
             <h4>Upload image</h4>
-            {renderImage()}
             <Form
                 onSubmitInputs={onSubmitInputs}
                 formDefaultError={DEFAULT_FORM_ERROR}
@@ -34,7 +29,7 @@ export default function PerfilImageForm({
                     onChange={onChangeImage}
                 />
             </Form>
-        </div>
+        </>
     );
 
     function onChangeImage(e: React.ChangeEvent<HTMLInputElement>) {
@@ -50,22 +45,11 @@ export default function PerfilImageForm({
             value: e.target.files,
         });
     }
-
-    function renderImage() {
-        if (isUserStateLoading || !user.userImage) return null;
-        return (
-            <>
-                <Image
-                    src={user.userImage}
-                    alt="test image"
-                    width={200}
-                    height={200}
-                />
-            </>
-        );
-    }
-
-    async function onSubmitInputs(handledInputs: HandledInputs<typeof inputs>) {
+    async function onSubmitInputs(
+        handledInputs: FormInputsTypeToSubmit<
+            keyof typeof PERFIL_IMAGE_FORM_INPUTS_STATE
+        >,
+    ) {
         if (!handledInputs.imageInput?.files) return;
         const file = handledInputs.imageInput?.files[0];
         const fileName = handledName(handledInputs.imageInput.files[0].name);

@@ -5,9 +5,10 @@ import ChangeUsernameForm, {
     CHANGE_USERNAME_FORM_INPUTS_STATE,
 } from '@/components/ChangeUsernameForm';
 import InputsHandler from '@/components/InputsHandler';
+import PerfilImage from '@/components/PerfilImage/PerfilImage';
 import PerfilImageForm, {
     PERFIL_IMAGE_FORM_INPUTS_STATE,
-} from '@/components/PerfilImageForm';
+} from '@/components/PerfilImage/PerfilImageForm';
 import { useRouter } from 'next/router';
 
 type DashBoardPageProps = HandlerUserStateProps;
@@ -42,6 +43,12 @@ export default function DashBoardPage({
                             {...restProps}
                         />
                     </InputsHandler>
+                    <PerfilImage
+                        hasUser={hasUser}
+                        isUserStateLoading={isUserStateLoading}
+                        user={user}
+                        {...restProps}
+                    />
                     <InputsHandler
                         preInputs={CHANGE_PASSWORD_FORM_INPUTS_STATE}
                     >

@@ -37,12 +37,12 @@ export default function InputsHandler({
         value,
     }: onChangeInputsProps<T>) {
         setInputs((prevInputs) => {
-            // GETTING THE OBJECT  WITH THE NEWPROP ADDED INTO THE SPECIFIC FIELD (objectifiedName)
+            // UPDATING THE OBJECT WITH THE NEW ESPECIFIC INPUT
             const updatedInput = {
                 ...prevInputs[objectifiedName],
                 [targetProp]: value,
             };
-            // RETURNED ALL INPUTS WITH THE SPECIFIC FIELD UPTATED
+            // RETURNED ALL INPUTS WITH THE SPECIFIC INPUT UPTATED
             return {
                 ...prevInputs,
                 [objectifiedName]: updatedInput,
@@ -80,10 +80,11 @@ function onOmitFormInputsFields(preInputs: PreFormInputsType) {
         key.includes('confirm'),
     );
     const secondaryFieldsToOmit = INPUTS_FIELDS_TO_OMIT;
-    const handledInputs: unknown = Lodash.onOmitFields(
+    const handledInputs = Lodash.onOmitFields(
         preInputs,
         mainFieldsToOmit,
         secondaryFieldsToOmit,
-    );
-    return handledInputs as FormInputsTypeToSubmit;
+    ) as FormInputsTypeToSubmit<string>;
+
+    return handledInputs;
 }

@@ -26,7 +26,7 @@ const Input: React.FC<InputProps> = ({
     const [errorList, setErrorList] = useState<string[]>([]);
 
     useEffect(() => {
-        // ALL INPUTS ARE NECESSARY TO VALIDATE WHEN SUBMIT THEM
+        // ALL INPUTS ARE NECESSARY TO CONFIRM INPUTS ON THE VALIDATION FUNCTION
         setErrorList(preValidate(objectifiedName, inputs));
     }, [objectifiedName, inputs, preValidate]);
 
