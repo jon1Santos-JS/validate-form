@@ -1,19 +1,20 @@
-import { miniDBAccountHandler } from '@/database/accountHandler';
+import MiniDBAccountHandler from '@/database/accountHandler';
 import { SERVER_ERROR_RESPONSE } from '@/database/miniDB';
 import MiniDBHandler from '@/database/miniDBHandler';
 
 export async function getUserStateController() {
-    const DB = new MiniDBHandler();
-    const response = await DB.handleDB('getUsers');
+    const jsonDB = new MiniDBHandler();
+    const response = await (await jsonDB.handleDB('getUsers'))();
     if (typeof response === 'string') {
         console.log('controller error to get users: ', response);
         return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
     }
-    return { serverResponse: true, body: response as UserFromDataBaseType[] };
+    return { serverResponse: true, body: response };
 }
 
 export async function signInController(userAccount: UserFromClientType) {
-    const response = await miniDBAccountHandler.signIn(userAccount);
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.signIn(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to sign in user: ', response);
         return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
@@ -22,7 +23,8 @@ export async function signInController(userAccount: UserFromClientType) {
 }
 
 export async function signUpController(userAccount: UserFromClientType) {
-    const response = await miniDBAccountHandler.signUp(userAccount);
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.signUp(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to sign up user: ', response);
         return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
@@ -33,7 +35,8 @@ export async function signUpController(userAccount: UserFromClientType) {
 export async function changePasswordController(
     userAccount: ChangePasswordFromClientType,
 ) {
-    const response = await miniDBAccountHandler.updatePassword(userAccount);
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.updatePassword(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to change user password: ', response);
         return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
@@ -44,7 +47,8 @@ export async function changePasswordController(
 export async function changeUsernameController(
     user: ChangeUsernameFromClientType,
 ) {
-    const response = await miniDBAccountHandler.updateUsername(user);
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.updateUsername(user);
     if (typeof response === 'string') {
         console.log('controller error to change username: ', response);
         return { serverResponse: false, body: 'This username is already used' };
@@ -53,7 +57,8 @@ export async function changeUsernameController(
 }
 
 export async function changeUserImg(user: UserWithImgType) {
-    const response = await miniDBAccountHandler.updateUserImage(user);
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.updateUserImage(user);
     if (typeof response === 'string') {
         console.log('controller error to change user image: ', response);
         return {

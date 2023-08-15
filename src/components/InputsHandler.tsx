@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import InputHandlerContext from '@/context/InputsHandlerContext';
+import InputsHandledContext from '@/context/InputsHandlerContext';
 import { Lodash } from '@/lib/lodashAdapter';
 
 interface InputHandlerPropsTypes {
@@ -7,7 +7,7 @@ interface InputHandlerPropsTypes {
     children: JSX.Element[] | JSX.Element;
 }
 
-const INPUTS_FIELDS_TO_OMIT = ['required', 'validations', 'errors'];
+const INPUTS_FIELDS_TO_OMIT_FROM_SERVER = ['required', 'validations', 'errors'];
 
 export default function InputsHandler({
     preInputs,
@@ -18,7 +18,7 @@ export default function InputsHandler({
         useState(false);
 
     return (
-        <InputHandlerContext.Provider
+        <InputsHandledContext.Provider
             value={{
                 showInputMessagesFromOutside,
                 inputs,
@@ -28,7 +28,7 @@ export default function InputsHandler({
             }}
         >
             {children}
-        </InputHandlerContext.Provider>
+        </InputsHandledContext.Provider>
     );
 
     function onChangeInput<T>({
@@ -79,7 +79,7 @@ function onOmitFormInputsFields(preInputs: PreFormInputsType) {
     const mainFieldsToOmit = Object.keys(preInputs).filter((key) =>
         key.includes('confirm'),
     );
-    const secondaryFieldsToOmit = INPUTS_FIELDS_TO_OMIT;
+    const secondaryFieldsToOmit = INPUTS_FIELDS_TO_OMIT_FROM_SERVER;
     const handledInputs = Lodash.onOmitFields(
         preInputs,
         mainFieldsToOmit,

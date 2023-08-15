@@ -6,7 +6,7 @@ import {
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
 import MiniDBHandler from './miniDBHandler';
 
-class MiniDBAccountHandler {
+export default class MiniDBAccountHandler {
     #DB = new MiniDBHandler();
 
     async signIn(userAccount: UserFromClientType) {
@@ -129,10 +129,9 @@ class MiniDBAccountHandler {
             }
             return account;
         });
-        const handleResponse = await this.#DB.handleDB(
-            'refresh',
-            'MiniDBAccountHandler - changePassword',
-        );
+        const handleResponse = await (
+            await this.#DB.handleDB('createAndRefreshDB')
+        )('MiniDBAccountHandler - changePassword');
         if (!handleResponse) return;
         return SERVER_ERROR_RESPONSE;
     }
@@ -150,10 +149,9 @@ class MiniDBAccountHandler {
             }
             return account;
         });
-        const handleResponse = await this.#DB.handleDB(
-            'refresh',
-            'MiniDBAccountHandler - changeUsername',
-        );
+        const handleResponse = await (
+            await this.#DB.handleDB('createAndRefreshDB')
+        )('MiniDBAccountHandler - changeUsername');
         if (!handleResponse) return;
         return SERVER_ERROR_RESPONSE;
     }
@@ -162,10 +160,9 @@ class MiniDBAccountHandler {
         const userAccountHandled: UserFromDataBaseType =
             this.#onHandleInputs(userAccount);
         DATABASE.state.accounts.push(userAccountHandled);
-        const response = await this.#DB.handleDB(
-            'refresh',
-            'MiniDBAccountHandler - createAccount',
-        );
+        const response = await (
+            await this.#DB.handleDB('createAndRefreshDB')
+        )('MiniDBAccountHandler - createAccount');
         if (!response) return;
         return SERVER_ERROR_RESPONSE;
     }
@@ -183,10 +180,9 @@ class MiniDBAccountHandler {
             }
             return account;
         });
-        const response = await this.#DB.handleDB(
-            'refresh',
-            'MiniDBAccountHandler - createAccount',
-        );
+        const response = await (
+            await this.#DB.handleDB('createAndRefreshDB')
+        )('MiniDBAccountHandler - changeUserImg');
         if (!response) return;
         return SERVER_ERROR_RESPONSE;
     }
@@ -201,5 +197,3 @@ class MiniDBAccountHandler {
         return accountWithImg as UserFromDataBaseType;
     }
 }
-
-export const miniDBAccountHandler = new MiniDBAccountHandler();

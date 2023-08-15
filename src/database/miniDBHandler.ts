@@ -7,6 +7,25 @@ import {
 } from './miniDB';
 
 export default class MiniDBHandler {
+    #PrivateFunctions = {
+        getUsers: async () => {
+            const response = await this.#accessDB();
+            if (response) return SERVER_ERROR_RESPONSE;
+            return DATABASE.state.accounts;
+        },
+        createAndRefreshDB: async (caller: string) => {
+            const json = JSON.stringify(DATABASE.state, undefined, 2);
+            try {
+                await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
+                console.log('DB has been created or refreshed by: ', caller);
+                return;
+            } catch {
+                console.log('failed to create or refresh file by: ', caller);
+                return SERVER_ERROR_RESPONSE;
+            }
+        },
+    };
+
     async init() {
         const response = await this.#accessDB();
         if (response) return SERVER_ERROR_RESPONSE;
@@ -14,19 +33,8 @@ export default class MiniDBHandler {
         return;
     }
 
-    async handleDB<T extends HandleDBComandType>(command: T, caller?: string) {
-        const returnedFunctions = {
-            refresh: await this.#createAndRefreshDB(caller),
-            getUsers: await this.#getUsers(),
-        } as const;
-
-        return returnedFunctions[command];
-    }
-
-    async #getUsers() {
-        const response = await this.#accessDB();
-        if (response) return SERVER_ERROR_RESPONSE;
-        return DATABASE.state.accounts;
+    async handleDB<T extends HandleDBCommandTypes>(command: T) {
+        return this.#PrivateFunctions[command];
     }
 
     async #accessDB() {
@@ -35,27 +43,13 @@ export default class MiniDBHandler {
             DATABASE.state = JSON.parse(data);
             return;
         } catch {
+            if (DATABASE.state.accounts.length <= 1) return;
             DATABASE.state = INITIAL_STATE;
-            const response = await this.#createAndRefreshDB(
+            const response = await this.#PrivateFunctions.createAndRefreshDB(
                 'MiniDBHandler - accessDB',
             );
             if (response) return SERVER_ERROR_RESPONSE;
             return;
-        }
-    }
-
-    async #createAndRefreshDB(caller?: string) {
-        const json = JSON.stringify(DATABASE.state, undefined, 2);
-        try {
-            await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
-            console.log('DB has been created or refreshed');
-            return;
-        } catch {
-            console.log(
-                'failed to create or refresh file by: ',
-                caller && caller,
-            );
-            return SERVER_ERROR_RESPONSE;
         }
     }
 

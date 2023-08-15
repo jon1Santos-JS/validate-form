@@ -9,39 +9,31 @@ export default async function handler(
     res: NextApiResponse,
 ) {
     const cookies = new Cookies(req, res);
-    switch (req.method) {
-        case 'GET':
-            {
-                const browserHash = cookies.get('user-hash');
-                const hashResponse = await returnUserByHash(browserHash);
-                res.status(200).json(hashResponse);
-            }
-            break;
-        case 'POST':
-            {
-                const user: UserFromClientType = req.body;
-                const controllerResponse = await signInController(user);
-                if (controllerResponse.serverResponse) {
-                    const hash = createHash(user);
-                    cookies.set('user-hash', hash, {
-                        expires: COOKIES_EXPIRES,
-                        sameSite: 'lax',
-                    });
-                }
-                res.status(200).json(controllerResponse);
-            }
-            break;
-        case 'DELETE': {
-            cookies.set('user-hash');
-            const response = { serverResponse: true, body: 'User logged out' };
-            res.status(200).json(response);
-            break;
-        }
-        default: {
-            res.status(405).json({ serverResponse: 'Method Not Allowed' });
-            break;
-        }
+    if (req.method === 'GET') {
+        const browserHash = cookies.get('user-hash');
+        const hashResponse = await returnUserByHash(browserHash);
+        return res.status(200).json(hashResponse);
     }
+
+    if (req.method === 'POST') {
+        const user: UserFromClientType = req.body;
+        const controllerResponse = await signInController(user); //
+        if (controllerResponse.serverResponse) {
+            const hash = createHash(user);
+            cookies.set('user-hash', hash, {
+                expires: COOKIES_EXPIRES,
+                sameSite: 'lax',
+            });
+        }
+        return res.status(200).json(controllerResponse);
+    }
+
+    if (req.method === 'DELETE') {
+        cookies.set('user-hash');
+        const response = { serverResponse: true, body: 'User logged out' };
+        return res.status(200).json(response);
+    }
+    return res.status(405).json({ serverResponse: 'Method Not Allowed' });
 }
 
 export const config = {
