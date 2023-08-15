@@ -7,7 +7,14 @@ import {
 } from './miniDB';
 
 export default class MiniDBHandler {
-    #PrivateFunctions = {
+    #StateFunctions = {
+        checkDBState: () => {
+            if (DATABASE.state.accounts.length > DATABASE.state.limit) {
+                console.log('database limit account reached');
+                return SERVER_ERROR_RESPONSE;
+            }
+            return;
+        },
         getUsers: async () => {
             const response = await this.#accessDB();
             if (response) return SERVER_ERROR_RESPONSE;
@@ -29,12 +36,12 @@ export default class MiniDBHandler {
     async init() {
         const response = await this.#accessDB();
         if (response) return SERVER_ERROR_RESPONSE;
-        if (this.#checkDBState()) return SERVER_ERROR_RESPONSE;
+        if (this.#StateFunctions.checkDBState()) return SERVER_ERROR_RESPONSE;
         return;
     }
 
     async handleDB<T extends HandleDBCommandTypes>(command: T) {
-        return this.#PrivateFunctions[command];
+        return this.#StateFunctions[command];
     }
 
     async #accessDB() {
@@ -45,19 +52,11 @@ export default class MiniDBHandler {
         } catch {
             if (DATABASE.state.accounts.length <= 1) return;
             DATABASE.state = INITIAL_STATE;
-            const response = await this.#PrivateFunctions.createAndRefreshDB(
+            const response = await this.#StateFunctions.createAndRefreshDB(
                 'MiniDBHandler - accessDB',
             );
             if (response) return SERVER_ERROR_RESPONSE;
             return;
         }
-    }
-
-    #checkDBState() {
-        if (DATABASE.state.accounts.length > DATABASE.state.limit) {
-            console.log('database limit account reached');
-            return SERVER_ERROR_RESPONSE;
-        }
-        return;
     }
 }
