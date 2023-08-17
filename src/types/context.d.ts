@@ -1,10 +1,5 @@
-declare interface onChangeInputsValueProp {
-    objectifiedName: string;
-    value: string;
-}
-
-declare interface onChangeInputsProps<T> {
-    objectifiedName: string;
+declare interface onChangeInputsProps<T, U extends string> {
+    objectifiedName: U;
     targetProp: TargetPropsType;
     value: T;
 }

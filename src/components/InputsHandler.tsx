@@ -9,10 +9,10 @@ interface InputHandlerPropsTypes<T extends string> {
 
 const INPUTS_FIELDS_TO_OMIT_FROM_SERVER = ['required', 'validations', 'errors'];
 
-export default function InputsHandler({
+export default function InputsHandler<T extends string>({
     preInputs,
     children,
-}: InputHandlerPropsTypes<typeof preInputs>) {
+}: InputHandlerPropsTypes<T>) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
     const [handledInputs, setHandledInputs] = useState(
         onOmitFormInputsFields(preInputs),
@@ -35,11 +35,11 @@ export default function InputsHandler({
         </InputsHandledContext.Provider>
     );
 
-    function onChangeInput<T>({
+    function onChangeInput<T, U>({
         objectifiedName,
         targetProp,
         value,
-    }: onChangeInputsProps<T>) {
+    }: onChangeInputsProps<T, U>) {
         setInputs((prevInputs) => {
             // UPDATING THE OBJECT WITH THE NEW ESPECIFIC INPUT
             const updatedInput = {
@@ -75,21 +75,25 @@ export default function InputsHandler({
 
 // AUXILIARY FUNCTIONS
 
-function onAddFormInputsFields(inputs: PreFormInputsType) {
+function onAddFormInputsFields<T extends PreFormInputsType<string>>(
+    preInputs: T,
+) {
     const handledInputs = onAddRequiredInputs();
 
     function onAddRequiredInputs() {
-        for (const i in inputs) {
-            inputs[i].errors = [];
-            inputs[i].value = '';
+        for (const i in preInputs) {
+            preInputs[i].errors = [];
+            preInputs[i].value = '';
         }
-        return inputs;
+        return preInputs;
     }
 
-    return handledInputs as FormInputsType;
+    return handledInputs as FormInputsType<keyof typeof preInputs>;
 }
 
-function onOmitFormInputsFields(preInputs: PreFormInputsType) {
+function onOmitFormInputsFields<T extends string>(
+    preInputs: PreFormInputsType<T>,
+) {
     const mainFieldsToOmit = Object.keys(preInputs).filter((key) =>
         key.includes('confirm'),
     );
@@ -100,5 +104,5 @@ function onOmitFormInputsFields(preInputs: PreFormInputsType) {
         secondaryFieldsToOmit,
     ) as FormInputsTypeToSubmit<string>;
 
-    return handledInputs as FormHandledInputsType<typeof preInputs>;
+    return handledInputs as FormHandledInputsType<keyof typeof preInputs>;
 }
