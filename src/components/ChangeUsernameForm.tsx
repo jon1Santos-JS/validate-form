@@ -11,7 +11,7 @@ export default function ChangePasswordForm({
     setUser,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
-    const { onChangeInput } = useContext(InputsHandlerContext);
+    const { onChangeInput, inputs } = useContext(InputsHandlerContext);
 
     return <>{renderContent()}</>;
 
@@ -38,6 +38,12 @@ export default function ChangePasswordForm({
             objectifiedName: 'newUsername',
             targetProp: 'value',
             value: e.target.value,
+        });
+
+        onChangeInput({
+            objectifiedName: 'newUsername',
+            targetProp: 'clientTop',
+            value: e.target.clientTop,
         });
     }
 

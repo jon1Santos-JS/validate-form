@@ -21,8 +21,7 @@ const Form: React.FC<FormProps> = ({
     formDefaultError,
     formSubmitError,
 }) => {
-    const { inputs, setShowInputsMessage, updateInputsToSubmit } =
-        useContext(InputHandlerContext);
+    const { inputs, setShowInputsMessage } = useContext(InputHandlerContext);
     const { validateAllInputs } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(
@@ -81,9 +80,8 @@ const Form: React.FC<FormProps> = ({
     ) {
         e.preventDefault();
         if (!validateAllInputs(inputs)) {
-            const inputsToSubmit = updateInputsToSubmit();
             if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
-            const response = await onSubmitInputs(inputsToSubmit);
+            const response = await onSubmitInputs(inputs);
             if (typeof response === 'string') {
                 setMessage(formSubmitError ? formSubmitError : FORM_ERROR); // TO SET SUBMIT ERROR
                 setShowMessage(true);

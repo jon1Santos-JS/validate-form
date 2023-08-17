@@ -2,8 +2,8 @@ import { useState } from 'react';
 import InputsHandledContext from '@/context/InputsHandlerContext';
 import { Lodash } from '@/lib/lodashAdapter';
 
-interface InputHandlerPropsTypes {
-    preInputs: PreFormInputsType;
+interface InputHandlerPropsTypes<T extends string> {
+    preInputs: PreFormInputsType<T>;
     children: JSX.Element[] | JSX.Element;
 }
 
@@ -12,8 +12,11 @@ const INPUTS_FIELDS_TO_OMIT_FROM_SERVER = ['required', 'validations', 'errors'];
 export default function InputsHandler({
     preInputs,
     children,
-}: InputHandlerPropsTypes) {
+}: InputHandlerPropsTypes<typeof preInputs>) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
+    const [handledInputs, setHandledInputs] = useState(
+        onOmitFormInputsFields(preInputs),
+    );
     const [showInputMessagesFromOutside, setShowInputMessages] =
         useState(false);
 
@@ -22,6 +25,7 @@ export default function InputsHandler({
             value={{
                 showInputMessagesFromOutside,
                 inputs,
+                handledInputs,
                 onChangeInput,
                 updateInputsToSubmit,
                 setShowInputsMessage,
@@ -43,6 +47,16 @@ export default function InputsHandler({
                 [targetProp]: value,
             };
             // RETURNED ALL INPUTS WITH THE SPECIFIC INPUT UPTATED
+            return {
+                ...prevInputs,
+                [objectifiedName]: updatedInput,
+            };
+        });
+        setHandledInputs((prevInputs) => {
+            const updatedInput = {
+                ...prevInputs[objectifiedName],
+                [targetProp]: value,
+            };
             return {
                 ...prevInputs,
                 [objectifiedName]: updatedInput,
@@ -86,5 +100,5 @@ function onOmitFormInputsFields(preInputs: PreFormInputsType) {
         secondaryFieldsToOmit,
     ) as FormInputsTypeToSubmit<string>;
 
-    return handledInputs;
+    return handledInputs as FormHandledInputsType<typeof preInputs>;
 }

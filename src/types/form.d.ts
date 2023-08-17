@@ -1,8 +1,8 @@
 // FORM INPUTS PRE-DEFINED TYPES
 
-declare interface PreFormInputsType {
-    [key: string]: PreFormInputPropsType;
-}
+declare type PreFormInputsType<T extends string> = {
+    [key in T]: PreFormInputPropsType;
+};
 
 declare interface PreFormInputPropsType {
     validations?: (
@@ -21,9 +21,9 @@ declare interface Validation {
 
 // *NECESSARY FORM INPUT'S FIELDS TO VALIDATE
 
-declare interface FormInputsType {
-    [key: string]: FormInputPropsType;
-}
+declare type FormInputsType<T extends string> = {
+    [key in T]: FormInputPropsType;
+};
 
 declare interface FormInputPropsType extends PreFormInputPropsType {
     errors: string[];
@@ -40,7 +40,15 @@ declare type FormInputsTypeToSubmit<T extends string> = {
 
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
 
-declare type TargetPropsType = 'value' | 'files' | 'accessKey';
+declare type TargetPropsType = 'value' | 'files' | 'accessKey' | 'clientTop';
+
+declare type FormHandledInputsType<T extends string> = {
+    [key in T]: FormHandledInputsPropsType;
+};
+
+declare type FormHandledInputsPropsType<T> = {
+    [key in TargetPropsType]: T;
+};
 
 declare interface FormInputPropsTypeToSubmit {
     files?: FileType;
