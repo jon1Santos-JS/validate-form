@@ -16,6 +16,7 @@ export default function InputsHandler<T extends string>({
     children,
 }: InputHandlerPropsTypes<T>) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
+    const [objectifiedName, setObjectifiedName] = useState();
     const [handledInputs, setHandledInputs] = useState(
         onOmitFormInputsFields(preInputs),
     );
@@ -68,6 +69,10 @@ export default function InputsHandler<T extends string>({
                 [objectifiedName]: updatedInput,
             };
         });
+    }
+
+    function updateObjectifiedName<T>(name: T) {
+        setObjectifiedName(name);
     }
 
     function updateInputsToSubmit() {
