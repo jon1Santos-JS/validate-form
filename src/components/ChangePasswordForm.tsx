@@ -103,9 +103,9 @@ export const CHANGE_PASSWORD_FORM_INPUTS_STATE = {
         required: 'Password incorrect',
     },
     newPassword: {
-        validations: (
+        validations<T>: (
             currentInputValue: string,
-            formInputs: PreFormInputsType,
+            formInputs: PreFormInputsType<T>,
         ) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),

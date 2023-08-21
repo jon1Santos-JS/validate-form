@@ -4,7 +4,7 @@ interface InputsHandlerContextType {
     showInputMessagesFromOutside: boolean;
     inputs: FormInputsType<string>;
     handledInputs: FormHandledInputsType<string>;
-    onChangeInput: <T, U>(props: onChangeInputsProps<T, U>) => void;
+    onChangeInput: (props: any) => void;
     updateInputsToSubmit: () => FormInputsTypeToSubmit<string>;
     setShowInputsMessage: (value: boolean) => void;
 }

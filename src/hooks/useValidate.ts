@@ -1,7 +1,9 @@
 const EMPTY_INPUT_ERROR_RESPONSE = 'This field is required';
 
 export default function useValidate() {
-    const validateAllInputs = (formInputs: FormInputsType) => {
+    const validateAllInputs = <T extends string>(
+        formInputs: FormInputsType<T>,
+    ) => {
         const inputsKeys = Object.keys(formInputs);
         const inputErrors = inputsKeys.map((inputName) => {
             return preValidate(inputName, formInputs);
@@ -19,7 +21,10 @@ export default function useValidate() {
         return findConditional;
     };
 
-    const preValidate = (fieldName: string, formInputs: FormInputsType) => {
+    const preValidate = <T extends string>(
+        fieldName: string,
+        formInputs: FormInputsType<T>,
+    ) => {
         setAndResetInput(formInputs[fieldName]);
         return validate(formInputs[fieldName], formInputs);
     };

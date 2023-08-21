@@ -2,8 +2,10 @@ import { useState } from 'react';
 import InputsHandledContext from '@/context/InputsHandlerContext';
 import { Lodash } from '@/lib/lodashAdapter';
 
+export type PreFormInputsTypeToHandle<T extends string> = PreFormInputsType<T>;
+
 interface InputHandlerPropsTypes<T extends string> {
-    preInputs: PreFormInputsType<T>;
+    preInputs: PreFormInputsTypeToHandle<T>;
     children: JSX.Element[] | JSX.Element;
 }
 
@@ -35,11 +37,15 @@ export default function InputsHandler<T extends string>({
         </InputsHandledContext.Provider>
     );
 
-    function onChangeInput<T, U>({
+    function onChangeInput<U>({
         objectifiedName,
         targetProp,
         value,
-    }: onChangeInputsProps<T, U>) {
+    }: {
+        objectifiedName: T;
+        targetProp: TargetPropsType;
+        value: U;
+    }) {
         setInputs((prevInputs) => {
             // UPDATING THE OBJECT WITH THE NEW ESPECIFIC INPUT
             const updatedInput = {
@@ -75,8 +81,8 @@ export default function InputsHandler<T extends string>({
 
 // AUXILIARY FUNCTIONS
 
-function onAddFormInputsFields<T extends PreFormInputsType<string>>(
-    preInputs: T,
+function onAddFormInputsFields<T extends string>(
+    preInputs: PreFormInputsType<T>,
 ) {
     const handledInputs = onAddRequiredInputs();
 
