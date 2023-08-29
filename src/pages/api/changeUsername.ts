@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { changeUsernameController } from '@/lib/controllers';
 import Cookies from 'cookies';
-import { createHash } from '@/lib/hash';
+import { USER_HASH_NAME, createHash } from '@/lib/hash';
 import { COOKIES_EXPIRES } from '@/database/miniDB';
 
 export default async function handler(
@@ -18,26 +18,25 @@ export default async function handler(
                 !controllerResponse.serverResponse ||
                 typeof controllerResponse.body === 'string'
             ) {
-                res.status(200).json(controllerResponse);
-                return;
+                return res.status(200).json(controllerResponse);
             }
             const newAccountFromDB = controllerResponse.body;
             const hash = createHash(newAccountFromDB);
             const newUsername = newAccountFromDB.username.value;
             const cookies = new Cookies(req, res);
-            cookies.set('user-hash', hash, {
+            cookies.set(USER_HASH_NAME, hash, {
                 expires: COOKIES_EXPIRES,
                 sameSite: 'lax',
             });
-            res.status(200).json({
+            return res.status(200).json({
                 serverResponse: true,
                 body: newUsername,
             });
-            break;
         }
         default: {
-            res.status(405).json({ serverResponse: 'Method Not Allowed' });
-            break;
+            return res
+                .status(405)
+                .json({ serverResponse: 'Method Not Allowed' });
         }
     }
 }

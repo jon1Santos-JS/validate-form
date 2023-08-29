@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { changePasswordController } from '@/lib/controllers';
-import { createHash } from '@/lib/hash';
+import { USER_HASH_NAME, createHash } from '@/lib/hash';
 import Cookies from 'cookies';
 import { COOKIES_EXPIRES } from '@/database/miniDB';
 
@@ -19,17 +19,17 @@ export default async function handler(
                     password: { value: user.newPassword.value },
                 };
                 const hash = createHash(userToSetHash);
-                cookies.set('user-hash', hash, {
+                cookies.set(USER_HASH_NAME, hash, {
                     expires: COOKIES_EXPIRES,
                     sameSite: 'lax',
                 });
             }
-            res.status(200).json(controllerResponse);
-            break;
+            return res.status(200).json(controllerResponse);
         }
         default: {
-            res.status(405).json({ serverResponse: 'Method Not Allowed' });
-            break;
+            return res
+                .status(405)
+                .json({ serverResponse: 'Method Not Allowed' });
         }
     }
 }

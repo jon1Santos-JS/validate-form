@@ -8,12 +8,10 @@ export default async function handler(
     switch (req.method) {
         case 'POST': {
             const response = await changeUserImg(req.body as UserWithImgType);
-            res.status(200).json(response);
-            break;
+            return res.status(200).json(response);
         }
         default:
-            res.status(405).json({ message: 'Method Not Allowed' });
-            break;
+            return res.status(405).json({ message: 'Method Not Allowed' });
     }
 }
 

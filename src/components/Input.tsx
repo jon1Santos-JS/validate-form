@@ -1,31 +1,33 @@
-import InputHandlerContext from '@/context/InputHandlerContext';
+import { InputsHandledContext } from '@/context/InputsHandlerContext';
 import useValidate from '@/hooks/useValidate';
 import React, { useState, useEffect, useContext } from 'react';
 
 interface InputProps {
     label: string;
     inputType: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     objectifiedName: string;
     inputName?: string;
     inputAccept?: string;
-    targetProps: InputsTargetPropsType<ComplementaryTargetPropsType>;
 }
 
 const Input: React.FC<InputProps> = ({
     label,
     inputType,
+    onChange,
     objectifiedName,
     inputName,
     inputAccept,
-    targetProps,
 }) => {
-    const { inputs, showInputMessagesFromOutside, onChangeInput } =
-        useContext(InputHandlerContext);
+    const { inputs, showInputMessagesFromOutside } =
+        useContext(InputsHandledContext);
+
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
 
     useEffect(() => {
+        // ALL INPUTS ARE NECESSARY TO COMAPRE CONFIRM FIELDS INTO THE VALIDATION HOOK
         setErrorList(preValidate(objectifiedName, inputs));
     }, [objectifiedName, inputs, preValidate]);
 
@@ -57,23 +59,12 @@ const Input: React.FC<InputProps> = ({
                 className="input"
                 name={inputName && inputName}
                 accept={inputAccept && inputAccept}
-                onChange={onGetValues}
+                onChange={onChange}
                 type={inputType}
             />
             {renderErrors()}
         </div>
     );
-
-    function onGetValues(e: React.ChangeEvent<HTMLInputElement>) {
-        targetProps.map((props) => {
-            const handledAttribute = {
-                objectifiedName: objectifiedName,
-                targetProps: props,
-                value: e.target[props],
-            };
-            onChangeInput(handledAttribute);
-        });
-    }
 
     function renderErrors() {
         if (!showMessage) return null;

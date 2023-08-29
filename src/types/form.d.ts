@@ -1,13 +1,13 @@
 // FORM INPUTS PRE-DEFINED TYPES
 
-declare interface PreFormInputsType {
-    [key: string]: PreFormInputPropsType;
-}
+declare type PreFormInputsType<T extends string> = {
+    [key in T]: PreFormInputPropsType<T>;
+};
 
-declare interface PreFormInputPropsType {
-    validations?: (
+declare interface PreFormInputPropsType<T extends string> {
+    validations: <U extends FormInputsType<T>>(
         currentInput: string,
-        formInputs: FormInputsType,
+        formInputs: U,
     ) => Validation[];
     required?: boolean | string;
     errors?: string[];
@@ -21,37 +21,26 @@ declare interface Validation {
 
 // *NECESSARY FORM INPUT'S FIELDS TO VALIDATE
 
-declare interface FormInputsType {
-    [key: string]: FormInputPropsType;
-}
+declare type FormInputsType<T extends string> = {
+    [key in T]: FormInputPropsType<T>;
+};
 
-declare interface FormInputPropsType extends PreFormInputPropsType {
+declare interface FormInputPropsType<T extends string>
+    extends PreFormInputPropsType<T> {
     errors: string[];
-    value?: string;
+    value: string;
 }
-
-declare type InputsTargetPropsType<T extends ComplementaryTargetPropsType> = [
-    'value',
-    ...T[],
-];
-
-declare type HandledInputs<T> = Partial<
-    Record<keyof T, FormInputPropsTypeToSubmit>
->;
 
 declare type FileType = FileList | undefined | null;
 
-// FORM INPUT'S FIELDS TO SUBMIT
-
-declare interface FormInputsTypeToSubmit {
-    [key: string]: FormInputPropsTypeToSubmit;
-}
-
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
 
-declare type ComplementaryTargetPropsType = 'files' | 'accessKey';
+declare type TargetPropsType = 'value' | 'files' | 'accessKey' | 'clientTop';
 
-declare interface FormInputPropsTypeToSubmit {
-    files?: FileType;
-    value: string;
-}
+declare type FormHandledInputsType<T extends string> = {
+    [key in T]: FormHandledInputsPropsType;
+};
+
+declare type FormHandledInputsPropsType<T> = {
+    [key in TargetPropsType]: T;
+};

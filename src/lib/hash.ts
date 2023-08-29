@@ -2,9 +2,12 @@ import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
 import { getUserStateController } from './controllers';
 import { Lodash } from './lodashAdapter';
 
-export const HASH_DEFAULT_ERROR = 'invalid hash';
+const HASH_DEFAULT_ERROR = 'invalid hash';
 
-const INPUTS_FIELDS_TO_OMIT = ['ID', 'constraint', 'userImage'];
+export const USER_HASH_NAME = 'user-hash';
+const USER_HASH_ERROR = 'User was not found by hash';
+
+const OMIT_INPUTS_FIELDS_TO_COMPARE = ['ID', 'constraint', 'userImage'];
 
 export function createHash<T>(value: T) {
     const salt = genSaltSync(10);
@@ -28,7 +31,7 @@ export async function returnUserByHash(
     const validation = {
         isValid: false,
         user: { username: '' } as UserType,
-        message: 'User was not found',
+        message: USER_HASH_ERROR,
     };
     const controllerResponse = await getUserStateController();
     // NO DATABASE
@@ -41,25 +44,24 @@ export async function returnUserByHash(
     const usersFromDB = controllerResponse.body;
     if (usersFromDB.length > 1) {
         usersFromDB.forEach((user) => {
-            const userToCompare = Lodash.onOmitFields(
+            const userToCompare: UserFromClientType = Lodash.onOmitFields(
                 user,
-                INPUTS_FIELDS_TO_OMIT,
+                OMIT_INPUTS_FIELDS_TO_COMPARE,
             );
             if (compareSync(JSON.stringify(userToCompare), browserHash)) {
-                const userToClient = {
+                validation.user = {
                     username: user.username.value,
                     userImage: user.userImage,
                 };
-                validation.user = userToClient;
                 validation.isValid = true;
             }
         });
     } else {
         // IF THERE'S NO DATABASE USERS, IT IS COMPARING ADMIN'S ACCOUNT TO HASH
         const uniqueUser = controllerResponse.body[0];
-        const userToCompare = Lodash.onOmitFields(
+        const userToCompare: UserFromClientType = Lodash.onOmitFields(
             uniqueUser,
-            INPUTS_FIELDS_TO_OMIT,
+            OMIT_INPUTS_FIELDS_TO_COMPARE,
         );
         if (compareSync(JSON.stringify(userToCompare), browserHash)) {
             validation.user = {

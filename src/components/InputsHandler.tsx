@@ -1,57 +1,66 @@
-import { useState } from 'react';
-import InputHandlerContext from '@/context/InputHandlerContext';
+import { useEffect, useState } from 'react';
 import { Lodash } from '@/lib/lodashAdapter';
+import {
+    InputsHandledContext,
+    InputsHandlerContextType,
+} from '@/context/InputsHandlerContext';
 
-interface InputHandlerPropsTypes {
-    preInputs: PreFormInputsType;
+interface InputHandlerPropsTypes<T extends string> {
+    preInputs: PreFormInputsType<T>;
     children: JSX.Element[] | JSX.Element;
 }
 
-const INPUTS_FIELDS_TO_OMIT = ['required', 'validations', 'errors'];
+const INPUTS_FIELDS_TO_OMIT_FROM_SERVER = ['required', 'validations', 'errors'];
 
-export default function InputsHandler({
+export default function InputsHandler<T extends string>({
     preInputs,
     children,
-}: InputHandlerPropsTypes) {
+}: InputHandlerPropsTypes<T>) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
+    const [handledInputs, setHandledInputs] = useState(
+        onOmitFormInputsFields(preInputs),
+    );
     const [showInputMessagesFromOutside, setShowInputMessages] =
         useState(false);
+    const contextData: InputsHandlerContextType<T> = {
+        showInputMessagesFromOutside,
+        inputs,
+        handledInputs,
+        onChangeInput,
+        setShowInputsMessage,
+    };
+
+    useEffect(() => {
+        setHandledInputs(onOmitFormInputsFields(inputs));
+    }, [inputs]);
 
     return (
-        <InputHandlerContext.Provider
-            value={{
-                showInputMessagesFromOutside,
-                inputs,
-                onChangeInput,
-                updateInputsToSubmit,
-                setShowInputsMessage,
-            }}
-        >
+        <InputsHandledContext.Provider value={contextData}>
             {children}
-        </InputHandlerContext.Provider>
+        </InputsHandledContext.Provider>
     );
 
-    function onChangeInput({
+    function onChangeInput<R extends T, U>({
         objectifiedName,
-        targetProps,
+        targetProp,
         value,
-    }: onChangeInputsProps) {
+    }: {
+        objectifiedName: R;
+        targetProp: TargetPropsType;
+        value: U;
+    }) {
         setInputs((prevInputs) => {
-            // GETTING THE OBJECT  WITH THE NEWPROP ADDED INTO THE SPECIFIC FIELD (objectifiedName)
+            // UPDATING THE OBJECT WITH THE NEW ESPECIFIC INPUT
             const updatedInput = {
                 ...prevInputs[objectifiedName],
-                [targetProps]: value,
+                [targetProp]: value,
             };
-            // RETURNED ALL INPUTS WITH THE SPECIFIC FIELD UPTATED
+            // RETURNED ALL INPUTS WITH THE SPECIFIC INPUT UPTATED
             return {
                 ...prevInputs,
                 [objectifiedName]: updatedInput,
             };
         });
-    }
-
-    function updateInputsToSubmit() {
-        return onOmitFormInputsFields(inputs);
     }
 
     function setShowInputsMessage(value: boolean) {
@@ -61,29 +70,34 @@ export default function InputsHandler({
 
 // AUXILIARY FUNCTIONS
 
-function onAddFormInputsFields(inputs: PreFormInputsType) {
+function onAddFormInputsFields<T extends string>(
+    preInputs: PreFormInputsType<T>,
+) {
     const handledInputs = onAddRequiredInputs();
 
     function onAddRequiredInputs() {
-        for (const i in inputs) {
-            inputs[i].errors = [];
-            inputs[i].value = '';
+        for (const i in preInputs) {
+            preInputs[i].errors = [];
+            preInputs[i].value = '';
         }
-        return inputs;
+        return preInputs;
     }
 
-    return handledInputs as FormInputsType;
+    return handledInputs as FormInputsType<keyof typeof preInputs>;
 }
 
-function onOmitFormInputsFields(preInputs: PreFormInputsType) {
-    const mainFieldsToOmit = Object.keys(preInputs).filter((key) =>
-        key.includes('confirm'),
-    );
-    const secondaryFieldsToOmit = INPUTS_FIELDS_TO_OMIT;
-    const handledInputs: unknown = Lodash.onOmitFields(
-        preInputs,
+function onOmitFormInputsFields<T extends string>(
+    preInputs: PreFormInputsType<T>,
+): FormHandledInputsType<keyof typeof preInputs> {
+    const mainFieldsToOmit = Object.keys(
+        preInputs as PreFormInputsType<T>,
+    ).filter((key) => key.includes('confirm'));
+    const secondaryFieldsToOmit = INPUTS_FIELDS_TO_OMIT_FROM_SERVER;
+    const handledInputs = Lodash.onOmitFields(
+        preInputs as PreFormInputsType<T>,
         mainFieldsToOmit,
         secondaryFieldsToOmit,
     );
-    return handledInputs as FormInputsTypeToSubmit;
+
+    return handledInputs as FormHandledInputsType<keyof typeof preInputs>;
 }

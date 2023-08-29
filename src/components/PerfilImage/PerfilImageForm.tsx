@@ -1,61 +1,57 @@
-import InputsHandler from './InputsHandler';
-import Form from './Form';
-import Input from './Input';
-import Image from 'next/image';
+import Form from '../Form';
+import Input from '../Input';
 import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
+import { InputsHandledContext } from '@/context/InputsHandlerContext';
+import { useContext } from 'react';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 const DEFAULT_FORM_ERROR = 'Invalid image';
 
-type PerfilImagePropsTypes = HandlerUserStateProps;
+type PerfilImageFormPropsTypes = HandlerUserStateProps;
 
-export default function PerfilImage({
-    user,
-    isUserStateLoading,
-}: PerfilImagePropsTypes) {
+export default function PerfilImageForm({ user }: PerfilImageFormPropsTypes) {
     const { handledName } = useStringHandler();
+    const { onChangeInput } = useContext(InputsHandledContext);
 
     return (
-        <div>
+        <>
             <h4>Upload image</h4>
-            {renderImage()}
-            <InputsHandler preInputs={preInputs}>
-                <Form
-                    onSubmitInputs={onSubmitInputs}
-                    formDefaultError={DEFAULT_FORM_ERROR}
-                >
-                    <Input
-                        label="image"
-                        objectifiedName="imageInput"
-                        inputType="file"
-                        inputName="image"
-                        inputAccept="image/*"
-                        targetProps={['value', 'files']}
-                    />
-                </Form>
-            </InputsHandler>
-        </div>
+            <Form
+                onSubmitInputs={onSubmitInputs}
+                formDefaultError={DEFAULT_FORM_ERROR}
+            >
+                <Input
+                    label="image"
+                    objectifiedName="imageInput"
+                    inputType="file"
+                    inputName="image"
+                    inputAccept="image/*"
+                    onChange={onChangeImage}
+                />
+            </Form>
+        </>
     );
 
-    function renderImage() {
-        if (isUserStateLoading || !user.userImage) return null;
-        return (
-            <>
-                <Image
-                    src={user.userImage}
-                    alt="test image"
-                    width={200}
-                    height={200}
-                    priority={true}
-                />
-            </>
-        );
-    }
+    function onChangeImage(e: React.ChangeEvent<HTMLInputElement>) {
+        onChangeInput({
+            objectifiedName: 'imageInput',
+            targetProp: 'value',
+            value: e.target.value,
+        });
 
-    async function onSubmitInputs(inputs: HandledInputs<typeof preInputs>) {
-        if (!inputs.imageInput?.files) return;
-        const file = inputs.imageInput?.files[0];
-        const fileName = handledName(inputs.imageInput.files[0].name);
+        onChangeInput({
+            objectifiedName: 'imageInput',
+            targetProp: 'files',
+            value: e.target.files,
+        });
+    }
+    async function onSubmitInputs(
+        handledInputs: FormHandledInputsType<
+            keyof typeof PERFIL_IMAGE_FORM_INPUTS_STATE
+        >,
+    ) {
+        const file = handledInputs.imageInput.files[0];
+        const fileName = handledName(handledInputs.imageInput.files[0].name);
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file, fileName);
         const fetchOptions: FetchOptionsType = {
@@ -91,9 +87,9 @@ export default function PerfilImage({
     }
 }
 
-const preInputs = {
+export const PERFIL_IMAGE_FORM_INPUTS_STATE: PreFormInputsType<'imageInput'> = {
     imageInput: {
-        validations: (currentInputValue: string) => [
+        validations: (currentInputValue) => [
             {
                 coditional: !onCheckExtensions(
                     ALLOWED_EXTENSIONS,

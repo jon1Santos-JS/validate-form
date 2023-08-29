@@ -8,9 +8,9 @@ export default function MainNavigationBar({
     setUser,
     isUserStateLoading,
 }: MainNavigationBarProps) {
-    return <>{renderAlternativeContent()}</>;
+    return <>{renderContent()}</>;
 
-    function renderAlternativeContent() {
+    function renderContent() {
         if (isUserStateLoading) return null;
 
         return (
@@ -18,9 +18,11 @@ export default function MainNavigationBar({
                 <div className="navigation-container">
                     {!hasUser() && <Link href="/">Sign In</Link>}
                     {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
-                    {hasUser() && <Link href="/dashboard-page">Profile</Link>}
                     {hasUser() && (
-                        <div className="c-button" onClick={signOutUser}>
+                        <div
+                            className="c-button sign-out"
+                            onClick={signOutUser}
+                        >
                             Sign out
                         </div>
                     )}

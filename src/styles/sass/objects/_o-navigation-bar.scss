@@ -12,4 +12,9 @@
         padding: calc(var(--app-base-measure) * 2)
             calc(var(--app-base-measure) * 4);
     }
+
+    .sign-out {
+        flex-basis: 100%;
+        text-align: right;
+    }
 }
