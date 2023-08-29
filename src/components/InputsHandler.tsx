@@ -17,7 +17,7 @@ export default function InputsHandler<T extends string>({
     children,
 }: InputHandlerPropsTypes<T>) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
-    const [handledInputs, setHandledInputs] = useState(
+    const [handledInputs, setHandledInput] = useState(
         onOmitFormInputsFields(preInputs),
     );
     const [showInputMessagesFromOutside, setShowInputMessages] =
@@ -31,7 +31,7 @@ export default function InputsHandler<T extends string>({
     };
 
     useEffect(() => {
-        setHandledInputs(onOmitFormInputsFields(inputs));
+        setHandledInput(onOmitFormInputsFields(inputs));
     }, [inputs]);
 
     return (
