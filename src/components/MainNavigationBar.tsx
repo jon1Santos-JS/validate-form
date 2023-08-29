@@ -1,13 +1,14 @@
 import Link from 'next/link';
 
-type MainNavigationBarProps = HandlerUserStateProps;
+type MainNavigationBarProps = {
+    handleUserProps: HandleUserPropsType;
+};
 
 export default function MainNavigationBar({
-    hasUser,
-    setHasUser,
-    setUser,
-    isUserStateLoading,
+    handleUserProps,
 }: MainNavigationBarProps) {
+    const { hasUser, setHasUser, setUser, isUserStateLoading } =
+        handleUserProps;
     return <>{renderContent()}</>;
 
     function renderContent() {

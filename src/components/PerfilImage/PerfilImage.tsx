@@ -1,10 +1,12 @@
 import Image from 'next/image';
-type PerfilImagePropsTypes = HandlerUserStateProps;
+type PerfilImagePropsTypes = {
+    handleUserProps: HandleUserPropsType;
+};
 
 export default function PerfilImage({
-    isUserStateLoading,
-    user,
+    handleUserProps,
 }: PerfilImagePropsTypes) {
+    const { isUserStateLoading, user } = handleUserProps;
     return <>{renderImage()}</>;
 
     function renderImage() {

@@ -1,13 +1,25 @@
 import { useState } from 'react';
-import SignUpForm from './SignUpForm';
+import SignUpForm, { SignUpInputs } from './SignUpForm';
 import SignUpModal from './SignUpModal';
 
-export default function SignUpContent() {
+interface SignUpContentPropsType {
+    handleInputsProps: HandleInputsPropsType<SignUpInputs>;
+    handleUserProps: HandleUserPropsType;
+}
+
+export default function SignUpContent({
+    handleInputsProps,
+    handleUserProps,
+}: SignUpContentPropsType) {
     const [signUpResponse, setSignUpResponse] = useState(false); // SHOW MODAL
     return (
         <>
             <SignUpForm
-                setResponse={(data: boolean) => setSignUpResponse(data)}
+                props={{
+                    setResponse: (data: boolean) => setSignUpResponse(data),
+                }}
+                handleInputsProps={handleInputsProps}
+                handleUserProps={handleUserProps}
             />
             <SignUpModal
                 isModalOpen={() => signUpResponse}

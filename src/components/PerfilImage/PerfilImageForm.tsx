@@ -1,32 +1,44 @@
 import Form from '../Form';
 import Input from '../Input';
 import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
-import { InputsHandledContext } from '@/context/InputsHandlerContext';
-import { useContext } from 'react';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
-const DEFAULT_FORM_ERROR = 'Invalid image';
+const DEFAULT_ERROR_MESSAGE = 'Invalid image';
 
-type PerfilImageFormPropsTypes = HandlerUserStateProps;
+type PerfilImageFormPropsTypes = {
+    handleUserProps: HandleUserPropsType;
+    handleInputsProps: HandleInputsPropsType<PerfilFormInputs>;
+};
+type PerfilFormInputs = 'imageInput';
 
-export default function PerfilImageForm({ user }: PerfilImageFormPropsTypes) {
+export default function PerfilImageForm({
+    handleUserProps,
+    handleInputsProps,
+}: PerfilImageFormPropsTypes) {
+    const { user } = handleUserProps;
     const { handledName } = useStringHandler();
-    const { onChangeInput } = useContext(InputsHandledContext);
+    const { onChangeInput } = handleInputsProps;
 
     return (
         <>
             <h4>Upload image</h4>
             <Form
-                onSubmitInputs={onSubmitInputs}
-                formDefaultError={DEFAULT_FORM_ERROR}
+                props={{
+                    onSubmitInputs: onSubmitInputs,
+                    formDefaultError: DEFAULT_ERROR_MESSAGE,
+                }}
+                handleInputsProps={handleInputsProps}
             >
                 <Input
-                    label="image"
-                    objectifiedName="imageInput"
-                    inputType="file"
-                    inputName="image"
-                    inputAccept="image/*"
-                    onChange={onChangeImage}
+                    props={{
+                        label: 'image',
+                        inputType: 'file',
+                        inputName: 'image',
+                        inputAccept: 'image/*',
+                        onChange: onChangeImage,
+                        objectifiedName: 'imageInput',
+                    }}
+                    handleInputsProps={handleInputsProps}
                 />
             </Form>
         </>
@@ -59,7 +71,9 @@ export default function PerfilImageForm({ user }: PerfilImageFormPropsTypes) {
             body: formData,
         };
         const imgApiResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_IMGBB_API as string}expiration=600&key=${
+            `${
+                process.env.NEXT_PUBLIC_IMGBB_API_LINK as string
+            }expiration=600&key=${
                 process.env.NEXT_PUBLIC_IMGBB_API_KEY as string
             }`,
             fetchOptions,
@@ -87,16 +101,19 @@ export default function PerfilImageForm({ user }: PerfilImageFormPropsTypes) {
     }
 }
 
-export const PERFIL_IMAGE_FORM_INPUTS_STATE: PreFormInputsType<'imageInput'> = {
-    imageInput: {
-        validations: (currentInputValue) => [
-            {
-                coditional: !onCheckExtensions(
-                    ALLOWED_EXTENSIONS,
-                    currentInputValue,
-                ),
-                message: `Allowed extensions: ${ALLOWED_EXTENSIONS.join(', ')}`,
-            },
-        ],
-    },
-};
+export const PERFIL_IMAGE_FORM_INPUTS_STATE: PreFormInputsType<PerfilFormInputs> =
+    {
+        imageInput: {
+            validations: (currentInputValue) => [
+                {
+                    coditional: !onCheckExtensions(
+                        ALLOWED_EXTENSIONS,
+                        currentInputValue,
+                    ),
+                    message: `Allowed extensions: ${ALLOWED_EXTENSIONS.join(
+                        ', ',
+                    )}`,
+                },
+            ],
+        },
+    };

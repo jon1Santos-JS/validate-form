@@ -1,11 +1,15 @@
-import { InputsHandledContext } from '@/context/InputsHandlerContext';
 import useValidate from '@/hooks/useValidate';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const FORM_ERROR = 'Invalid form';
 
-interface FormProps {
+interface FormPropsTypes {
+    props: PropsType;
+    handleInputsProps: HandleInputsPropsType<string>;
     children: JSX.Element[] | JSX.Element;
+}
+
+interface PropsType {
     onSubmitInputs: <T extends FormHandledInputsType<string>>(
         handledInputs: T,
     ) => Promise<string | undefined | void>;
@@ -14,15 +18,13 @@ interface FormProps {
     formSubmitError?: string;
 }
 
-const Form: React.FC<FormProps> = ({
+export default function FormFormProps({
+    props,
+    handleInputsProps,
     children,
-    onSubmitInputs,
-    legend,
-    formDefaultError,
-    formSubmitError,
-}) => {
-    const { inputs, handledInputs, setShowInputsMessage } =
-        useContext(InputsHandledContext);
+}: FormPropsTypes) {
+    const { onSubmitInputs, legend, formDefaultError, formSubmitError } = props;
+    const { inputs, handledInputs, setShowInputsMessage } = handleInputsProps;
     const { validateAllInputs } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(
@@ -95,6 +97,4 @@ const Form: React.FC<FormProps> = ({
         setShowMessage(true);
         setShowInputsMessage(true);
     }
-};
-
-export default Form;
+}

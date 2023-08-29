@@ -1,36 +1,57 @@
-import { InputsHandledContext } from '@/context/InputsHandlerContext';
 import Form from '../Form';
 import Input from '../Input';
-import { useContext } from 'react';
 
 interface SignUpFormPropsType {
+    props: PropsType;
+    handleUserProps: HandleUserPropsType;
+    handleInputsProps: HandleInputsPropsType<SignUpInputs>;
+}
+export type SignUpInputs = 'username' | 'password' | 'confirmPassword';
+
+interface PropsType {
     setResponse: (data: boolean) => void;
 }
 
-export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
-    const { onChangeInput } = useContext(InputsHandledContext);
+export default function SignUpForm({
+    props,
+    handleInputsProps,
+}: SignUpFormPropsType) {
+    const { onChangeInput } = handleInputsProps;
+    const { setResponse } = props;
 
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
-                <Form legend="SignUp" onSubmitInputs={onSubmitInputs}>
+                <Form
+                    props={{ legend: 'SignUp', onSubmitInputs: onSubmitInputs }}
+                    handleInputsProps={handleInputsProps}
+                >
                     <Input
-                        label="Username"
-                        inputType="text"
-                        onChange={onchangeUsername}
-                        objectifiedName="username"
+                        props={{
+                            label: 'Username',
+                            inputType: 'text',
+                            onChange: onchangeUsername,
+                            objectifiedName: 'username',
+                        }}
+                        handleInputsProps={handleInputsProps}
                     />
                     <Input
-                        label="Password"
-                        inputType="password"
-                        onChange={onchangePassword}
-                        objectifiedName="password"
+                        props={{
+                            label: 'Password',
+                            inputType: 'password',
+                            onChange: onchangePassword,
+                            objectifiedName: 'password',
+                        }}
+                        handleInputsProps={handleInputsProps}
                     />
                     <Input
-                        label="Confirm Password"
-                        inputType="password"
-                        onChange={onchangeConfirmPassword}
-                        objectifiedName="confirmPassword"
+                        props={{
+                            label: 'Confirm Password',
+                            inputType: 'password',
+                            onChange: onchangeConfirmPassword,
+                            objectifiedName: 'confirmPassword',
+                        }}
+                        handleInputsProps={handleInputsProps}
                     />
                 </Form>
             </div>
@@ -82,8 +103,6 @@ export default function SignUpForm({ setResponse }: SignUpFormPropsType) {
         setResponse(true);
     }
 }
-
-type SignUpInputs = 'username' | 'password' | 'confirmPassword';
 
 export const SIGN_UP_FORM_INPUTS_STATE: PreFormInputsType<SignUpInputs> = {
     username: {

@@ -3,12 +3,12 @@ import SignUpContent from '@/components/SignUp/SignUpContent';
 import { SIGN_UP_FORM_INPUTS_STATE } from '@/components/SignUp/SignUpForm';
 import { useRouter } from 'next/router';
 
-type SignUpPageProps = HandlerUserStateProps;
+type SignUpPageProps = {
+    handleUserProps: HandleUserPropsType;
+};
 
-export default function SignUpPage({
-    hasUser,
-    isUserStateLoading,
-}: SignUpPageProps) {
+export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
+    const { hasUser, isUserStateLoading } = handleUserProps;
     const router = useRouter();
 
     return <>{renderContent()}</>;
@@ -22,9 +22,16 @@ export default function SignUpPage({
 
         return (
             <div className="o-sign-up-page">
-                <InputsHandler preInputs={SIGN_UP_FORM_INPUTS_STATE}>
-                    <SignUpContent />
-                </InputsHandler>
+                <InputsHandler
+                    renderChildren={(handleInputsProps) => (
+                        <SignUpContent
+                            handleInputsProps={handleInputsProps}
+                            handleUserProps={handleUserProps}
+                            key={'SignUpContent'}
+                        />
+                    )}
+                    preInputs={SIGN_UP_FORM_INPUTS_STATE}
+                />
             </div>
         );
     }

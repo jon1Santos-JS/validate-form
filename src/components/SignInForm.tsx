@@ -1,39 +1,50 @@
-import { InputsHandledContext } from '@/context/InputsHandlerContext';
 import Form from './Form';
 import Input from './Input';
-import { useContext } from 'react';
 
-type SignInFormProps = HandlerUserStateProps;
+type SignInFormProps = {
+    handleUserProps: HandleUserPropsType;
+    handleInputsProps: HandleInputsPropsType<SignInInputs>;
+};
+type SignInInputs = 'username' | 'password';
 
 const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
 
 export default function SignInForm({
-    setUser,
-    setHasUser,
-    setUserStateLoading,
+    handleUserProps,
+    handleInputsProps,
 }: SignInFormProps) {
-    const { onChangeInput } = useContext(InputsHandledContext);
+    const { setUser, setHasUser, setUserStateLoading } = handleUserProps;
+    const { onChangeInput } = handleInputsProps;
 
     return (
         <div className="o-sign-in-form">
             <div className="c-container">
                 <Form
-                    legend="SignIn"
-                    onSubmitInputs={onSubmitInputs}
-                    formDefaultError={SIGN_IN_ERROR_RESPONSE}
-                    formSubmitError={SIGN_IN_ERROR_RESPONSE}
+                    props={{
+                        legend: 'SignIn',
+                        onSubmitInputs: onSubmitInputs,
+                        formDefaultError: SIGN_IN_ERROR_RESPONSE,
+                        formSubmitError: SIGN_IN_ERROR_RESPONSE,
+                    }}
+                    handleInputsProps={handleInputsProps}
                 >
                     <Input
-                        label="Username"
-                        inputType="text"
-                        objectifiedName="username"
-                        onChange={onchangeUsername}
+                        props={{
+                            label: 'Username',
+                            inputType: 'text',
+                            objectifiedName: 'username',
+                            onChange: onchangeUsername,
+                        }}
+                        handleInputsProps={handleInputsProps}
                     />
                     <Input
-                        label="Password"
-                        inputType="password"
-                        objectifiedName="password"
-                        onChange={onchangePassword}
+                        props={{
+                            label: 'Password',
+                            inputType: 'password',
+                            objectifiedName: 'password',
+                            onChange: onchangePassword,
+                        }}
+                        handleInputsProps={handleInputsProps}
                     />
                 </Form>
             </div>
@@ -78,8 +89,6 @@ export default function SignInForm({
         setUser({ username: parsedResponse.body as string });
     }
 }
-
-type SignInInputs = 'username' | 'password';
 
 export const SIGN_IN_FORM_STATE_INPUTS: PreFormInputsType<SignInInputs> = {
     username: {

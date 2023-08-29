@@ -1,8 +1,12 @@
-import { InputsHandledContext } from '@/context/InputsHandlerContext';
 import useValidate from '@/hooks/useValidate';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 
-interface InputProps {
+interface InputPropsTypes {
+    props: PropsType;
+    handleInputsProps: HandleInputsPropsType<string>;
+}
+
+interface PropsType {
     label: string;
     inputType: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -11,16 +15,16 @@ interface InputProps {
     inputAccept?: string;
 }
 
-const Input: React.FC<InputProps> = ({
-    label,
-    inputType,
-    onChange,
-    objectifiedName,
-    inputName,
-    inputAccept,
-}) => {
-    const { inputs, showInputMessagesFromOutside } =
-        useContext(InputsHandledContext);
+export default function Input({ props, handleInputsProps }: InputPropsTypes) {
+    const {
+        label,
+        inputType,
+        onChange,
+        objectifiedName,
+        inputName,
+        inputAccept,
+    } = props;
+    const { inputs, showInputMessagesFromOutside } = handleInputsProps;
 
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
@@ -82,6 +86,4 @@ const Input: React.FC<InputProps> = ({
         }, time);
         return currentTimer;
     }
-};
-
-export default Input;
+}

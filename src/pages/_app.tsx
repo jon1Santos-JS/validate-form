@@ -39,20 +39,24 @@ export default function App({ Component, pageProps }: AppProps) {
                     <link rel="icon" href="data:,"></link>
                 </Head>
                 <MainNavigationBar
-                    hasUser={() => hasUser}
-                    setHasUser={onUpdateHasUser}
-                    user={user}
-                    setUser={onUpdateUser}
-                    isUserStateLoading={userStateLoading}
-                    setUserStateLoading={onUpdateState}
+                    handleUserProps={{
+                        hasUser: () => hasUser,
+                        setHasUser: onUpdateHasUser,
+                        user: user,
+                        setUser: onUpdateUser,
+                        isUserStateLoading: userStateLoading,
+                        setUserStateLoading: onUpdateState,
+                    }}
                 />
                 <Component
-                    hasUser={() => hasUser}
-                    setHasUser={onUpdateHasUser}
-                    user={user}
-                    setUser={onUpdateUser}
-                    isUserStateLoading={userStateLoading}
-                    setUserStateLoading={onUpdateState}
+                    handleUserProps={{
+                        hasUser: () => hasUser,
+                        setHasUser: onUpdateHasUser,
+                        user: user,
+                        setUser: onUpdateUser,
+                        isUserStateLoading: userStateLoading,
+                        setUserStateLoading: onUpdateState,
+                    }}
                     {...pageProps}
                 />
             </div>

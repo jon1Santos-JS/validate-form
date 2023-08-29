@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Lodash } from '@/lib/lodashAdapter';
-import {
-    InputsHandledContext,
-    InputsHandlerContextType,
-} from '@/context/InputsHandlerContext';
+import React from 'react';
 
 interface InputHandlerPropsTypes<T extends string> {
     preInputs: PreFormInputsType<T>;
-    children: JSX.Element[] | JSX.Element;
+    renderChildren: (
+        handleInputsProps: HandleInputsPropsType<T>,
+    ) => JSX.Element[] | JSX.Element;
+    key: string;
 }
 
 const INPUTS_FIELDS_TO_OMIT_FROM_SERVER = ['required', 'validations', 'errors'];
 
 export default function InputsHandler<T extends string>({
     preInputs,
-    children,
+    renderChildren,
 }: InputHandlerPropsTypes<T>) {
     const [inputs, setInputs] = useState(onAddFormInputsFields(preInputs));
     const [handledInputs, setHandledInputs] = useState(
@@ -22,7 +22,7 @@ export default function InputsHandler<T extends string>({
     );
     const [showInputMessagesFromOutside, setShowInputMessages] =
         useState(false);
-    const contextData: InputsHandlerContextType<T> = {
+    const handleInputsProps: HandleInputsPropsType<T> = {
         showInputMessagesFromOutside,
         inputs,
         handledInputs,
@@ -34,11 +34,7 @@ export default function InputsHandler<T extends string>({
         setHandledInputs(onOmitFormInputsFields(inputs));
     }, [inputs]);
 
-    return (
-        <InputsHandledContext.Provider value={contextData}>
-            {children}
-        </InputsHandledContext.Provider>
-    );
+    return <>{renderChildren(handleInputsProps)}</>;
 
     function onChangeInput<R extends T, U>({
         objectifiedName,

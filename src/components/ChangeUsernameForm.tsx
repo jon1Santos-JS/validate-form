@@ -1,17 +1,19 @@
-import { InputsHandledContext } from '@/context/InputsHandlerContext';
 import Form from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
 
-type ChangePasswordFormPropsTypes = HandlerUserStateProps;
+type ChangePasswordFormPropsTypes = {
+    handleUserProps: HandleUserPropsType;
+    handleInputsProps: HandleInputsPropsType<'newUsername'>;
+};
 
 export default function ChangePasswordForm({
-    user,
-    setUser,
+    handleUserProps,
+    handleInputsProps,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
-    const { onChangeInput } = useContext(InputsHandledContext);
+    const { user, setUser } = handleUserProps;
+    const { onChangeInput } = handleInputsProps;
 
     return <>{renderContent()}</>;
 
@@ -22,12 +24,21 @@ export default function ChangePasswordForm({
             return null;
 
         return (
-            <Form legend="Change Username" onSubmitInputs={onSubmitInputs}>
+            <Form
+                props={{
+                    legend: 'Change Username',
+                    onSubmitInputs: onSubmitInputs,
+                }}
+                handleInputsProps={handleInputsProps}
+            >
                 <Input
-                    label="New Username"
-                    inputType="text"
-                    onChange={onChangeUsername}
-                    objectifiedName="newUsername"
+                    props={{
+                        label: 'New Username',
+                        inputType: 'text',
+                        onChange: onChangeUsername,
+                        objectifiedName: 'newUsername',
+                    }}
+                    handleInputsProps={handleInputsProps}
                 />
             </Form>
         );
@@ -38,12 +49,6 @@ export default function ChangePasswordForm({
             objectifiedName: 'newUsername',
             targetProp: 'value',
             value: e.target.value,
-        });
-
-        onChangeInput({
-            objectifiedName: 'newUsername',
-            targetProp: 'clientTop',
-            value: e.target.clientTop,
         });
     }
 

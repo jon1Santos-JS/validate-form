@@ -1,16 +1,20 @@
-import { InputsHandledContext } from '@/context/InputsHandlerContext';
 import Form from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
 
-type ChangePasswordFormPropsTypes = HandlerUserStateProps;
+type ChangePasswordFormPropsTypes = {
+    handleUserProps: HandleUserPropsType;
+    handleInputsProps: HandleInputsPropsType<ChangePasswordInputs>;
+};
+type ChangePasswordInputs = 'password' | 'newPassword' | 'confirmNewPassword';
 
 export default function ChangePasswordForm({
-    user,
+    handleUserProps,
+    handleInputsProps,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
-    const { onChangeInput } = useContext(InputsHandledContext);
+    const { user } = handleUserProps;
+    const { onChangeInput } = handleInputsProps;
 
     return <>{renderContent()}</>;
 
@@ -21,24 +25,39 @@ export default function ChangePasswordForm({
             return null;
 
         return (
-            <Form legend="Change Password" onSubmitInputs={onSubmitInputs}>
+            <Form
+                props={{
+                    legend: 'Change Password',
+                    onSubmitInputs: onSubmitInputs,
+                }}
+                handleInputsProps={handleInputsProps}
+            >
                 <Input
-                    label="Password"
-                    inputType="password"
-                    onChange={onchangePassword}
-                    objectifiedName="password"
+                    props={{
+                        label: 'Password',
+                        inputType: 'password',
+                        onChange: onchangePassword,
+                        objectifiedName: 'password',
+                    }}
+                    handleInputsProps={handleInputsProps}
                 />
                 <Input
-                    label="New Password"
-                    inputType="password"
-                    onChange={onchangeNewPassword}
-                    objectifiedName="newPassword"
+                    props={{
+                        label: 'New Password',
+                        inputType: 'password',
+                        onChange: onchangeNewPassword,
+                        objectifiedName: 'newPassword',
+                    }}
+                    handleInputsProps={handleInputsProps}
                 />
                 <Input
-                    label="Confirm New Password"
-                    inputType="password"
-                    onChange={onchangeConfirmNewPassword}
-                    objectifiedName="confirmNewPassword"
+                    props={{
+                        label: 'Confirm New Password',
+                        inputType: 'password',
+                        onChange: onchangeConfirmNewPassword,
+                        objectifiedName: 'confirmNewPassword',
+                    }}
+                    handleInputsProps={handleInputsProps}
                 />
             </Form>
         );
@@ -91,8 +110,6 @@ export default function ChangePasswordForm({
         router.reload();
     }
 }
-
-type ChangePasswordInputs = 'password' | 'newPassword' | 'confirmNewPassword';
 
 export const CHANGE_PASSWORD_FORM_INPUTS_STATE: PreFormInputsType<ChangePasswordInputs> =
     {
