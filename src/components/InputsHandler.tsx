@@ -7,7 +7,6 @@ interface InputHandlerPropsTypes<T extends string> {
     renderChildren: (
         handleInputsProps: HandleInputsPropsType<T>,
     ) => JSX.Element[] | JSX.Element;
-    key: string;
 }
 
 const INPUTS_FIELDS_TO_OMIT_FROM_SERVER = ['required', 'validations', 'errors'];
