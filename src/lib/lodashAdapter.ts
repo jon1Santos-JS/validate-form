@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import { omit, deburr } from 'lodash';
 
 class LodashAdapter {
     onOmitFields<T extends object, U>(inputs: T, ...fieldsToOmit: string[][]) {
@@ -14,6 +14,11 @@ class LodashAdapter {
             }
         }
         return handled as U;
+    }
+
+    onConverToBasicLatinLetters(word: string) {
+        const handledWord = deburr(word);
+        return handledWord;
     }
 }
 

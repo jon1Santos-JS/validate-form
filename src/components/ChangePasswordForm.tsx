@@ -20,7 +20,8 @@ export default function ChangePasswordForm({
 
     function renderContent() {
         if (
-            user.username === (process.env.NEXT_PUBLIC_ADMIN_USERNAME as string)
+            user.username ===
+            (process.env.NEXT_PUBLIC_ADMINS_USERNAME as string)
         )
             return null;
 

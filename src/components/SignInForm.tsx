@@ -23,7 +23,7 @@ export default function SignInForm({
                     ownProps={{
                         legend: 'SignIn',
                         onSubmitInputs: onSubmitInputs,
-                        formDefaultError: SIGN_IN_ERROR_RESPONSE,
+                        formError: SIGN_IN_ERROR_RESPONSE,
                         formSubmitError: SIGN_IN_ERROR_RESPONSE,
                     }}
                     handleInputsProps={handleInputsProps}

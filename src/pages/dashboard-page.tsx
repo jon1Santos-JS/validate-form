@@ -27,7 +27,7 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
             router.push('/');
             return null;
         }
-        const message = `welcome to dashboard page ${user.username}, and thank you to test our validate hook`;
+        const message = `welcome to dashboard page ${user.username}, and thank you to use the validate hook`;
 
         return (
             <div className="o-dashboard-page">

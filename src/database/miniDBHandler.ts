@@ -23,7 +23,7 @@ export default class MiniDBHandler {
         getUsers: async (caller: string) => {
             const response = await this.#accessDB();
             if (response) return SERVER_ERROR_RESPONSE;
-            console.log('Users have been got by: ', caller);
+            console.log('Users have been gotten by: ', caller);
             return DATABASE.state.accounts;
         },
         createAndRefreshDB: async (caller: string) => {

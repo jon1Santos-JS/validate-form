@@ -39,8 +39,8 @@ export default function InputsHandler<
 
     const handleInputsProps: HandleInputsPropsType<T> = {
         showInputMessagesFromOutside,
-        inputs, // INPUTS TO VALIDATE (WITH ERRORS, VALUE AND VALIDATION FIELDS)
-        handledInputs, // INPUTS TO MANIPULATE OR SUBMIT(JUST WITH TARGET FIELDS)
+        inputs, // INPUTS TO VALIDATE (WITH VALIDATION FIELDS: ERRORS, VALUE AND VALIDATION)
+        handledInputs, // INPUTS TO MANIPULATE OR SUBMIT(JUST WITH TARGET FIELDS: VALUE, FILE, ETC...)
         onChangeInput,
         setShowInputsMessage,
     };

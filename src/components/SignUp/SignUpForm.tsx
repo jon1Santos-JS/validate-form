@@ -85,7 +85,7 @@ export default function SignUpForm({
         const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         if (parsedResponse.serverResponse) {
-            // window.location.assign('/'); // USING ASSIGN JUST FOR THE SIMULATION
+            window.location.assign('/'); // USING ASSIGN JUST FOR THE SIMULATION
             return;
         }
         setResponse(true);

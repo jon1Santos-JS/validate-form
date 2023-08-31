@@ -1,7 +1,7 @@
 import useValidate from '@/hooks/useValidate';
 import React, { useEffect, useState } from 'react';
 
-const FORM_ERROR = 'Invalid form';
+const FORM_DEFAULT_ERROR = 'Invalid form';
 
 interface FormPropsTypes<T extends string> {
     ownProps: PropsType<T>;
@@ -14,7 +14,7 @@ interface PropsType<T extends string> {
         handledInputs: R,
     ) => Promise<string | undefined | void>;
     legend?: string;
-    formDefaultError?: string;
+    formError?: string;
     formSubmitError?: string;
 }
 
@@ -23,13 +23,12 @@ export default function FormFormProps<T extends string>({
     handleInputsProps,
     children,
 }: FormPropsTypes<T>) {
-    const { onSubmitInputs, legend, formDefaultError, formSubmitError } =
-        ownProps;
+    const { onSubmitInputs, legend, formError, formSubmitError } = ownProps;
     const { inputs, handledInputs, setShowInputsMessage } = handleInputsProps;
     const { validateAllInputs } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(
-        formDefaultError ? formDefaultError : FORM_ERROR,
+        formError ? formError : FORM_DEFAULT_ERROR,
     );
 
     useEffect(() => {
@@ -87,7 +86,9 @@ export default function FormFormProps<T extends string>({
             if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
             const response = await onSubmitInputs(handledInputs);
             if (typeof response === 'string') {
-                setMessage(formSubmitError ? formSubmitError : FORM_ERROR); // TO SET SUBMIT ERROR
+                setMessage(
+                    formSubmitError ? formSubmitError : FORM_DEFAULT_ERROR,
+                ); // TO SET SUBMIT ERROR
                 setShowMessage(true);
                 return;
             }

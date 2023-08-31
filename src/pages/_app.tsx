@@ -8,6 +8,14 @@ export default function App({ Component, pageProps }: AppProps) {
     const [user, setUser] = useState<UserType>({ username: '' });
     const [hasUser, setHasUser] = useState(false);
     const [userStateLoading, setUserStateLoading] = useState(true);
+    const userProps = {
+        hasUser: () => hasUser,
+        setHasUser: onUpdateHasUser,
+        user: user,
+        setUser: onUpdateUser,
+        isUserStateLoading: userStateLoading,
+        setUserStateLoading: onUpdateState,
+    };
 
     const onCheckUserState = useCallback(async () => {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
@@ -38,27 +46,8 @@ export default function App({ Component, pageProps }: AppProps) {
                 <Head>
                     <link rel="icon" href="data:,"></link>
                 </Head>
-                <MainNavigationBar
-                    handleUserProps={{
-                        hasUser: () => hasUser,
-                        setHasUser: onUpdateHasUser,
-                        user: user,
-                        setUser: onUpdateUser,
-                        isUserStateLoading: userStateLoading,
-                        setUserStateLoading: onUpdateState,
-                    }}
-                />
-                <Component
-                    handleUserProps={{
-                        hasUser: () => hasUser,
-                        setHasUser: onUpdateHasUser,
-                        user: user,
-                        setUser: onUpdateUser,
-                        isUserStateLoading: userStateLoading,
-                        setUserStateLoading: onUpdateState,
-                    }}
-                    {...pageProps}
-                />
+                <MainNavigationBar handleUserProps={userProps} />
+                <Component handleUserProps={userProps} {...pageProps} />
             </div>
         </>
     );

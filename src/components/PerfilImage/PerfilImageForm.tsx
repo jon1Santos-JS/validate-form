@@ -25,7 +25,7 @@ export default function PerfilImageForm({
             <Form
                 ownProps={{
                     onSubmitInputs: onSubmitInputs,
-                    formDefaultError: DEFAULT_ERROR_MESSAGE,
+                    formError: DEFAULT_ERROR_MESSAGE,
                 }}
                 handleInputsProps={handleInputsProps}
             >
