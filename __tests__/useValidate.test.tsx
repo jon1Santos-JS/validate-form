@@ -3,14 +3,16 @@ import '@testing-library/jest-dom';
 import { useEffect } from 'react';
 import { act, render } from '@testing-library/react';
 
-interface CustomComponentWrapperPropsType {
-    inputs?: FormInputsType;
-    fieldName?: string;
+interface CustomComponentWrapperPropsType<T extends string> {
+    inputs?: FormInputsType<T>;
+    fieldName?: T;
     setIsolatedResult?: (newValue: string[]) => void;
     setResult?: (newValue: boolean) => void;
 }
 
-const inputs: FormInputsType = {
+type InputsType = 'username' | 'password' | 'confirmPassword';
+
+const inputs: FormInputsType<InputsType> = {
     username: {
         validations: (currentInputValue: string) => [
             {
@@ -92,12 +94,12 @@ test('testing validateAllInputs function from the useValidate hook', async () =>
     expect(result).toBe(false);
 });
 
-const CustomComponentWrapper = ({
+function CustomComponentWrapper<T extends string>({
     inputs,
     fieldName,
     setResult,
     setIsolatedResult,
-}: CustomComponentWrapperPropsType) => {
+}: CustomComponentWrapperPropsType<T>) {
     const { validateAllInputs, preValidate } = useValidate();
 
     useEffect(() => {
@@ -114,4 +116,4 @@ const CustomComponentWrapper = ({
     ]);
 
     return null;
-};
+}

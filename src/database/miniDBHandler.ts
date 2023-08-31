@@ -8,16 +8,22 @@ import {
 
 export default class MiniDBHandler {
     #StateFunctions = {
-        checkDBState: () => {
-            if (DATABASE.state.accounts.length > DATABASE.state.limit) {
-                console.log('database limit account reached');
+        checkDBState: async (caller: string) => {
+            const response = await this.#accessDB();
+            if (response) return SERVER_ERROR_RESPONSE;
+            if (DATABASE.state.accounts.length >= DATABASE.state.limit) {
+                console.log(
+                    'database limit account reached, to attempted create a new account by: ',
+                    caller,
+                );
                 return SERVER_ERROR_RESPONSE;
             }
             return;
         },
-        getUsers: async () => {
+        getUsers: async (caller: string) => {
             const response = await this.#accessDB();
             if (response) return SERVER_ERROR_RESPONSE;
+            console.log('Users have been got by: ', caller);
             return DATABASE.state.accounts;
         },
         createAndRefreshDB: async (caller: string) => {
@@ -36,11 +42,10 @@ export default class MiniDBHandler {
     async init() {
         const response = await this.#accessDB();
         if (response) return SERVER_ERROR_RESPONSE;
-        if (this.#StateFunctions.checkDBState()) return SERVER_ERROR_RESPONSE;
         return;
     }
 
-    async handleDB<T extends HandleDBCommandTypes>(command: T) {
+    handleDB<T extends HandleDBCommandTypes>(command: T) {
         return this.#StateFunctions[command];
     }
 

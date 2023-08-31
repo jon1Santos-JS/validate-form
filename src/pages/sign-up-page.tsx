@@ -23,14 +23,15 @@ export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
         return (
             <div className="o-sign-up-page">
                 <InputsHandler
-                    renderChildren={(handleInputsProps) => (
-                        <SignUpContent
-                            handleInputsProps={handleInputsProps}
-                            handleUserProps={handleUserProps}
-                            key={'SignUpContent'}
-                        />
-                    )}
-                    preInputs={SIGN_UP_FORM_INPUTS_STATE}
+                    ownProps={{
+                        preInputs: SIGN_UP_FORM_INPUTS_STATE,
+                        renderChildren: (handleInputsProps) => (
+                            <SignUpContent
+                                handleInputsProps={handleInputsProps}
+                                handleUserProps={handleUserProps}
+                            />
+                        ),
+                    }}
                 />
             </div>
         );

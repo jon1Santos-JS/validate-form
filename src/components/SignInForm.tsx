@@ -20,7 +20,7 @@ export default function SignInForm({
         <div className="o-sign-in-form">
             <div className="c-container">
                 <Form
-                    props={{
+                    ownProps={{
                         legend: 'SignIn',
                         onSubmitInputs: onSubmitInputs,
                         formDefaultError: SIGN_IN_ERROR_RESPONSE,
@@ -29,20 +29,20 @@ export default function SignInForm({
                     handleInputsProps={handleInputsProps}
                 >
                     <Input
-                        props={{
+                        ownProps={{
                             label: 'Username',
                             inputType: 'text',
                             objectifiedName: 'username',
-                            onChange: onchangeUsername,
+                            onChange: (e) => onChange(e, 'username'),
                         }}
                         handleInputsProps={handleInputsProps}
                     />
                     <Input
-                        props={{
+                        ownProps={{
                             label: 'Password',
                             inputType: 'password',
                             objectifiedName: 'password',
-                            onChange: onchangePassword,
+                            onChange: (e) => onChange(e, 'password'),
                         }}
                         handleInputsProps={handleInputsProps}
                     />
@@ -51,26 +51,19 @@ export default function SignInForm({
         </div>
     );
 
-    function onchangeUsername(e: React.ChangeEvent<HTMLInputElement>) {
+    function onChange(
+        e: React.ChangeEvent<HTMLInputElement>,
+        name: SignInInputs,
+    ) {
         onChangeInput({
-            objectifiedName: 'username',
-            targetProp: 'value',
-            value: e.target.value,
-        });
-    }
-
-    function onchangePassword(e: React.ChangeEvent<HTMLInputElement>) {
-        onChangeInput({
-            objectifiedName: 'password',
+            objectifiedName: name,
             targetProp: 'value',
             value: e.target.value,
         });
     }
 
     async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<
-            keyof typeof SIGN_IN_FORM_STATE_INPUTS
-        >,
+        handledInputs: FormHandledInputsType<SignInInputs>,
     ) {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {

@@ -4,7 +4,9 @@ import MiniDBHandler from '@/database/miniDBHandler';
 
 export async function getUserStateController() {
     const jsonDB = new MiniDBHandler();
-    const response = await (await jsonDB.handleDB('getUsers'))();
+    const response = await jsonDB.handleDB('getUsers')(
+        'getUsersState controller',
+    );
     if (typeof response === 'string') {
         console.log('controller error to get users: ', response);
         return { serverResponse: false, body: SERVER_ERROR_RESPONSE };

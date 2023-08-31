@@ -4,8 +4,10 @@ import { useRouter } from 'next/router';
 
 type ChangePasswordFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
-    handleInputsProps: HandleInputsPropsType<'newUsername'>;
+    handleInputsProps: HandleInputsPropsType<ChangeUsernameInputs>;
 };
+
+type ChangeUsernameInputs = 'newUsername';
 
 export default function ChangePasswordForm({
     handleUserProps,
@@ -25,18 +27,18 @@ export default function ChangePasswordForm({
 
         return (
             <Form
-                props={{
+                ownProps={{
                     legend: 'Change Username',
                     onSubmitInputs: onSubmitInputs,
                 }}
                 handleInputsProps={handleInputsProps}
             >
                 <Input
-                    props={{
+                    ownProps={{
                         label: 'New Username',
                         inputType: 'text',
-                        onChange: onChangeUsername,
                         objectifiedName: 'newUsername',
+                        onChange: (e) => onChange(e, 'newUsername'),
                     }}
                     handleInputsProps={handleInputsProps}
                 />
@@ -44,18 +46,19 @@ export default function ChangePasswordForm({
         );
     }
 
-    function onChangeUsername(e: React.ChangeEvent<HTMLInputElement>) {
+    function onChange(
+        e: React.ChangeEvent<HTMLInputElement>,
+        name: ChangeUsernameInputs,
+    ) {
         onChangeInput({
-            objectifiedName: 'newUsername',
+            objectifiedName: name,
             targetProp: 'value',
             value: e.target.value,
         });
     }
 
     async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<
-            keyof typeof CHANGE_USERNAME_FORM_INPUTS_STATE
-        >,
+        handledInputs: FormHandledInputsType<ChangeUsernameInputs>,
     ) {
         const action = process.env.NEXT_PUBLIC_CHANGE_USERNAME_LINK as string;
         const handledBody = {
@@ -79,7 +82,7 @@ export default function ChangePasswordForm({
     }
 }
 
-export const CHANGE_USERNAME_FORM_INPUTS_STATE: PreFormInputsType<'newUsername'> =
+export const CHANGE_USERNAME_FORM_INPUTS_STATE: PreFormInputsType<ChangeUsernameInputs> =
     {
         newUsername: {
             validations: (currentInputValue) => [

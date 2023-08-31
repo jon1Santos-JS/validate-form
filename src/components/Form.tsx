@@ -3,27 +3,28 @@ import React, { useEffect, useState } from 'react';
 
 const FORM_ERROR = 'Invalid form';
 
-interface FormPropsTypes {
-    props: PropsType;
-    handleInputsProps: HandleInputsPropsType<string>;
+interface FormPropsTypes<T extends string> {
+    ownProps: PropsType<T>;
+    handleInputsProps: HandleInputsPropsType<T>;
     children: JSX.Element[] | JSX.Element;
 }
 
-interface PropsType {
-    onSubmitInputs: <T extends FormHandledInputsType<string>>(
-        handledInputs: T,
+interface PropsType<T extends string> {
+    onSubmitInputs: <R extends FormHandledInputsType<T>>(
+        handledInputs: R,
     ) => Promise<string | undefined | void>;
     legend?: string;
     formDefaultError?: string;
     formSubmitError?: string;
 }
 
-export default function FormFormProps({
-    props,
+export default function FormFormProps<T extends string>({
+    ownProps,
     handleInputsProps,
     children,
-}: FormPropsTypes) {
-    const { onSubmitInputs, legend, formDefaultError, formSubmitError } = props;
+}: FormPropsTypes<T>) {
+    const { onSubmitInputs, legend, formDefaultError, formSubmitError } =
+        ownProps;
     const { inputs, handledInputs, setShowInputsMessage } = handleInputsProps;
     const { validateAllInputs } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
@@ -67,7 +68,7 @@ export default function FormFormProps({
         const inputsElements = children as JSX.Element[];
         if (inputsElements?.length > 1) {
             return inputsElements.map((child) => (
-                <div key={child.props.label}>{child}</div>
+                <div key={child.props.ownProps.label}>{child}</div>
             ));
         }
         return children;

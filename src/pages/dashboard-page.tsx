@@ -34,35 +34,38 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
                 <div>{message}</div>
                 <div>
                     <InputsHandler
-                        preInputs={PERFIL_IMAGE_FORM_INPUTS_STATE}
-                        renderChildren={(handleInputsProps) => (
-                            <PerfilImageForm
-                                handleUserProps={handleUserProps}
-                                handleInputsProps={handleInputsProps}
-                                key={'PerfilImageForm'}
-                            />
-                        )}
+                        ownProps={{
+                            preInputs: PERFIL_IMAGE_FORM_INPUTS_STATE,
+                            renderChildren: (handleInputsProps) => (
+                                <PerfilImageForm
+                                    handleUserProps={handleUserProps}
+                                    handleInputsProps={handleInputsProps}
+                                />
+                            ),
+                        }}
                     />
                     <PerfilImage handleUserProps={handleUserProps} />
                     <InputsHandler
-                        preInputs={CHANGE_PASSWORD_FORM_INPUTS_STATE}
-                        renderChildren={(handleInputsProps) => (
-                            <ChangePasswordForm
-                                handleUserProps={handleUserProps}
-                                handleInputsProps={handleInputsProps}
-                                key={'ChangePasswordForm'}
-                            />
-                        )}
+                        ownProps={{
+                            preInputs: CHANGE_PASSWORD_FORM_INPUTS_STATE,
+                            renderChildren: (handleInputsProps) => (
+                                <ChangePasswordForm
+                                    handleUserProps={handleUserProps}
+                                    handleInputsProps={handleInputsProps}
+                                />
+                            ),
+                        }}
                     />
                     <InputsHandler
-                        preInputs={CHANGE_USERNAME_FORM_INPUTS_STATE}
-                        renderChildren={(handleInputsProps) => (
-                            <ChangeUsernameForm
-                                handleUserProps={handleUserProps}
-                                handleInputsProps={handleInputsProps}
-                                key={'ChangeUsernameForm'}
-                            />
-                        )}
+                        ownProps={{
+                            preInputs: CHANGE_USERNAME_FORM_INPUTS_STATE,
+                            renderChildren: (handleInputsProps) => (
+                                <ChangeUsernameForm
+                                    handleUserProps={handleUserProps}
+                                    handleInputsProps={handleInputsProps}
+                                />
+                            ),
+                        }}
                     />
                 </div>
             </div>

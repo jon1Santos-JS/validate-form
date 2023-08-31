@@ -35,8 +35,6 @@ declare type FileType = FileList | undefined | null;
 
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
 
-declare type TargetPropsType = 'value' | 'files' | 'accessKey';
-
 declare type FormHandledInputsType<T extends string> = {
     [key in T]: FormHandledInputsPropsType;
 };
@@ -49,14 +47,18 @@ declare type HandleInputsPropsType<T extends string> = {
     showInputMessagesFromOutside: boolean;
     inputs: FormInputsType<T>;
     handledInputs: FormHandledInputsType<T>;
-    onChangeInput: <R extends T, U>({
+    onChangeInput: <O extends T, V>({
         objectifiedName,
         targetProp,
         value,
-    }: {
-        objectifiedName: R;
-        targetProp: TargetPropsType;
-        value: U;
-    }) => void;
+    }: ChangeInputsTypes<O, V>) => void;
     setShowInputsMessage: (value: boolean) => void;
 };
+
+declare interface ChangeInputsTypes<O extends T, V> {
+    objectifiedName: O;
+    targetProp: TargetPropsType;
+    value: V;
+}
+
+declare type TargetPropsType = 'value' | 'files';

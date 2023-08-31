@@ -23,14 +23,14 @@ export default function PerfilImageForm({
         <>
             <h4>Upload image</h4>
             <Form
-                props={{
+                ownProps={{
                     onSubmitInputs: onSubmitInputs,
                     formDefaultError: DEFAULT_ERROR_MESSAGE,
                 }}
                 handleInputsProps={handleInputsProps}
             >
                 <Input
-                    props={{
+                    ownProps={{
                         label: 'image',
                         inputType: 'file',
                         inputName: 'image',
@@ -58,9 +58,7 @@ export default function PerfilImageForm({
         });
     }
     async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<
-            keyof typeof PERFIL_IMAGE_FORM_INPUTS_STATE
-        >,
+        handledInputs: FormHandledInputsType<PerfilFormInputs>,
     ) {
         const file = handledInputs.imageInput.files[0];
         const fileName = handledName(handledInputs.imageInput.files[0].name);

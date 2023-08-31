@@ -26,36 +26,36 @@ export default function ChangePasswordForm({
 
         return (
             <Form
-                props={{
+                ownProps={{
                     legend: 'Change Password',
                     onSubmitInputs: onSubmitInputs,
                 }}
                 handleInputsProps={handleInputsProps}
             >
                 <Input
-                    props={{
+                    ownProps={{
                         label: 'Password',
                         inputType: 'password',
-                        onChange: onchangePassword,
                         objectifiedName: 'password',
+                        onChange: (e) => onChange(e, 'password'),
                     }}
                     handleInputsProps={handleInputsProps}
                 />
                 <Input
-                    props={{
+                    ownProps={{
                         label: 'New Password',
                         inputType: 'password',
-                        onChange: onchangeNewPassword,
                         objectifiedName: 'newPassword',
+                        onChange: (e) => onChange(e, 'newPassword'),
                     }}
                     handleInputsProps={handleInputsProps}
                 />
                 <Input
-                    props={{
+                    ownProps={{
                         label: 'Confirm New Password',
                         inputType: 'password',
-                        onChange: onchangeConfirmNewPassword,
                         objectifiedName: 'confirmNewPassword',
+                        onChange: (e) => onChange(e, 'confirmNewPassword'),
                     }}
                     handleInputsProps={handleInputsProps}
                 />
@@ -63,36 +63,19 @@ export default function ChangePasswordForm({
         );
     }
 
-    function onchangePassword(e: React.ChangeEvent<HTMLInputElement>) {
-        onChangeInput({
-            objectifiedName: 'password',
-            targetProp: 'value',
-            value: e.target.value,
-        });
-    }
-
-    function onchangeNewPassword(e: React.ChangeEvent<HTMLInputElement>) {
-        onChangeInput({
-            objectifiedName: 'newPassword',
-            targetProp: 'value',
-            value: e.target.value,
-        });
-    }
-
-    function onchangeConfirmNewPassword(
+    function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
+        name: ChangePasswordInputs,
     ) {
         onChangeInput({
-            objectifiedName: 'confirmNewPassword',
+            objectifiedName: name,
             targetProp: 'value',
             value: e.target.value,
         });
     }
 
     async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<
-            keyof typeof CHANGE_PASSWORD_FORM_INPUTS_STATE
-        >,
+        handledInputs: FormHandledInputsType<ChangePasswordInputs>,
     ) {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
         const handledBody = {

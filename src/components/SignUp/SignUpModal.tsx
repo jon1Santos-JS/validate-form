@@ -44,7 +44,8 @@ export default function SignUpModal({
 
 const MODAL_TEXT = {
     warningTittle: 'Failed to sign up account',
-    warning: 'Account already exist or you are not in "localhost" server.',
+    warning:
+        'Account already exist / You are not in "localhost" server / The limit to create account reached.',
     advise: 'You can access the app using the admin\'s account: [ username: admin1 / password: admin1 ] or execute the app in "localhost".',
     stepsTittle:
         'To execute this application in "localhost", you can clone this project, It\'s just follow the steps below:',

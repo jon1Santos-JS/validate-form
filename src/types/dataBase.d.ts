@@ -40,4 +40,7 @@ declare interface UserWithImgType {
     userImg: string;
 }
 
-declare type HandleDBCommandTypes = 'createAndRefreshDB' | 'getUsers';
+declare type HandleDBCommandTypes =
+    | 'createAndRefreshDB'
+    | 'getUsers'
+    | 'checkDBState';

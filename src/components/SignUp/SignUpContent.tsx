@@ -15,7 +15,7 @@ export default function SignUpContent({
     return (
         <>
             <SignUpForm
-                props={{
+                ownProps={{
                     setResponse: (data: boolean) => setSignUpResponse(data),
                 }}
                 handleInputsProps={handleInputsProps}

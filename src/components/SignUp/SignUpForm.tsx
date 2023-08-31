@@ -2,7 +2,7 @@ import Form from '../Form';
 import Input from '../Input';
 
 interface SignUpFormPropsType {
-    props: PropsType;
+    ownProps: PropsType;
     handleUserProps: HandleUserPropsType;
     handleInputsProps: HandleInputsPropsType<SignUpInputs>;
 }
@@ -13,43 +13,46 @@ interface PropsType {
 }
 
 export default function SignUpForm({
-    props,
+    ownProps,
     handleInputsProps,
 }: SignUpFormPropsType) {
     const { onChangeInput } = handleInputsProps;
-    const { setResponse } = props;
+    const { setResponse } = ownProps;
 
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
                 <Form
-                    props={{ legend: 'SignUp', onSubmitInputs: onSubmitInputs }}
+                    ownProps={{
+                        legend: 'SignUp',
+                        onSubmitInputs: onSubmitInputs,
+                    }}
                     handleInputsProps={handleInputsProps}
                 >
                     <Input
-                        props={{
+                        ownProps={{
                             label: 'Username',
                             inputType: 'text',
-                            onChange: onchangeUsername,
                             objectifiedName: 'username',
+                            onChange: (e) => onChange(e, 'username'),
                         }}
                         handleInputsProps={handleInputsProps}
                     />
                     <Input
-                        props={{
+                        ownProps={{
                             label: 'Password',
                             inputType: 'password',
-                            onChange: onchangePassword,
                             objectifiedName: 'password',
+                            onChange: (e) => onChange(e, 'password'),
                         }}
                         handleInputsProps={handleInputsProps}
                     />
                     <Input
-                        props={{
+                        ownProps={{
                             label: 'Confirm Password',
                             inputType: 'password',
-                            onChange: onchangeConfirmPassword,
                             objectifiedName: 'confirmPassword',
+                            onChange: (e) => onChange(e, 'confirmPassword'),
                         }}
                         handleInputsProps={handleInputsProps}
                     />
@@ -58,34 +61,19 @@ export default function SignUpForm({
         </div>
     );
 
-    function onchangeUsername(e: React.ChangeEvent<HTMLInputElement>) {
+    function onChange(
+        e: React.ChangeEvent<HTMLInputElement>,
+        name: SignUpInputs,
+    ) {
         onChangeInput({
-            objectifiedName: 'username',
-            targetProp: 'value',
-            value: e.target.value,
-        });
-    }
-
-    function onchangePassword(e: React.ChangeEvent<HTMLInputElement>) {
-        onChangeInput({
-            objectifiedName: 'password',
-            targetProp: 'value',
-            value: e.target.value,
-        });
-    }
-
-    function onchangeConfirmPassword(e: React.ChangeEvent<HTMLInputElement>) {
-        onChangeInput({
-            objectifiedName: 'confirmPassword',
+            objectifiedName: name,
             targetProp: 'value',
             value: e.target.value,
         });
     }
 
     async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<
-            keyof typeof SIGN_UP_FORM_INPUTS_STATE
-        >,
+        handledInputs: FormHandledInputsType<SignUpInputs>,
     ) {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const options = {
@@ -97,7 +85,7 @@ export default function SignUpForm({
         const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         if (parsedResponse.serverResponse) {
-            window.location.assign('/'); // USING ASSIGN JUST FOR THE SIMULATION
+            // window.location.assign('/'); // USING ASSIGN JUST FOR THE SIMULATION
             return;
         }
         setResponse(true);
@@ -112,7 +100,7 @@ export const SIGN_UP_FORM_INPUTS_STATE: PreFormInputsType<SignUpInputs> = {
                 message: 'Username must has 6 characters at least',
             },
             {
-                coditional: !currentInputValue.match(/^[A-Za-z]+$/),
+                coditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
                 message: 'Only characters',
             },
         ],

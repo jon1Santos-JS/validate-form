@@ -21,14 +21,15 @@ export default function SignInPage({ handleUserProps }: SignInPageProps) {
         return (
             <div>
                 <InputsHandler
-                    preInputs={SIGN_IN_FORM_STATE_INPUTS}
-                    renderChildren={(handleInputsProps) => (
-                        <SignInForm
-                            handleInputsProps={handleInputsProps}
-                            handleUserProps={handleUserProps}
-                            key={'SignInForm'}
-                        />
-                    )}
+                    ownProps={{
+                        preInputs: SIGN_IN_FORM_STATE_INPUTS,
+                        renderChildren: (handleInputsProps) => (
+                            <SignInForm
+                                handleInputsProps={handleInputsProps}
+                                handleUserProps={handleUserProps}
+                            />
+                        ),
+                    }}
                 />
             </div>
         );

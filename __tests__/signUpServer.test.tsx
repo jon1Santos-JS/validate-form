@@ -1,30 +1,22 @@
-import { MiniDBAccountHandler } from '@/database/accountHandler';
+import MiniDBAccountHandler from '@/database/accountHandler';
 
-const AMOUNT_OF_ACCOUNTS = 6;
+const AMOUNT_OF_ACCOUNTS = 9;
 
 test('check signUp function', async () => {
-    const DBAccountHandler = new MiniDBAccountHandler();
-
-    try {
-        for (let i = 1; i <= AMOUNT_OF_ACCOUNTS; i++) {
-            const account = {
-                username: { value: randomString() },
-                password: { value: randomString() },
-            };
-            await expect(DBAccountHandler.signUp(account)).resolves.toBe(
-                'account has been created',
-            );
-        }
-    } catch {
-        const account = {
-            username: { value: randomString() },
-            password: { value: randomString() },
-        };
-        await expect(DBAccountHandler.signUp(account)).resolves.toBe(
-            'internal server error',
-        );
-    }
+    await testLoop(AMOUNT_OF_ACCOUNTS);
 });
+
+async function testLoop(limit: number) {
+    const DBAccountHandler = new MiniDBAccountHandler();
+    const account = {
+        username: { value: randomString() },
+        password: { value: randomString() },
+    };
+    await expect(DBAccountHandler.signUp(account)).resolves.toBe(undefined);
+    limit--;
+    if (limit === 0) return;
+    testLoop(limit);
+}
 
 function randomCharacter(min: number, max: number) {
     const code = Math.floor(Math.random() * (max - min) + min);
