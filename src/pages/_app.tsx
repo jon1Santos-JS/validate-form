@@ -5,17 +5,14 @@ import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const [user, setUser] = useState<UserType>({ username: '' });
-    const [hasUser, setHasUser] = useState(false);
-    const [userStateLoading, setUserStateLoading] = useState(true);
-    const userProps = {
-        hasUser: () => hasUser,
+    const [userProps, setUserProps] = useState({
+        user: { username: '' } as UserType,
+        hasUser: false,
+        isUserStateLoading: true,
         setHasUser: onUpdateHasUser,
-        user: user,
         setUser: onUpdateUser,
-        isUserStateLoading: userStateLoading,
         setUserStateLoading: onUpdateState,
-    };
+    });
 
     const onCheckUserState = useCallback(async () => {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
@@ -23,13 +20,19 @@ export default function App({ Component, pageProps }: AppProps) {
             method: 'GET',
         });
         const parsedResponse: ServerResponse = await response.json();
-        setHasUser(parsedResponse.serverResponse);
-        setUserStateLoading(false);
+        setUserProps((prev) => ({
+            ...prev,
+            hasUser: parsedResponse.serverResponse,
+            isUserStateLoading: false,
+        }));
         if (
             parsedResponse.serverResponse &&
             typeof parsedResponse.body !== 'string'
         ) {
-            setUser(parsedResponse.body);
+            setUserProps((prev) => ({
+                ...prev,
+                user: parsedResponse.body as UserType,
+            }));
             return;
         }
     }, []);
@@ -52,15 +55,27 @@ export default function App({ Component, pageProps }: AppProps) {
         </>
     );
 
-    function onUpdateUser({ username, userImage = user.userImage }: UserType) {
-        setUser({ username, userImage });
+    function onUpdateUser({
+        username,
+        userImage = userProps.user.userImage,
+    }: UserType) {
+        setUserProps((prev) => ({
+            ...prev,
+            user: { username, userImage },
+        }));
     }
 
     function onUpdateHasUser(value: boolean) {
-        setHasUser(value);
+        setUserProps((prev) => ({
+            ...prev,
+            hasUser: value,
+        }));
     }
 
     function onUpdateState(value: boolean) {
-        setUserStateLoading(value);
+        setUserProps((prev) => ({
+            ...prev,
+            isUserStateLoading: value,
+        }));
     }
 }

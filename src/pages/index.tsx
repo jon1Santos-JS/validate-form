@@ -13,7 +13,7 @@ export default function SignInPage({ handleUserProps }: SignInPageProps) {
 
     function renderContent() {
         if (isUserStateLoading) return null;
-        if (!isUserStateLoading && hasUser()) {
+        if (!isUserStateLoading && hasUser) {
             router.push('/dashboard-page');
             return null;
         }

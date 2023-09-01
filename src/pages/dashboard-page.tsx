@@ -23,7 +23,7 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
 
     function renderElement() {
         if (isUserStateLoading) return null;
-        if (!isUserStateLoading && !hasUser()) {
+        if (!isUserStateLoading && !hasUser) {
             router.push('/');
             return null;
         }

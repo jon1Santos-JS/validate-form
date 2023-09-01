@@ -15,7 +15,7 @@ export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
 
     function renderContent() {
         if (isUserStateLoading) return null;
-        if (!isUserStateLoading && hasUser()) {
+        if (!isUserStateLoading && hasUser) {
             router.push('/');
             return null;
         }

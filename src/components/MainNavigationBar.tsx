@@ -17,9 +17,9 @@ export default function MainNavigationBar({
         return (
             <div className="o-navigation-bar">
                 <div className="navigation-container">
-                    {!hasUser() && <Link href="/">Sign In</Link>}
-                    {!hasUser() && <Link href="/sign-up-page">Sign up</Link>}
-                    {hasUser() && (
+                    {!hasUser && <Link href="/">Sign In</Link>}
+                    {!hasUser && <Link href="/sign-up-page">Sign up</Link>}
+                    {hasUser && (
                         <div
                             className="c-button sign-out"
                             onClick={signOutUser}

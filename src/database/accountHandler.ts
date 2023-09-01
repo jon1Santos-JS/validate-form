@@ -53,7 +53,11 @@ export default class MiniDBAccountHandler {
         if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
         const hasUsername = this.#authUsername(user.newUsername.value);
         const currentUserAccount = this.#authUsername(user.username.value);
-        if (hasUsername || !currentUserAccount) return SERVER_ERROR_RESPONSE;
+        if (hasUsername) return SERVER_ERROR_RESPONSE;
+        if (!currentUserAccount) {
+            console.log('error to get the user account by: updateUsername');
+            return SERVER_ERROR_RESPONSE;
+        }
         const response = await this.#changeUsername(user);
         const newUserAccount = {
             username: { value: user.newUsername.value },

@@ -24,7 +24,6 @@ export default function SignInForm({
                         legend: 'SignIn',
                         onSubmitInputs: onSubmitInputs,
                         formError: SIGN_IN_ERROR_RESPONSE,
-                        formSubmitError: SIGN_IN_ERROR_RESPONSE,
                     }}
                     handleInputsProps={handleInputsProps}
                 >

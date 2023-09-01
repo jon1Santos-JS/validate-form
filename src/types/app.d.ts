@@ -1,15 +1,13 @@
-declare type HasUserType = () => boolean | string;
-
 declare type SetUserType = (user: UserType) => void;
 
 declare type IsUserStateLoadingType = () => boolean | undefined;
 
 declare interface HandleUserPropsType {
-    hasUser: HasUserType;
-    setHasUser: (value: boolean) => void;
     user: UserType;
-    setUser: SetUserType;
+    hasUser: boolean;
     isUserStateLoading: boolean;
+    setHasUser: (value: boolean) => void;
+    setUser: SetUserType;
     setUserStateLoading: (value: boolean) => void;
 }
 

@@ -15,7 +15,6 @@ interface PropsType<T extends string> {
     ) => Promise<string | undefined | void>;
     legend?: string;
     formError?: string;
-    formSubmitError?: string;
 }
 
 export default function FormFormProps<T extends string>({
@@ -23,7 +22,7 @@ export default function FormFormProps<T extends string>({
     handleInputsProps,
     children,
 }: FormPropsTypes<T>) {
-    const { onSubmitInputs, legend, formError, formSubmitError } = ownProps;
+    const { onSubmitInputs, legend, formError } = ownProps;
     const { inputs, handledInputs, setShowInputsMessage } = handleInputsProps;
     const { validateAllInputs } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
@@ -85,10 +84,12 @@ export default function FormFormProps<T extends string>({
         if (!validateAllInputs(inputs)) {
             if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
             const response = await onSubmitInputs(handledInputs);
-            if (typeof response === 'string') {
-                setMessage(
-                    formSubmitError ? formSubmitError : FORM_DEFAULT_ERROR,
-                ); // TO SET SUBMIT ERROR
+            if (response !== undefined) {
+                const conditional =
+                    typeof response === 'string'
+                        ? response
+                        : FORM_DEFAULT_ERROR;
+                setMessage(conditional); // TO SET SUBMIT ERROR
                 setShowMessage(true);
                 return;
             }
