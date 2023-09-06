@@ -14,7 +14,7 @@ interface PropsType<T extends string> {
         handledInputs: R,
     ) => Promise<string | undefined | void>;
     legend?: string;
-    formError?: string;
+    formError?: string | null;
 }
 
 export default function FormFormProps<T extends string>({
@@ -73,7 +73,7 @@ export default function FormFormProps<T extends string>({
     }
 
     function renderError() {
-        if (!showMessage) return null;
+        if (!showMessage || formError === null) return null;
         return <div className="notification is-danger">{message}</div>;
     }
 

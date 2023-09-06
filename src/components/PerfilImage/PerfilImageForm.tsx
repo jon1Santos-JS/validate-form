@@ -3,7 +3,6 @@ import Input from '../Input';
 import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
-const DEFAULT_ERROR_MESSAGE = 'Invalid image';
 
 type PerfilImageFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
@@ -25,7 +24,7 @@ export default function PerfilImageForm({
             <Form
                 ownProps={{
                     onSubmitInputs: onSubmitInputs,
-                    formError: DEFAULT_ERROR_MESSAGE,
+                    formError: null,
                 }}
                 handleInputsProps={handleInputsProps}
             >
@@ -113,5 +112,6 @@ export const PERFIL_IMAGE_FORM_INPUTS_STATE: PreFormInputsType<PerfilFormInputs>
                     )}`,
                 },
             ],
+            required: 'No image loaded',
         },
     };

@@ -31,6 +31,7 @@ export default function ChangePasswordForm({
                 ownProps={{
                     legend: 'Change Username',
                     onSubmitInputs: onSubmitInputs,
+                    formError: null,
                 }}
                 handleInputsProps={handleInputsProps}
             >
@@ -89,6 +90,10 @@ export const CHANGE_USERNAME_FORM_INPUTS_STATE: PreFormInputsType<ChangeUsername
             validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
+                    message: 'Incorrect username',
+                },
+                {
+                    coditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
                     message: 'Incorrect username',
                 },
             ],

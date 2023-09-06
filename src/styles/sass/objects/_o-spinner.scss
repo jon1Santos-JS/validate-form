@@ -1,0 +1,38 @@
+.o-spinner-container {
+    display: grid;
+    min-height: var(--app-base-image);
+    min-width: var(--app-base-image);
+    place-items: center;
+    position: absolute;
+
+    .spinner-element {
+        animation: rotation-animate 0.4s ease-out infinite;
+        background: var(--base-spinner-color);
+        border-radius: 50%;
+        height: 25px;
+        position: relative;
+        transform: rotate(100deg);
+        width: 25px;
+
+        &::after {
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            content: '';
+            height: 12px;
+            inset: 0;
+            margin: auto;
+            position: absolute;
+            width: 12px;
+        }
+    }
+}
+
+@keyframes rotation-animate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
