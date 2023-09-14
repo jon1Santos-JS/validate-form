@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Form from './Form';
 import Input from './Input';
 
@@ -15,6 +16,10 @@ export default function SignInForm({
 }: SignInFormProps) {
     const { setUser, setHasUser, setUserStateLoading } = handleUserProps;
     const { onChangeInput, handledInputs } = handleInputsProps;
+    const [inputs, setInputs] = useState({
+        username: { value: '' },
+        password: { value: '' },
+    });
 
     return (
         <div className="o-sign-in-form">
@@ -35,6 +40,20 @@ export default function SignInForm({
                             onChange: (e) => onChange(e, 'username'),
                         }}
                         handleInputsProps={handleInputsProps}
+                        validationProps={{
+                            validations: (currentInputValue: string) => [
+                                {
+                                    coditional:
+                                        !currentInputValue.match(/.{6,}/),
+                                },
+                                {
+                                    coditional:
+                                        !currentInputValue.match(/^[A-Za-z]+$/),
+                                },
+                            ],
+                            required: true,
+                            value: inputs.username.value,
+                        }}
                     />
                     <Input
                         ownProps={{
@@ -44,6 +63,16 @@ export default function SignInForm({
                             onChange: (e) => onChange(e, 'password'),
                         }}
                         handleInputsProps={handleInputsProps}
+                        validationProps={{
+                            validations: (currentInputValue: string) => [
+                                {
+                                    coditional:
+                                        !currentInputValue.match(/.{6,}/),
+                                },
+                            ],
+                            required: true,
+                            value: inputs.password.value,
+                        }}
                     />
                 </Form>
             </div>
@@ -54,10 +83,9 @@ export default function SignInForm({
         e: React.ChangeEvent<HTMLInputElement>,
         name: SignInInputs,
     ) {
-        onChangeInput({
-            objectifiedName: name,
-            targetProp: 'value',
-            value: e.target.value,
+        setInputs((prev) => {
+            const newObj = { ...prev, [name]: { value: e.target.value } };
+            return { ...newObj };
         });
     }
 
@@ -79,25 +107,3 @@ export default function SignInForm({
         setUser({ username: parsedResponse.body as string });
     }
 }
-
-export const SIGN_IN_FORM_STATE_INPUTS: PreFormInputsType<SignInInputs> = {
-    username: {
-        validations: (currentInputValue: string) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-            },
-            {
-                coditional: !currentInputValue.match(/^[A-Za-z]+$/),
-            },
-        ],
-        required: true,
-    },
-    password: {
-        validations: (currentInputValue: string) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-            },
-        ],
-        required: true,
-    },
-};

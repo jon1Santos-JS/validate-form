@@ -14,11 +14,6 @@ declare interface PreFormInputPropsType<T extends string> {
     value?: string;
 }
 
-declare interface Validation {
-    coditional: boolean | RegExpMatchArray | null;
-    message?: string;
-}
-
 // *NECESSARY FORM INPUT'S FIELDS TO VALIDATE
 
 declare type FormInputsType<T extends string> = {
@@ -71,3 +66,25 @@ declare interface ChangeInputsTypes<O extends T, V> {
 }
 
 declare type TargetPropsType = 'value' | 'files';
+
+declare interface PreValidateType {
+    validations?: (
+        currentInput: string,
+        inputToCompare?: string,
+    ) => Validation[];
+    required?: boolean | string;
+}
+
+declare interface ValidateType {
+    validations?: (
+        currentInput: string,
+        inputToCompare?: string,
+    ) => Validation[];
+    required?: boolean | string;
+    value: string;
+}
+
+declare interface Validation {
+    coditional: boolean | RegExpMatchArray | null;
+    message?: string;
+}

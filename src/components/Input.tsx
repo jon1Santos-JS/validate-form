@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 interface InputPropsTypes {
     ownProps: PropsType;
     handleInputsProps: HandleInputsPropsType<string>;
+    validationProps: ValidateType;
 }
 
 interface PropsType {
@@ -18,6 +19,7 @@ interface PropsType {
 export default function Input({
     ownProps,
     handleInputsProps,
+    validationProps,
 }: InputPropsTypes) {
     const {
         label,
@@ -36,8 +38,8 @@ export default function Input({
 
     useEffect(() => {
         // ALL INPUTS ARE NECESSARY TO COMPARE CONFIRM FIELDS INTO THE VALIDATION HOOK
-        setErrorList(preValidate(objectifiedName, inputs));
-    }, [objectifiedName, inputs, preValidate]);
+        setErrorList(preValidate(validationProps));
+    }, [preValidate, validationProps]);
 
     useEffect(() => {
         if (!ownInput.value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
