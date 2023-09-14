@@ -1,8 +1,8 @@
-import { Lodash } from '@/lib/lodashAdapter';
+import { onConverToBasicLatinLetters } from '@/lib/lodashAdapter';
 
 export default function useStringHandler() {
     function handledName(name: string) {
-        const handledName = Lodash.onConverToBasicLatinLetters(name);
+        const handledName = onConverToBasicLatinLetters(name);
         const noCedilha = handledName.replace(/[çÇ]/g, (match) =>
             match === 'ç' ? 'c' : 'C',
         );

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { USER_HASH_NAME, createHash, returnUserByHash } from '@/lib/hash';
-import { signInController } from '@/lib/controllers';
+import { getUserStateController, signInController } from '@/lib/controllers';
 import Cookies from 'cookies';
 import { COOKIES_EXPIRES } from '@/database/miniDB';
 
@@ -12,7 +12,16 @@ export default async function handler(
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const hashResponse = await returnUserByHash(browserHash);
+            const controllerResponse = await getUserStateController();
+            // NO DATABASE
+            if (typeof controllerResponse.body === 'string')
+                return res.status(200).json(controllerResponse);
+            // DATABASE
+            const usersFromDB = controllerResponse.body;
+            const hashResponse = await returnUserByHash(
+                browserHash,
+                usersFromDB,
+            );
             return res.status(200).json(hashResponse);
         }
         case 'POST': {

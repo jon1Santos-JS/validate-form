@@ -5,7 +5,7 @@ declare type PreFormInputsType<T extends string> = {
 };
 
 declare interface PreFormInputPropsType<T extends string> {
-    validations: <U extends FormInputsType<T>>(
+    validations?: <U extends FormInputsType<T>>(
         currentInput: string,
         formInputs: U,
     ) => Validation[];
@@ -35,13 +35,22 @@ declare type FileType = FileList | undefined | null;
 
 // FORM INPUT ATTRIBUTES TO COSTUMIZE
 
-declare type FormHandledInputsType<T extends string> = {
-    [key in T]: FormHandledInputsPropsType;
-};
+declare type FormHandledInputsType<
+    T extends string,
+    IF extends string | undefined = undefined,
+    IO extends string | undefined = undefined,
+> = IO extends undefined
+    ? { [key in T]: FormHandledInputsProps<T, IF> }
+    : { [key in Omit<T, IO>]: FormHandledInputsProps<T, IF> };
 
-declare type FormHandledInputsPropsType<T> = {
-    [key in TargetPropsType]: T;
-};
+declare type FormHandledInputsProps<
+    T extends string,
+    IF extends string | undefined,
+> = IF extends undefined
+    ? Omit<PreFormInputPropsType<T>, DefaultFieldsToOmitType>
+    : Omit<PreFormInputPropsType<T>, IF>;
+
+declare type DefaultFieldsToOmitType = 'errors' | 'required' | 'validations';
 
 declare type HandleInputsPropsType<T extends string> = {
     showInputMessagesFromOutside: boolean;

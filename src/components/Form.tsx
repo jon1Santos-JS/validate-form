@@ -4,15 +4,13 @@ import React, { useEffect, useState } from 'react';
 const FORM_DEFAULT_ERROR = 'Invalid form';
 
 interface FormPropsTypes<T extends string> {
-    ownProps: PropsType<T>;
+    ownProps: PropsType;
     handleInputsProps: HandleInputsPropsType<T>;
     children: JSX.Element[] | JSX.Element;
 }
 
-interface PropsType<T extends string> {
-    onSubmitInputs: <R extends FormHandledInputsType<T>>(
-        handledInputs: R,
-    ) => Promise<string | undefined | void>;
+interface PropsType {
+    onSubmitInputs: () => Promise<string | undefined | void>;
     legend?: string;
     formError?: string | null;
 }
@@ -23,7 +21,7 @@ export default function FormFormProps<T extends string>({
     children,
 }: FormPropsTypes<T>) {
     const { onSubmitInputs, legend, formError } = ownProps;
-    const { inputs, handledInputs, setShowInputsMessage } = handleInputsProps;
+    const { inputs, setShowInputsMessage } = handleInputsProps;
     const { validateAllInputs } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(
@@ -83,7 +81,7 @@ export default function FormFormProps<T extends string>({
         e.preventDefault();
         if (!validateAllInputs(inputs)) {
             if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
-            const response = await onSubmitInputs(handledInputs);
+            const response = await onSubmitInputs();
             if (response !== undefined) {
                 const conditional =
                     typeof response === 'string'

@@ -31,6 +31,7 @@ export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
                                 handleUserProps={handleUserProps}
                             />
                         ),
+                        inputsToOmit: ['confirmPassword'],
                     }}
                 />
             </div>

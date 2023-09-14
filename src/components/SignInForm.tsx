@@ -14,7 +14,7 @@ export default function SignInForm({
     handleInputsProps,
 }: SignInFormProps) {
     const { setUser, setHasUser, setUserStateLoading } = handleUserProps;
-    const { onChangeInput } = handleInputsProps;
+    const { onChangeInput, handledInputs } = handleInputsProps;
 
     return (
         <div className="o-sign-in-form">
@@ -61,9 +61,7 @@ export default function SignInForm({
         });
     }
 
-    async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<SignInInputs>,
-    ) {
+    async function onSubmitInputs() {
         const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {
             method: 'POST',

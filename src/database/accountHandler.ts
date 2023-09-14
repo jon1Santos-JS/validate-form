@@ -1,8 +1,3 @@
-import {
-    onCreateConstraint,
-    onCreateID,
-    onCreateUserImg,
-} from '@/lib/inputHandler';
 import { DATABASE, SERVER_ERROR_RESPONSE } from './miniDB';
 import MiniDBHandler from './miniDBHandler';
 
@@ -198,12 +193,13 @@ export default class MiniDBAccountHandler {
     }
 
     #onHandleInputs(userAccount: UserFromClientType) {
-        const accountWithConstraint = onCreateConstraint(userAccount, 'user');
-        const accountWithID = onCreateID(
-            accountWithConstraint,
-            DATABASE.state.accounts.length,
-        );
-        const accountWithImg = onCreateUserImg(accountWithID);
-        return accountWithImg as UserFromDataBaseType;
+        const handledUserAccount = {
+            ID: DATABASE.state.accounts.length,
+            constraint: 'user',
+            ...userAccount,
+            userImage: process.env
+                .NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
+        };
+        return handledUserAccount as UserFromDataBaseType;
     }
 }

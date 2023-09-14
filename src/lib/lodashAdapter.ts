@@ -1,25 +1,14 @@
 import { omit, deburr } from 'lodash';
 
-class LodashAdapter {
-    onOmitFields<T extends object, U>(inputs: T, ...fieldsToOmit: string[][]) {
-        const handled = omit(inputs, fieldsToOmit[0]);
-        const handledFieldsToOmit = fieldsToOmit;
-        while (handledFieldsToOmit[0 + 1]) {
-            handledFieldsToOmit.shift();
-            for (const i in handled) {
-                handled[i] = this.onOmitFields(
-                    handled[i] as T,
-                    ...handledFieldsToOmit,
-                );
-            }
-        }
-        return handled as U;
-    }
-
-    onConverToBasicLatinLetters(word: string) {
-        const handledWord = deburr(word);
-        return handledWord;
-    }
+export function onOmitProps<T extends object, U extends keyof T>(
+    obj: T,
+    propsToOmit: U[],
+) {
+    const handledObj: unknown = omit(obj, propsToOmit);
+    return handledObj as Omit<T, U>;
 }
 
-export const Lodash = new LodashAdapter();
+export function onConverToBasicLatinLetters(word: string) {
+    const handledWord = deburr(word);
+    return handledWord;
+}

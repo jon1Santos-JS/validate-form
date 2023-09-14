@@ -61,8 +61,10 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
                             preInputs: CHANGE_USERNAME_FORM_INPUTS_STATE,
                             renderChildren: (handleInputsProps) => (
                                 <ChangeUsernameForm
-                                    handleUserProps={handleUserProps}
-                                    handleInputsProps={handleInputsProps}
+                                    ownProps={{
+                                        handleInputsProps: handleInputsProps,
+                                        handleUserProps: handleUserProps,
+                                    }}
                                 />
                             ),
                         }}

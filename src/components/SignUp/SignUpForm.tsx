@@ -16,7 +16,7 @@ export default function SignUpForm({
     ownProps,
     handleInputsProps,
 }: SignUpFormPropsType) {
-    const { onChangeInput } = handleInputsProps;
+    const { onChangeInput, handledInputs } = handleInputsProps;
     const { setResponse } = ownProps;
 
     return (
@@ -72,9 +72,7 @@ export default function SignUpForm({
         });
     }
 
-    async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<SignUpInputs>,
-    ) {
+    async function onSubmitInputs() {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const options = {
             method: 'POST',

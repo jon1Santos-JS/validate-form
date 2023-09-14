@@ -1,8 +1,12 @@
+import { onOmitProps } from '@/lib/lodashAdapter';
 import { useState } from 'react';
-import { Lodash } from '@/lib/lodashAdapter';
 import React from 'react';
 
-const DEFAULT_INPUT_FIELDS_TO_OMIT = ['required', 'validations', 'errors'];
+const DEFAULT_INPUT_FIELDS_TO_OMIT: DefaultFieldsToOmitType[] = [
+    'errors',
+    'required',
+    'validations',
+];
 
 interface InputHandlerPropsTypes<
     T extends string,
@@ -21,8 +25,8 @@ interface PropsType<
     renderChildren: (
         handleInputsProps: HandleInputsPropsType<T>,
     ) => JSX.Element;
-    inputsToOmit?: IO[];
-    inputFieldToOmit?: IF[];
+    inputsToOmit?: [IO];
+    inputFieldToOmit?: [IF];
 }
 
 export default function InputsHandler<
@@ -32,10 +36,10 @@ export default function InputsHandler<
 >({ ownProps }: InputHandlerPropsTypes<T, IO, IF>) {
     const { preInputs, renderChildren, inputsToOmit, inputFieldToOmit } =
         ownProps;
-    const [inputs, setInputs] = useState(onAddFormInputsFields());
+    const [inputs, setInputs] = useState(onAddRequiredFields());
     const [showInputMessagesFromOutside, setShowInputMessages] =
         useState(false);
-    const handledInputs = onOmitFormInputsFields(inputs);
+    const handledInputs = onOmitFormInputs({ ...inputs });
 
     const handleInputsProps: HandleInputsPropsType<T> = {
         showInputMessagesFromOutside,
@@ -51,11 +55,7 @@ export default function InputsHandler<
         objectifiedName,
         targetProp,
         value,
-    }: {
-        objectifiedName: R;
-        targetProp: TargetPropsType;
-        value: U;
-    }) {
+    }: ChangeInputsTypes<R, U>) {
         setInputs((prevInputs) => {
             // UPDATING THE SPECIFIC  TARGET PROP INTO THE SPECIFIC INPUT
             const updatedInput = {
@@ -74,37 +74,54 @@ export default function InputsHandler<
         setShowInputMessages(value);
     }
 
-    function onAddFormInputsFields() {
-        const handledInputs = onAddRequiredInputs();
+    function onAddRequiredFields() {
+        const handledPreInputs = { ...preInputs };
 
-        function onAddRequiredInputs() {
-            for (const i in preInputs) {
-                preInputs[i].errors = [];
-                preInputs[i].value = '';
-            }
-            return preInputs;
+        for (const i in handledPreInputs) {
+            handledPreInputs[i] = {
+                ...handledPreInputs[i],
+                errors: [],
+                value: '',
+            };
         }
 
-        return handledInputs as FormInputsType<T>;
+        return handledPreInputs as FormInputsType<T>;
     }
 
-    function onOmitFormInputsFields(obj: FormInputsType<T>) {
-        const defaultConfirms = Object.keys(obj as FormInputsType<T>).filter(
-            (key) => key.includes('confirm'),
-        );
-        const toOmit = {
-            inputs: inputsToOmit ? inputsToOmit : defaultConfirms,
-            fields: inputFieldToOmit
-                ? inputFieldToOmit
-                : DEFAULT_INPUT_FIELDS_TO_OMIT,
-        };
+    function onOmitFormInputs(obj: FormInputsType<T>) {
+        const inputsWithOmittedFields = onOmitInputFields(obj);
+        if (inputsToOmit) {
+            const objWithOmittedInputs = onOmitProps(
+                inputsWithOmittedFields,
+                inputsToOmit,
+            );
+            if (inputFieldToOmit)
+                return objWithOmittedInputs as FormHandledInputsType<T, IF, IO>;
+            return objWithOmittedInputs as FormHandledInputsType<
+                T,
+                DefaultFieldsToOmitType,
+                IO
+            >;
+        }
 
-        const handledInputs = Lodash.onOmitFields(
-            obj as FormInputsType<T>,
-            toOmit.inputs,
-            toOmit.fields,
-        );
+        return inputsWithOmittedFields;
+    }
 
-        return handledInputs as FormHandledInputsType<T>;
+    function onOmitInputFields(obj: PreFormInputsType<T>) {
+        const handleObj = obj;
+
+        if (inputFieldToOmit) {
+            for (const i in handleObj) {
+                handleObj[i] = onOmitProps(handleObj[i], inputFieldToOmit);
+            }
+            return handleObj as FormHandledInputsType<T, IF>;
+        }
+        for (const i in handleObj) {
+            handleObj[i] = onOmitProps(
+                handleObj[i],
+                DEFAULT_INPUT_FIELDS_TO_OMIT,
+            );
+        }
+        return handleObj as FormHandledInputsType<T>;
     }
 }

@@ -14,7 +14,7 @@ export default function ChangePasswordForm({
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
     const { user } = handleUserProps;
-    const { onChangeInput } = handleInputsProps;
+    const { onChangeInput, handledInputs } = handleInputsProps;
 
     return <>{renderContent()}</>;
 
@@ -75,9 +75,7 @@ export default function ChangePasswordForm({
         });
     }
 
-    async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<ChangePasswordInputs>,
-    ) {
+    async function onSubmitInputs() {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
         const handledBody = {
             username: { value: user.username },

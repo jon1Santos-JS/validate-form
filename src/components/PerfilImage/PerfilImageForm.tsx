@@ -16,7 +16,7 @@ export default function PerfilImageForm({
 }: PerfilImageFormPropsTypes) {
     const { user } = handleUserProps;
     const { handledName } = useStringHandler();
-    const { onChangeInput } = handleInputsProps;
+    const { onChangeInput, handledInputs } = handleInputsProps;
 
     return (
         <>
@@ -56,9 +56,7 @@ export default function PerfilImageForm({
             value: e.target.files,
         });
     }
-    async function onSubmitInputs(
-        handledInputs: FormHandledInputsType<PerfilFormInputs>,
-    ) {
+    async function onSubmitInputs() {
         const file = handledInputs.imageInput.files[0];
         const fileName = handledName(handledInputs.imageInput.files[0].name);
         const formData = new FormData(); // multipart/form-data format to send to API;
