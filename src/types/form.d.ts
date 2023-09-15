@@ -67,21 +67,18 @@ declare interface ChangeInputsTypes<O extends T, V> {
 
 declare type TargetPropsType = 'value' | 'files';
 
-declare interface PreValidateType {
-    validations?: (
-        currentInput: string,
-        inputToCompare?: string,
-    ) => Validation[];
-    required?: boolean | string;
-}
+declare type HandledInputsType<T extends string> = {
+    [key in T]: ValidateInputType;
+};
 
-declare interface ValidateType {
+declare interface ValidateInputType {
     validations?: (
         currentInput: string,
         inputToCompare?: string,
     ) => Validation[];
     required?: boolean | string;
     value: string;
+    errors: string[];
 }
 
 declare interface Validation {

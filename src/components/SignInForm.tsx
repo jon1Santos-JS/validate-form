@@ -10,15 +10,33 @@ type SignInInputs = 'username' | 'password';
 
 const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
 
-export default function SignInForm({
-    handleUserProps,
-    handleInputsProps,
-}: SignInFormProps) {
+export default function SignInForm({ handleUserProps }: SignInFormProps) {
     const { setUser, setHasUser, setUserStateLoading } = handleUserProps;
-    const { onChangeInput, handledInputs } = handleInputsProps;
+    const [areValid, setAreValid] = useState(false);
     const [inputs, setInputs] = useState({
-        username: { value: '' },
-        password: { value: '' },
+        username: {
+            validations: (currentInputValue: string) => [
+                {
+                    coditional: !currentInputValue.match(/.{6,}/),
+                },
+                {
+                    coditional: !currentInputValue.match(/^[A-Za-z]+$/),
+                },
+            ],
+            required: true,
+            value: '',
+            errors: [],
+        },
+        password: {
+            validations: (currentInputValue: string) => [
+                {
+                    coditional: !currentInputValue.match(/.{6,}/),
+                },
+            ],
+            required: true,
+            value: '',
+            errors: [],
+        },
     });
 
     return (
@@ -30,48 +48,31 @@ export default function SignInForm({
                         onSubmitInputs: onSubmitInputs,
                         formError: SIGN_IN_ERROR_RESPONSE,
                     }}
-                    handleInputsProps={handleInputsProps}
+                    validateProps={{
+                        setShowInputsMessage,
+                        inputs,
+                    }}
                 >
                     <Input
                         ownProps={{
                             label: 'Username',
                             inputType: 'text',
-                            objectifiedName: 'username',
                             onChange: (e) => onChange(e, 'username'),
                         }}
-                        handleInputsProps={handleInputsProps}
-                        validationProps={{
-                            validations: (currentInputValue: string) => [
-                                {
-                                    coditional:
-                                        !currentInputValue.match(/.{6,}/),
-                                },
-                                {
-                                    coditional:
-                                        !currentInputValue.match(/^[A-Za-z]+$/),
-                                },
-                            ],
-                            required: true,
-                            value: inputs.username.value,
+                        validateProps={{
+                            input: inputs.username,
+                            showInputMessagesFromOutside: areValid,
                         }}
                     />
                     <Input
                         ownProps={{
                             label: 'Password',
                             inputType: 'password',
-                            objectifiedName: 'password',
                             onChange: (e) => onChange(e, 'password'),
                         }}
-                        handleInputsProps={handleInputsProps}
-                        validationProps={{
-                            validations: (currentInputValue: string) => [
-                                {
-                                    coditional:
-                                        !currentInputValue.match(/.{6,}/),
-                                },
-                            ],
-                            required: true,
-                            value: inputs.password.value,
+                        validateProps={{
+                            input: inputs.password,
+                            showInputMessagesFromOutside: areValid,
                         }}
                     />
                 </Form>
@@ -84,9 +85,16 @@ export default function SignInForm({
         name: SignInInputs,
     ) {
         setInputs((prev) => {
-            const newObj = { ...prev, [name]: { value: e.target.value } };
+            const newObj = {
+                ...prev,
+                [name]: { ...prev[name], value: e.target.value },
+            };
             return { ...newObj };
         });
+    }
+
+    function setShowInputsMessage(value: boolean) {
+        setAreValid(value);
     }
 
     async function onSubmitInputs() {
@@ -94,7 +102,7 @@ export default function SignInForm({
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(handledInputs),
+            body: JSON.stringify(inputs),
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();

@@ -1,30 +1,16 @@
 const EMPTY_INPUT_ERROR_RESPONSE = 'This field is required';
 
 export default function useValidate() {
-    const errors: string[] = [];
+    function validateAll<T extends string>(inputs: HandledInputsType<T>) {
+        const isValid = { value: true };
+        for (const i in inputs) {
+            if (inputs[i].errors) isValid.value = false;
+        }
+        return isValid.value;
+    }
 
-    // const validateAllInputs = <T extends string>(
-    //     formInputs: FormInputsType<T>,
-    // ) => {
-    //     const inputsKeys = Object.keys(formInputs);
-    //     const inputErrors = inputsKeys.map((inputName) => {
-    //         return preValidate(inputName as T, formInputs);
-    //     });
-    //     const validations = inputErrors.map((error) => {
-    //         if (!error) return false;
-    //         if (error.length >= 1) return true;
-    //         return false;
-    //     });
-    //     const validation = validations.find(
-    //         (validation) => validation === true,
-    //     );
-    //     const findConditional = validation === undefined ? false : validation;
-
-    //     return findConditional;
-    // };
-
-    function preValidate(content: ValidateType) {
-        const { value, required } = content;
+    function preValidate(content: ValidateInputType) {
+        const { value, required, errors } = content;
         if (!value && required) {
             if (typeof required === 'string') {
                 errors.push(required);
@@ -36,7 +22,7 @@ export default function useValidate() {
         return validate(content);
     }
 
-    function validate({ value, validations }: ValidateType) {
+    function validate({ value, validations, errors }: ValidateInputType) {
         if (!validations) return errors;
         if (!value) return errors;
 
@@ -47,5 +33,5 @@ export default function useValidate() {
         return errors;
     }
 
-    return { preValidate };
+    return { preValidate, validateAll };
 }

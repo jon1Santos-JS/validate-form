@@ -3,52 +3,43 @@ import React, { useState, useEffect } from 'react';
 
 interface InputPropsTypes {
     ownProps: PropsType;
-    handleInputsProps: HandleInputsPropsType<string>;
-    validationProps: ValidateType;
+    validateProps: ValidatePropsType;
+}
+
+interface ValidatePropsType {
+    input: ValidateInputType;
+    showInputMessagesFromOutside: boolean;
 }
 
 interface PropsType {
     label: string;
     inputType: string;
-    objectifiedName: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     inputName?: string;
     inputAccept?: string;
 }
 
-export default function Input({
-    ownProps,
-    handleInputsProps,
-    validationProps,
-}: InputPropsTypes) {
-    const {
-        label,
-        inputType,
-        objectifiedName,
-        onChange,
-        inputName,
-        inputAccept,
-    } = ownProps;
-    const { inputs, showInputMessagesFromOutside } = handleInputsProps;
+export default function Input({ ownProps, validateProps }: InputPropsTypes) {
+    const { label, inputType, onChange, inputName, inputAccept } = ownProps;
+    const { input, showInputMessagesFromOutside } = validateProps;
+    const { value } = input;
 
     const { preValidate } = useValidate();
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
-    const ownInput = inputs[objectifiedName];
 
     useEffect(() => {
-        // ALL INPUTS ARE NECESSARY TO COMPARE CONFIRM FIELDS INTO THE VALIDATION HOOK
-        setErrorList(preValidate(validationProps));
-    }, [preValidate, validationProps]);
+        setErrorList(preValidate(input));
+    }, [preValidate, input]);
 
     useEffect(() => {
-        if (!ownInput.value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
+        if (!value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
         setShowMessage(false); // RESET THE MESSAGE AS THE ERROR LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
             const currentTimer = setMessageWithTimer(true, 850);
             return () => clearTimeout(currentTimer);
         }
-    }, [errorList, ownInput]);
+    }, [errorList, value]);
 
     useEffect(() => {
         if (!showMessage) setShowMessage(showInputMessagesFromOutside);

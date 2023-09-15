@@ -5,8 +5,13 @@ const FORM_DEFAULT_ERROR = 'Invalid form';
 
 interface FormPropsTypes<T extends string> {
     ownProps: PropsType;
-    handleInputsProps: HandleInputsPropsType<T>;
+    validateProps: ValidatePropsType<T>;
     children: JSX.Element[] | JSX.Element;
+}
+
+interface ValidatePropsType<T extends string> {
+    inputs: HandledInputsType<T>;
+    setShowInputsMessage: (value: boolean) => void;
 }
 
 interface PropsType {
@@ -17,24 +22,16 @@ interface PropsType {
 
 export default function FormFormProps<T extends string>({
     ownProps,
-    handleInputsProps,
     children,
+    validateProps,
 }: FormPropsTypes<T>) {
+    const { inputs, setShowInputsMessage } = validateProps;
     const { onSubmitInputs, legend, formError } = ownProps;
-    const { inputs, setShowInputsMessage } = handleInputsProps;
-    const { validateAllInputs } = useValidate();
+    const { validateAll } = useValidate();
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(
         formError ? formError : FORM_DEFAULT_ERROR,
     );
-
-    useEffect(() => {
-        const timerDownMessage = setTimeout(() => {
-            setShowInputsMessage(false);
-        }, 2550);
-
-        return () => clearTimeout(timerDownMessage);
-    }, [setShowInputsMessage]);
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
@@ -79,7 +76,7 @@ export default function FormFormProps<T extends string>({
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) {
         e.preventDefault();
-        if (!validateAllInputs(inputs)) {
+        if (!validateAll(inputs)) {
             if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
             const response = await onSubmitInputs();
             if (response !== undefined) {
