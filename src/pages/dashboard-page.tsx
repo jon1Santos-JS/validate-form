@@ -1,14 +1,7 @@
-import ChangePasswordForm, {
-    CHANGE_PASSWORD_FORM_INPUTS_STATE,
-} from '@/components/ChangePasswordForm';
-import ChangeUsernameForm, {
-    CHANGE_USERNAME_FORM_INPUTS_STATE,
-} from '@/components/ChangeUsernameForm';
-import InputsHandler from '@/components/InputsHandler';
+import ChangePasswordForm from '@/components/ChangePasswordForm';
+import ChangeUsernameForm from '@/components/ChangeUsernameForm';
 import PerfilImage from '@/components/PerfilImage/PerfilImage';
-import PerfilImageForm, {
-    PERFIL_IMAGE_FORM_INPUTS_STATE,
-} from '@/components/PerfilImage/PerfilImageForm';
+import PerfilImageForm from '@/components/PerfilImage/PerfilImageForm';
 import { useRouter } from 'next/router';
 
 type DashBoardPageProps = {
@@ -33,40 +26,12 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
             <div className="o-dashboard-page">
                 <div>{message}</div>
                 <div>
-                    <InputsHandler
-                        ownProps={{
-                            preInputs: PERFIL_IMAGE_FORM_INPUTS_STATE,
-                            renderChildren: (handleInputsProps) => (
-                                <PerfilImageForm
-                                    handleUserProps={handleUserProps}
-                                    handleInputsProps={handleInputsProps}
-                                />
-                            ),
-                        }}
-                    />
+                    <PerfilImageForm handleUserProps={handleUserProps} />
                     <PerfilImage handleUserProps={handleUserProps} />
-                    <InputsHandler
+                    <ChangePasswordForm handleUserProps={handleUserProps} />
+                    <ChangeUsernameForm
                         ownProps={{
-                            preInputs: CHANGE_PASSWORD_FORM_INPUTS_STATE,
-                            renderChildren: (handleInputsProps) => (
-                                <ChangePasswordForm
-                                    handleUserProps={handleUserProps}
-                                    handleInputsProps={handleInputsProps}
-                                />
-                            ),
-                        }}
-                    />
-                    <InputsHandler
-                        ownProps={{
-                            preInputs: CHANGE_USERNAME_FORM_INPUTS_STATE,
-                            renderChildren: (handleInputsProps) => (
-                                <ChangeUsernameForm
-                                    ownProps={{
-                                        handleInputsProps: handleInputsProps,
-                                        handleUserProps: handleUserProps,
-                                    }}
-                                />
-                            ),
+                            handleUserProps: handleUserProps,
                         }}
                     />
                 </div>

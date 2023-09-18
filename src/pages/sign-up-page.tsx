@@ -1,6 +1,4 @@
-import InputsHandler from '@/components/InputsHandler';
 import SignUpContent from '@/components/SignUp/SignUpContent';
-import { SIGN_UP_FORM_INPUTS_STATE } from '@/components/SignUp/SignUpForm';
 import { useRouter } from 'next/router';
 
 type SignUpPageProps = {
@@ -22,18 +20,7 @@ export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
 
         return (
             <div className="o-sign-up-page">
-                <InputsHandler
-                    ownProps={{
-                        preInputs: SIGN_UP_FORM_INPUTS_STATE,
-                        renderChildren: (handleInputsProps) => (
-                            <SignUpContent
-                                handleInputsProps={handleInputsProps}
-                                handleUserProps={handleUserProps}
-                            />
-                        ),
-                        inputsToOmit: ['confirmPassword'],
-                    }}
-                />
+                <SignUpContent handleUserProps={handleUserProps} />
             </div>
         );
     }

@@ -1,23 +1,28 @@
+import { useState } from 'react';
 import Form from '../Form';
 import Input from '../Input';
+import { omitFields } from '@/hooks/useInputsHandler';
+import { onOmitProps } from '@/lib/lodashAdapter';
 
 interface SignUpFormPropsType {
     ownProps: PropsType;
     handleUserProps: HandleUserPropsType;
-    handleInputsProps: HandleInputsPropsType<SignUpInputs>;
 }
-export type SignUpInputs = 'username' | 'password' | 'confirmPassword';
 
 interface PropsType {
     setResponse: (data: boolean) => void;
 }
 
-export default function SignUpForm({
-    ownProps,
-    handleInputsProps,
-}: SignUpFormPropsType) {
-    const { onChangeInput, handledInputs } = handleInputsProps;
+type InputsType = 'username' | 'password' | 'confirmPassword';
+
+export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const { setResponse } = ownProps;
+    const [areValid, setAreValid] = useState(false);
+    const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
+    type InputsWithouConfirmType = HandledInputsType<
+        keyof typeof inputs,
+        ValidateInputType<InputsType>
+    >;
 
     return (
         <div className="o-sign-up-form">
@@ -27,34 +32,46 @@ export default function SignUpForm({
                         legend: 'SignUp',
                         onSubmitInputs: onSubmitInputs,
                     }}
-                    handleInputsProps={handleInputsProps}
+                    validateProps={{
+                        inputs,
+                        setShowInputsMessage,
+                    }}
                 >
                     <Input
                         ownProps={{
                             label: 'Username',
                             inputType: 'text',
-                            objectifiedName: 'username',
                             onChange: (e) => onChange(e, 'username'),
                         }}
-                        handleInputsProps={handleInputsProps}
+                        validateProps={{
+                            inputs,
+                            input: inputs.username,
+                            showInputMessagesFromOutside: areValid,
+                        }}
                     />
                     <Input
                         ownProps={{
                             label: 'Password',
                             inputType: 'password',
-                            objectifiedName: 'password',
                             onChange: (e) => onChange(e, 'password'),
                         }}
-                        handleInputsProps={handleInputsProps}
+                        validateProps={{
+                            input: inputs.password,
+                            showInputMessagesFromOutside: areValid,
+                            inputs,
+                        }}
                     />
                     <Input
                         ownProps={{
                             label: 'Confirm Password',
                             inputType: 'password',
-                            objectifiedName: 'confirmPassword',
                             onChange: (e) => onChange(e, 'confirmPassword'),
                         }}
-                        handleInputsProps={handleInputsProps}
+                        validateProps={{
+                            input: inputs.confirmPassword,
+                            showInputMessagesFromOutside: areValid,
+                            inputs,
+                        }}
                     />
                 </Form>
             </div>
@@ -63,17 +80,24 @@ export default function SignUpForm({
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: SignUpInputs,
+        name: InputsType,
     ) {
-        onChangeInput({
-            objectifiedName: name,
-            targetProp: 'value',
-            value: e.target.value,
-        });
+        setInputs((prev) => ({
+            ...prev,
+            [name]: { ...prev[name], value: e.target.value },
+        }));
+    }
+
+    function setShowInputsMessage(value: boolean) {
+        setAreValid(value);
     }
 
     async function onSubmitInputs() {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
+        const handledInputs = omitFields(
+            onOmitProps(inputs, ['confirmPassword']) as InputsWithouConfirmType,
+            ['errors', 'required', 'validations'],
+        );
         const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -90,7 +114,10 @@ export default function SignUpForm({
     }
 }
 
-export const SIGN_UP_FORM_INPUTS_STATE: PreFormInputsType<SignUpInputs> = {
+const INPUTS_INITIAL_STATE: HandledInputsType<
+    InputsType,
+    ValidateInputType<InputsType>
+> = {
     username: {
         validations: (currentInputValue) => [
             {
@@ -103,28 +130,34 @@ export const SIGN_UP_FORM_INPUTS_STATE: PreFormInputsType<SignUpInputs> = {
             },
         ],
         required: true,
+        value: '',
+        errors: [],
     },
     password: {
-        validations: (currentInputValue, formInputs) => [
+        validations: (currentInputValue, hookInputs) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password must has 6 characters at least',
             },
             {
                 coditional:
-                    currentInputValue !== formInputs['confirmPassword'].value,
+                    currentInputValue !== hookInputs?.confirmPassword.value,
                 message: 'This field has to be equal to the confirm password',
             },
         ],
         required: true,
+        value: '',
+        errors: [],
     },
     confirmPassword: {
-        validations: (currentInputValue, formInputs) => [
+        validations: (currentInputValue, hookInputs) => [
             {
-                coditional: currentInputValue !== formInputs['password'].value,
+                coditional: currentInputValue !== hookInputs?.password.value,
                 message: 'This field has to be equal to the password',
             },
         ],
         required: true,
+        value: '',
+        errors: [],
     },
 };

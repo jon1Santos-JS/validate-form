@@ -11,8 +11,6 @@ type ChangeUsernameFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
 };
 
-type ChangeUsernameFormInputs = 'newUsername';
-
 export default function ChangeUsernameForm({
     ownProps: { handleUserProps },
 }: OwnPropsType) {
@@ -56,6 +54,7 @@ export default function ChangeUsernameForm({
                         onChange: (e) => onChange(e, 'newUsername'),
                     }}
                     validateProps={{
+                        inputs,
                         input: inputs.newUsername,
                         showInputMessagesFromOutside: areValid,
                     }}
@@ -66,7 +65,7 @@ export default function ChangeUsernameForm({
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: ChangeUsernameFormInputs,
+        name: keyof typeof inputs,
     ) {
         setInputs((prev) => ({
             ...prev,

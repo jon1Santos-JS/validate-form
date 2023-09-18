@@ -1,16 +1,20 @@
 const EMPTY_INPUT_ERROR_RESPONSE = 'This field is required';
 
-export default function useValidate() {
-    function validateAll<T extends string>(inputs: HandledInputsType<T>) {
-        const isValid = { value: true };
+export default function useValidate<T extends string>(
+    inputs: HandledInputsType<T, ValidateInputType<T>>,
+) {
+    function validateAll() {
+        let isValid = true;
         for (const i in inputs) {
-            if (inputs[i].errors) isValid.value = false;
+            if (inputs[i].errors.length > 0) isValid = false;
+            else isValid = true;
         }
-        return isValid.value;
+        return isValid;
     }
 
-    function preValidate(content: ValidateInputType) {
+    function preValidate(content: ValidateInputType<T>) {
         const { value, required, errors } = content;
+        cleanArray(errors);
         if (!value && required) {
             if (typeof required === 'string') {
                 errors.push(required);
@@ -22,11 +26,12 @@ export default function useValidate() {
         return validate(content);
     }
 
-    function validate({ value, validations, errors }: ValidateInputType) {
+    function validate(content: ValidateInputType<T>) {
+        const { value, validations, errors } = content;
         if (!validations) return errors;
         if (!value) return errors;
 
-        validations(value).map((validation) => {
+        validations(value, inputs).map((validation) => {
             const message = validation.message ? validation.message : '';
             if (validation.coditional) errors.push(message);
         });
@@ -34,4 +39,10 @@ export default function useValidate() {
     }
 
     return { preValidate, validateAll };
+}
+
+function cleanArray(arrayToClean: string[]) {
+    while (arrayToClean.length > 0) {
+        arrayToClean.pop();
+    }
 }

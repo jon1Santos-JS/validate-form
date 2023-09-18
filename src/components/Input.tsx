@@ -1,13 +1,14 @@
 import useValidate from '@/hooks/useValidate';
 import React, { useState, useEffect } from 'react';
 
-interface InputPropsTypes {
+interface InputPropsTypes<T extends string> {
     ownProps: PropsType;
-    validateProps: ValidatePropsType;
+    validateProps: ValidatePropsType<T>;
 }
 
-interface ValidatePropsType {
-    input: ValidateInputType;
+interface ValidatePropsType<T extends string> {
+    input: ValidateInputType<T>;
+    inputs: HandledInputsType<T, ValidateInputType<T>>;
     showInputMessagesFromOutside: boolean;
 }
 
@@ -19,12 +20,15 @@ interface PropsType {
     inputAccept?: string;
 }
 
-export default function Input({ ownProps, validateProps }: InputPropsTypes) {
+export default function Input<T extends string>({
+    ownProps,
+    validateProps,
+}: InputPropsTypes<T>) {
     const { label, inputType, onChange, inputName, inputAccept } = ownProps;
-    const { input, showInputMessagesFromOutside } = validateProps;
+    const { input, showInputMessagesFromOutside, inputs } = validateProps;
     const { value } = input;
 
-    const { preValidate } = useValidate();
+    const { preValidate } = useValidate(inputs);
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
 
@@ -61,6 +65,7 @@ export default function Input({ ownProps, validateProps }: InputPropsTypes) {
                 name={inputName && inputName}
                 accept={inputAccept && inputAccept}
                 onChange={onChange}
+                value={value}
                 type={inputType}
             />
             {renderErrors()}

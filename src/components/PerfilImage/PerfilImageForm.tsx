@@ -1,22 +1,39 @@
+import { useState } from 'react';
 import Form from '../Form';
 import Input from '../Input';
-import useStringHandler, { onCheckExtensions } from '@/hooks/useStringHandler';
+import useStringHandler, { onCheckExtensions } from '@/hooks/useInputsHandler';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
 type PerfilImageFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
-    handleInputsProps: HandleInputsPropsType<PerfilFormInputs>;
 };
-type PerfilFormInputs = 'imageInput';
 
 export default function PerfilImageForm({
     handleUserProps,
-    handleInputsProps,
 }: PerfilImageFormPropsTypes) {
     const { user } = handleUserProps;
     const { handledName } = useStringHandler();
-    const { onChangeInput, handledInputs } = handleInputsProps;
+    const [areValid, setAreValid] = useState(false);
+    const [inputs, setInputs] = useState({
+        imageInput: {
+            validations: (currentInputValue: string) => [
+                {
+                    coditional: !onCheckExtensions(
+                        ALLOWED_EXTENSIONS,
+                        currentInputValue,
+                    ),
+                    message: `Allowed extensions: ${ALLOWED_EXTENSIONS.join(
+                        ', ',
+                    )}`,
+                },
+            ],
+            required: 'No image loaded',
+            value: '',
+            errors: [],
+            files: null as FileList | null,
+        },
+    });
 
     return (
         <>
@@ -26,7 +43,10 @@ export default function PerfilImageForm({
                     onSubmitInputs: onSubmitInputs,
                     formError: null,
                 }}
-                handleInputsProps={handleInputsProps}
+                validateProps={{
+                    inputs,
+                    setShowInputsMessage,
+                }}
             >
                 <Input
                     ownProps={{
@@ -34,31 +54,39 @@ export default function PerfilImageForm({
                         inputType: 'file',
                         inputName: 'image',
                         inputAccept: 'image/*',
-                        onChange: onChangeImage,
-                        objectifiedName: 'imageInput',
+                        onChange: (e) => onChange(e, 'imageInput'),
                     }}
-                    handleInputsProps={handleInputsProps}
+                    validateProps={{
+                        input: inputs.imageInput,
+                        showInputMessagesFromOutside: areValid,
+                        inputs,
+                    }}
                 />
             </Form>
         </>
     );
 
-    function onChangeImage(e: React.ChangeEvent<HTMLInputElement>) {
-        onChangeInput({
-            objectifiedName: 'imageInput',
-            targetProp: 'value',
-            value: e.target.value,
-        });
+    function onChange(
+        e: React.ChangeEvent<HTMLInputElement>,
+        name: keyof typeof inputs,
+    ) {
+        setInputs((prev) => ({
+            ...prev,
+            [name]: {
+                ...prev[name],
+                value: e.target.value,
+                files: e.target.files,
+            },
+        }));
+    }
 
-        onChangeInput({
-            objectifiedName: 'imageInput',
-            targetProp: 'files',
-            value: e.target.files,
-        });
+    function setShowInputsMessage(value: boolean) {
+        setAreValid(value);
     }
     async function onSubmitInputs() {
-        const file = handledInputs.imageInput.files[0];
-        const fileName = handledName(handledInputs.imageInput.files[0].name);
+        if (!inputs.imageInput.files) return;
+        const file = inputs.imageInput.files[0];
+        const fileName = handledName(inputs.imageInput.files[0].name);
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file, fileName);
         const fetchOptions: FetchOptionsType = {
@@ -95,21 +123,3 @@ export default function PerfilImageForm({
         );
     }
 }
-
-export const PERFIL_IMAGE_FORM_INPUTS_STATE: PreFormInputsType<PerfilFormInputs> =
-    {
-        imageInput: {
-            validations: (currentInputValue) => [
-                {
-                    coditional: !onCheckExtensions(
-                        ALLOWED_EXTENSIONS,
-                        currentInputValue,
-                    ),
-                    message: `Allowed extensions: ${ALLOWED_EXTENSIONS.join(
-                        ', ',
-                    )}`,
-                },
-            ],
-            required: 'No image loaded',
-        },
-    };

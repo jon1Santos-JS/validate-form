@@ -1,87 +1,27 @@
-// FORM INPUTS PRE-DEFINED TYPES
-
-declare type PreFormInputsType<T extends string> = {
-    [key in T]: PreFormInputPropsType<T>;
+declare type HandledInputsType<T extends string, U> = {
+    [key in T]: U;
 };
 
-declare interface PreFormInputPropsType<T extends string> {
-    validations?: <U extends FormInputsType<T>>(
-        currentInput: string,
-        formInputs: U,
-    ) => Validation[];
-    required?: boolean | string;
-    errors?: string[];
-    value?: string;
-}
-
-// *NECESSARY FORM INPUT'S FIELDS TO VALIDATE
-
-declare type FormInputsType<T extends string> = {
-    [key in T]: FormInputPropsType<T>;
+declare type InputsToValidateType = {
+    [key: string]: ValidateInputType;
 };
 
-declare interface FormInputPropsType<T extends string>
-    extends PreFormInputPropsType<T> {
-    errors: string[];
-    value: string;
-}
-
-declare type FileType = FileList | undefined | null;
-
-// FORM INPUT ATTRIBUTES TO COSTUMIZE
-
-declare type FormHandledInputsType<
-    T extends string,
-    IF extends string | undefined = undefined,
-    IO extends string | undefined = undefined,
-> = IO extends undefined
-    ? { [key in T]: FormHandledInputsProps<T, IF> }
-    : { [key in Omit<T, IO>]: FormHandledInputsProps<T, IF> };
-
-declare type FormHandledInputsProps<
-    T extends string,
-    IF extends string | undefined,
-> = IF extends undefined
-    ? Omit<PreFormInputPropsType<T>, DefaultFieldsToOmitType>
-    : Omit<PreFormInputPropsType<T>, IF>;
-
-declare type DefaultFieldsToOmitType = 'errors' | 'required' | 'validations';
-
-declare type HandleInputsPropsType<T extends string> = {
-    showInputMessagesFromOutside: boolean;
-    inputs: FormInputsType<T>;
-    handledInputs: FormHandledInputsType<T>;
-    onChangeInput: <O extends T, V>({
-        objectifiedName,
-        targetProp,
-        value,
-    }: ChangeInputsTypes<O, V>) => void;
-    setShowInputsMessage: (value: boolean) => void;
-};
-
-declare interface ChangeInputsTypes<O extends T, V> {
-    objectifiedName: O;
-    targetProp: TargetPropsType;
-    value: V;
-}
-
-declare type TargetPropsType = 'value' | 'files';
-
-declare type HandledInputsType<T extends string> = {
-    [key in T]: ValidateInputType;
-};
-
-declare interface ValidateInputType {
+declare interface ValidateInputType<T extends string> {
     validations?: (
         currentInput: string,
-        inputToCompare?: string,
+        inputs?: HandledInputsType<T, ValidateInputType<T>>,
     ) => Validation[];
     required?: boolean | string;
-    value: string;
     errors: string[];
+    value: string;
+    files?: FileList | null;
 }
 
 declare interface Validation {
     coditional: boolean | RegExpMatchArray | null;
     message?: string;
 }
+
+declare type Prettier<T> = {
+    [K in keyof T]: T[K];
+};

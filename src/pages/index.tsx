@@ -1,5 +1,4 @@
-import InputsHandler from '@/components/InputsHandler';
-import SignInForm, { SIGN_IN_FORM_STATE_INPUTS } from '@/components/SignInForm';
+import SignInForm from '@/components/SignInForm';
 import { useRouter } from 'next/router';
 
 type SignInPageProps = {
@@ -20,17 +19,7 @@ export default function SignInPage({ handleUserProps }: SignInPageProps) {
 
         return (
             <div>
-                <InputsHandler
-                    ownProps={{
-                        preInputs: SIGN_IN_FORM_STATE_INPUTS,
-                        renderChildren: (handleInputsProps) => (
-                            <SignInForm
-                                handleInputsProps={handleInputsProps}
-                                handleUserProps={handleUserProps}
-                            />
-                        ),
-                    }}
-                />
+                <SignInForm handleUserProps={handleUserProps} />
             </div>
         );
     }

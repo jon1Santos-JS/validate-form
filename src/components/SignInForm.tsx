@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import Form from './Form';
 import Input from './Input';
+import { omitFields } from '@/hooks/useInputsHandler';
 
 type SignInFormProps = {
     handleUserProps: HandleUserPropsType;
-    handleInputsProps: HandleInputsPropsType<SignInInputs>;
 };
-type SignInInputs = 'username' | 'password';
 
 const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
 
@@ -62,6 +61,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                         validateProps={{
                             input: inputs.username,
                             showInputMessagesFromOutside: areValid,
+                            inputs,
                         }}
                     />
                     <Input
@@ -73,6 +73,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                         validateProps={{
                             input: inputs.password,
                             showInputMessagesFromOutside: areValid,
+                            inputs,
                         }}
                     />
                 </Form>
@@ -82,7 +83,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: SignInInputs,
+        name: keyof typeof inputs,
     ) {
         setInputs((prev) => {
             const newObj = {
@@ -102,7 +103,9 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(inputs),
+            body: JSON.stringify(
+                omitFields(inputs, ['errors', 'required', 'validations']),
+            ),
         };
         const response = await fetch(action, options);
         const parsedResponse: ServerResponse = await response.json();

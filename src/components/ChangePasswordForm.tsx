@@ -1,20 +1,22 @@
+import { useState } from 'react';
 import Form from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
+import { omitFields } from '@/hooks/useInputsHandler';
 
 type ChangePasswordFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
-    handleInputsProps: HandleInputsPropsType<ChangePasswordInputs>;
 };
-type ChangePasswordInputs = 'password' | 'newPassword' | 'confirmNewPassword';
+
+type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 
 export default function ChangePasswordForm({
     handleUserProps,
-    handleInputsProps,
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
     const { user } = handleUserProps;
-    const { onChangeInput, handledInputs } = handleInputsProps;
+    const [areValid, setAreValid] = useState(false);
+    const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
 
     return <>{renderContent()}</>;
 
@@ -31,34 +33,46 @@ export default function ChangePasswordForm({
                     legend: 'Change Password',
                     onSubmitInputs: onSubmitInputs,
                 }}
-                handleInputsProps={handleInputsProps}
+                validateProps={{
+                    inputs,
+                    setShowInputsMessage,
+                }}
             >
                 <Input
                     ownProps={{
                         label: 'Password',
                         inputType: 'password',
-                        objectifiedName: 'password',
                         onChange: (e) => onChange(e, 'password'),
                     }}
-                    handleInputsProps={handleInputsProps}
+                    validateProps={{
+                        inputs,
+                        input: inputs.password,
+                        showInputMessagesFromOutside: areValid,
+                    }}
                 />
                 <Input
                     ownProps={{
                         label: 'New Password',
                         inputType: 'password',
-                        objectifiedName: 'newPassword',
                         onChange: (e) => onChange(e, 'newPassword'),
                     }}
-                    handleInputsProps={handleInputsProps}
+                    validateProps={{
+                        inputs,
+                        input: inputs.newPassword,
+                        showInputMessagesFromOutside: areValid,
+                    }}
                 />
                 <Input
                     ownProps={{
                         label: 'Confirm New Password',
                         inputType: 'password',
-                        objectifiedName: 'confirmNewPassword',
                         onChange: (e) => onChange(e, 'confirmNewPassword'),
                     }}
-                    handleInputsProps={handleInputsProps}
+                    validateProps={{
+                        inputs,
+                        input: inputs.confirmNewPassword,
+                        showInputMessagesFromOutside: areValid,
+                    }}
                 />
             </Form>
         );
@@ -66,20 +80,23 @@ export default function ChangePasswordForm({
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: ChangePasswordInputs,
+        name: keyof typeof inputs,
     ) {
-        onChangeInput({
-            objectifiedName: name,
-            targetProp: 'value',
-            value: e.target.value,
-        });
+        setInputs((prev) => ({
+            ...prev,
+            [name]: { ...prev[name], value: e.target.value },
+        }));
+    }
+
+    function setShowInputsMessage(value: boolean) {
+        setAreValid(value);
     }
 
     async function onSubmitInputs() {
         const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
         const handledBody = {
             username: { value: user.username },
-            ...handledInputs,
+            ...omitFields(inputs, ['errors', 'required', 'validations']),
         };
         const options: FetchOptionsType = {
             method: 'POST',
@@ -93,47 +110,50 @@ export default function ChangePasswordForm({
     }
 }
 
-export const CHANGE_PASSWORD_FORM_INPUTS_STATE: PreFormInputsType<ChangePasswordInputs> =
-    {
-        password: {
-            validations: (currentInputValue) => [
-                {
-                    coditional: !currentInputValue.match(/.{6,}/),
-                    message: 'Password incorrect',
-                },
-            ],
-            required: 'Password incorrect',
-        },
-        newPassword: {
-            validations: (currentInputValue, formInputs) => [
-                {
-                    coditional: !currentInputValue.match(/.{6,}/),
-                    message: 'Password must has 6 characters at least',
-                },
-                {
-                    coditional:
-                        currentInputValue === formInputs['password'].value,
-                    message:
-                        'This field have to be different than the password',
-                },
-                {
-                    coditional:
-                        currentInputValue !==
-                        formInputs['confirmNewPassword'].value,
-                    message:
-                        'This field has to be equal to the confirm new password',
-                },
-            ],
-            required: 'New password incorrect',
-        },
-        confirmNewPassword: {
-            validations: (currentInputValue, formInputs) => [
-                {
-                    coditional:
-                        currentInputValue !== formInputs['newPassword'].value,
-                    message: 'This field has to be equal to the new password',
-                },
-            ],
-            required: 'Confirm new password incorrect',
-        },
-    };
+const INPUTS_INITIAL_STATE: HandledInputsType<
+    InputsType,
+    ValidateInputType<InputsType>
+> = {
+    password: {
+        validations: (currentInputValue) => [
+            {
+                coditional: !currentInputValue.match(/.{6,}/),
+                message: 'Password incorrect',
+            },
+        ],
+        required: 'Password incorrect',
+        value: '',
+        errors: [],
+    },
+    newPassword: {
+        validations: (currentInputValue, hookInputs) => [
+            {
+                coditional: !currentInputValue.match(/.{6,}/),
+                message: 'Password must has 6 characters at least',
+            },
+            {
+                coditional: currentInputValue === hookInputs?.password.value,
+                message: 'This field have to be different than the password',
+            },
+            {
+                coditional: currentInputValue !== hookInputs?.password.value,
+                message:
+                    'This field has to be equal to the confirm new password',
+            },
+        ],
+        required: 'New password incorrect',
+        value: '',
+        errors: [],
+    },
+    confirmNewPassword: {
+        validations: (currentInputValue, hookInputs) => [
+            {
+                coditional: currentInputValue !== hookInputs?.password.value,
+                message: 'This field has to be equal to the new password',
+            },
+        ],
+        required: 'Confirm new password incorrect',
+        value: '',
+        errors: [],
+    },
+};

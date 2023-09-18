@@ -10,7 +10,7 @@ interface FormPropsTypes<T extends string> {
 }
 
 interface ValidatePropsType<T extends string> {
-    inputs: HandledInputsType<T>;
+    inputs: HandledInputsType<T, ValidateInputType<T>>;
     setShowInputsMessage: (value: boolean) => void;
 }
 
@@ -27,7 +27,7 @@ export default function FormFormProps<T extends string>({
 }: FormPropsTypes<T>) {
     const { inputs, setShowInputsMessage } = validateProps;
     const { onSubmitInputs, legend, formError } = ownProps;
-    const { validateAll } = useValidate();
+    const { validateAll } = useValidate(inputs);
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(
         formError ? formError : FORM_DEFAULT_ERROR,
@@ -40,6 +40,14 @@ export default function FormFormProps<T extends string>({
 
         return () => clearTimeout(timerDownMessage);
     }, [showMessage]);
+
+    useEffect(() => {
+        const timerDownMessage = setTimeout(() => {
+            setShowInputsMessage(false);
+        }, 2750);
+
+        return () => clearTimeout(timerDownMessage);
+    }, [setShowInputsMessage]);
 
     return (
         <form className="c-form">
@@ -76,7 +84,7 @@ export default function FormFormProps<T extends string>({
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) {
         e.preventDefault();
-        if (!validateAll(inputs)) {
+        if (validateAll()) {
             if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
             const response = await onSubmitInputs();
             if (response !== undefined) {
