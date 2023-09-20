@@ -13,16 +13,10 @@ interface PropsType {
     setResponse: (data: boolean) => void;
 }
 
-type InputsType = 'username' | 'password' | 'confirmPassword';
-
 export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const { setResponse } = ownProps;
     const [areValid, setAreValid] = useState(false);
     const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
-    type InputsWithouConfirmType = HandledInputsType<
-        keyof typeof inputs,
-        ValidateInputType<InputsType>
-    >;
 
     return (
         <div className="o-sign-up-form">
@@ -80,7 +74,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: InputsType,
+        name: keyof typeof inputs,
     ) {
         setInputs((prev) => ({
             ...prev,
@@ -95,7 +89,9 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     async function onSubmitInputs() {
         const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const handledInputs = omitFields(
-            onOmitProps(inputs, ['confirmPassword']) as InputsWithouConfirmType,
+            onOmitProps(inputs, ['confirmPassword']) as InputsToValidateType<
+                keyof typeof inputs
+            >,
             ['errors', 'required', 'validations'],
         );
         const options = {
@@ -114,9 +110,8 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     }
 }
 
-const INPUTS_INITIAL_STATE: HandledInputsType<
-    InputsType,
-    ValidateInputType<InputsType>
+const INPUTS_INITIAL_STATE: InputsToValidateType<
+    'confirmPassword' | 'password' | 'username'
 > = {
     username: {
         validations: (currentInputValue) => [

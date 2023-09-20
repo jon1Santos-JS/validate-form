@@ -10,7 +10,7 @@ interface FormPropsTypes<T extends string> {
 }
 
 interface ValidatePropsType<T extends string> {
-    inputs: HandledInputsType<T, ValidateInputType<T>>;
+    inputs: InputsToValidateType<T>;
     setShowInputsMessage: (value: boolean) => void;
 }
 

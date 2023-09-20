@@ -86,7 +86,7 @@ export default function PerfilImageForm({
     async function onSubmitInputs() {
         if (!inputs.imageInput.files) return;
         const file = inputs.imageInput.files[0];
-        const fileName = handledName(inputs.imageInput.files[0].name);
+        const fileName = handledName(file.name);
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file, fileName);
         const fetchOptions: FetchOptionsType = {

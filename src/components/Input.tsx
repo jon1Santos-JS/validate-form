@@ -8,7 +8,7 @@ interface InputPropsTypes<T extends string> {
 
 interface ValidatePropsType<T extends string> {
     input: ValidateInputType<T>;
-    inputs: HandledInputsType<T, ValidateInputType<T>>;
+    inputs: InputsToValidateType<T>;
     showInputMessagesFromOutside: boolean;
 }
 

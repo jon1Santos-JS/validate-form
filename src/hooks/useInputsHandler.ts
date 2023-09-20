@@ -21,7 +21,7 @@ export function onCheckExtensions(extensions: string[], text: string) {
 }
 
 export function omitFields<T extends string>(
-    obj: HandledInputsType<T, Partial<ValidateInputType<T>>>,
+    obj: HandledInputsType<T>,
     fieldsToOmit: (keyof ValidateInputType<T>)[],
 ) {
     const handleInputs = { ...obj };

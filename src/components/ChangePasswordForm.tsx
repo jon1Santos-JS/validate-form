@@ -8,8 +8,6 @@ type ChangePasswordFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
 };
 
-type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
-
 export default function ChangePasswordForm({
     handleUserProps,
 }: ChangePasswordFormPropsTypes) {
@@ -110,9 +108,8 @@ export default function ChangePasswordForm({
     }
 }
 
-const INPUTS_INITIAL_STATE: HandledInputsType<
-    InputsType,
-    ValidateInputType<InputsType>
+const INPUTS_INITIAL_STATE: InputsToValidateType<
+    'password' | 'newPassword' | 'confirmNewPassword'
 > = {
     password: {
         validations: (currentInputValue) => [
