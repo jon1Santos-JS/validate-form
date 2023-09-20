@@ -21,7 +21,7 @@ export const config = {
     },
 };
 
-// import { MongoClient, ServerApiVersion } from 'mongodb';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 // const uri =
 //     'mongodb+srv://joaosantos58981:HExPSBU0gf4NsKZC@cluster0.jtc0ysv.mongodb.net/?retryWrites=true&w=majority';
@@ -41,8 +41,40 @@ export const config = {
 //         const db = client.db('accounts');
 
 //         const collection = db.collection('users');
-//         const docs = await collection.find().toArray();
-//         console.log(docs);
+
+//         const newAccounts = [
+//             {
+//                 ID: '0',
+//                 constraint: 'admin',
+//                 username: {
+//                     value: 'admins',
+//                 },
+//                 password: {
+//                     value: 'admins',
+//                 },
+//                 userImage: 'https://i.ibb.co/gjc1KnN/perfil-default-img.png',
+//             },
+//             {
+//                 ID: '1',
+//                 constraint: 'user',
+//                 username: {
+//                     value: 'carlos',
+//                 },
+//                 password: {
+//                     value: 'asdasd',
+//                 },
+//                 userImage:
+//                     'https://i.ibb.co/QHcc4Lv/office-funcionarios-copiar.png',
+//             },
+//         ];
+
+//         const updateOperation = {
+//             $set: {
+//                 accounts: newAccounts,
+//             },
+//         };
+//         const result = await collection.updateMany({}, updateOperation);
+//         console.log(result);
 //     } catch (err: unknown) {
 //         console.log(err);
 //     } finally {
