@@ -194,7 +194,7 @@ export default class MiniDBAccountHandler {
 
     #onHandleInputs(userAccount: UserFromClientType) {
         const handledUserAccount = {
-            ID: DATABASE.state.accounts.length,
+            ID: DATABASE.state.accounts.length.toString(),
             constraint: 'user',
             ...userAccount,
             userImage: process.env

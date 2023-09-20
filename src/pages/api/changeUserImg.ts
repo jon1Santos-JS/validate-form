@@ -42,11 +42,10 @@ export const config = {
 
 //         const collection = db.collection('users');
 //         const docs = await collection.find().toArray();
-//         return docs;
+//         console.log(docs);
 //     } catch (err: unknown) {
 //         console.log(err);
 //     } finally {
-//         // Ensures that the client will close when you finish/error
 //         await client.close();
 //     }
 // }

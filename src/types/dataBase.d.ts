@@ -1,14 +1,15 @@
-declare interface MiniDBType {
-    state: MiniDBState;
+declare interface MiniDBType<T> {
+    state: MiniDBState<T>;
 }
 
-declare interface MiniDBState {
+declare interface MiniDBState<T> {
+    _id: T;
     accounts: UserFromDataBaseType[];
     limit: number;
 }
 
 declare interface UserFromDataBaseType {
-    ID: number;
+    ID: string;
     constraint: ConstraintsType;
     username: { value: string };
     password: { value: string };

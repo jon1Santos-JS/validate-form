@@ -9,7 +9,7 @@ import {
 export default class MiniDBHandler {
     #StateFunctions = {
         checkDBState: async (caller: string) => {
-            const response = await this.#accessDB();
+            const response = await this.#accessDB('Check State');
             if (response) return SERVER_ERROR_RESPONSE;
             if (DATABASE.state.accounts.length >= DATABASE.state.limit) {
                 console.log(
@@ -21,7 +21,7 @@ export default class MiniDBHandler {
             return;
         },
         getUsers: async (caller: string) => {
-            const response = await this.#accessDB();
+            const response = await this.#accessDB('Get Users');
             if (response) return SERVER_ERROR_RESPONSE;
             console.log('Users have been gotten by: ', caller);
             return DATABASE.state.accounts;
@@ -40,7 +40,7 @@ export default class MiniDBHandler {
     };
 
     async init() {
-        const response = await this.#accessDB();
+        const response = await this.#accessDB('Init');
         if (response) return SERVER_ERROR_RESPONSE;
         return;
     }
@@ -49,7 +49,7 @@ export default class MiniDBHandler {
         return this.#StateFunctions[command];
     }
 
-    async #accessDB() {
+    async #accessDB(caller?: string) {
         try {
             const data = await readFileSync(MINI_DB_FILE_PATH_NAME, 'utf8');
             DATABASE.state = JSON.parse(data);
@@ -58,7 +58,7 @@ export default class MiniDBHandler {
             if (DATABASE.state.accounts.length <= 1) return;
             DATABASE.state = INITIAL_STATE;
             const response = await this.#StateFunctions.createAndRefreshDB(
-                'MiniDBHandler - accessDB',
+                caller ?? 'MiniDBHandler - accessDB',
             );
             if (response) return SERVER_ERROR_RESPONSE;
             return;
