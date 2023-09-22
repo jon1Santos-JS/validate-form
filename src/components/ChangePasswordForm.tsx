@@ -3,6 +3,7 @@ import Form from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
 import { omitFields } from '@/hooks/useInputsHandler';
+const API = 'api/changePassword';
 
 type ChangePasswordFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
@@ -91,7 +92,6 @@ export default function ChangePasswordForm({
     }
 
     async function onSubmitInputs() {
-        const action = process.env.NEXT_PUBLIC_CHANGE_PASSWORD_LINK as string;
         const handledBody = {
             username: { value: user.username },
             ...omitFields(inputs, ['errors', 'required', 'validations']),
@@ -101,7 +101,7 @@ export default function ChangePasswordForm({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledBody),
         };
-        const response = await fetch(action, options);
+        const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) return;
         router.reload();
@@ -133,7 +133,8 @@ const INPUTS_INITIAL_STATE: InputsToValidateType<
                 message: 'This field have to be different than the password',
             },
             {
-                coditional: currentInputValue !== hookInputs?.password.value,
+                coditional:
+                    currentInputValue !== hookInputs?.confirmNewPassword.value,
                 message:
                     'This field has to be equal to the confirm new password',
             },
@@ -145,7 +146,7 @@ const INPUTS_INITIAL_STATE: InputsToValidateType<
     confirmNewPassword: {
         validations: (currentInputValue, hookInputs) => [
             {
-                coditional: currentInputValue !== hookInputs?.password.value,
+                coditional: currentInputValue !== hookInputs?.newPassword.value,
                 message: 'This field has to be equal to the new password',
             },
         ],

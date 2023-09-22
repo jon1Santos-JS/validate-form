@@ -3,6 +3,7 @@ import Form from '../Form';
 import Input from '../Input';
 import useStringHandler, { onCheckExtensions } from '@/hooks/useInputsHandler';
 
+const API = 'api/changeUserImg';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
 type PerfilImageFormPropsTypes = {
@@ -93,16 +94,16 @@ export default function PerfilImageForm({
             method: 'POST',
             body: formData,
         };
+        // IMAGE THIRTY PARTY API
         const imgApiResponse = await fetch(
-            `${
-                process.env.NEXT_PUBLIC_IMGBB_API_LINK as string
-            }expiration=600&key=${
+            `${process.env.NEXT_PUBLIC_IMGBB_API_LINK}${
                 process.env.NEXT_PUBLIC_IMGBB_API_KEY as string
             }`,
             fetchOptions,
         );
         if (!imgApiResponse.ok) return;
         const image = await imgApiResponse.json();
+        // IMAGE LOCAL API
         onUpdateUserImageDB(image.data.url);
         window.location.reload();
     }
@@ -117,9 +118,6 @@ export default function PerfilImageForm({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledUser),
         };
-        await fetch(
-            process.env.NEXT_PUBLIC_CHANGE_USER_IMG_LINK as string,
-            options,
-        );
+        await fetch(API, options);
     }
 }

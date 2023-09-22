@@ -4,6 +4,8 @@ import PerfilImage from '@/components/PerfilImage/PerfilImage';
 import PerfilImageForm from '@/components/PerfilImage/PerfilImageForm';
 import { useRouter } from 'next/router';
 
+const API = 'api/deleteAccount';
+
 type DashBoardPageProps = {
     handleUserProps: HandleUserPropsType;
 };
@@ -34,8 +36,17 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
                             handleUserProps: handleUserProps,
                         }}
                     />
+                    <button onClick={onDeleteAccount}>Delete Account</button>
                 </div>
             </div>
         );
+
+        async function onDeleteAccount() {
+            const body = user.username;
+            const response = await fetch(API, { body: body, method: 'POST' });
+            const parsedResponse = await response.json();
+            if (typeof parsedResponse === 'string') return;
+            window.location.assign('/');
+        }
     }
 }

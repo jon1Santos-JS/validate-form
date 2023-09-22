@@ -21,13 +21,10 @@ export const config = {
     },
 };
 
-import { MongoClient, ServerApiVersion } from 'mongodb';
-
-// const uri =
-//     'mongodb+srv://joaosantos58981:HExPSBU0gf4NsKZC@cluster0.jtc0ysv.mongodb.net/?retryWrites=true&w=majority';
+// import { MongoClient, ServerApiVersion } from 'mongodb';
 
 // // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-// const client = new MongoClient(uri, {
+// const client = new MongoClient(process.env.MONGO_DB_URI as string, {
 //     serverApi: {
 //         version: ServerApiVersion.v1,
 //         strict: true,
@@ -65,6 +62,17 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 //                 },
 //                 userImage:
 //                     'https://i.ibb.co/QHcc4Lv/office-funcionarios-copiar.png',
+//             },
+//             {
+//                 ID: '2',
+//                 constraint: 'user',
+//                 username: {
+//                     value: 'mariana',
+//                 },
+//                 password: {
+//                     value: 'asdasd',
+//                 },
+//                 userImage: 'https://i.ibb.co/gjc1KnN/perfil-default-img.png',
 //             },
 //         ];
 

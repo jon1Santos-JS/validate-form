@@ -44,4 +44,5 @@ declare interface UserWithImgType {
 declare type HandleDBCommandTypes =
     | 'createAndRefreshDB'
     | 'getUsers'
-    | 'checkDBState';
+    | 'checkDBState'
+    | 'accessDB';

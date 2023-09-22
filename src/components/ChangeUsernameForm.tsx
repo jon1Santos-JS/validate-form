@@ -2,6 +2,9 @@ import { useState } from 'react';
 import Form from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
+const API = 'api/changeUsername';
+
+const DEFAULT_ERROR_MESSAGE = 'Invalid username';
 
 type OwnPropsType = {
     ownProps: ChangeUsernameFormPropsTypes;
@@ -44,6 +47,8 @@ export default function ChangeUsernameForm({
                 ownProps={{
                     legend: 'Change Username',
                     onSubmitInputs: onSubmitInputs,
+                    formError: DEFAULT_ERROR_MESSAGE,
+                    waitMessageToSubmit: true,
                 }}
                 validateProps={{ inputs, setShowInputsMessage }}
             >
@@ -78,7 +83,6 @@ export default function ChangeUsernameForm({
     }
 
     async function onSubmitInputs() {
-        const action = process.env.NEXT_PUBLIC_CHANGE_USERNAME_LINK as string;
         const handledBody = {
             username: { value: user.username },
             newUsername: { value: inputs.newUsername.value },
@@ -88,7 +92,7 @@ export default function ChangeUsernameForm({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledBody),
         };
-        const response = await fetch(action, options);
+        const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) {
             return parsedResponse.body as string;

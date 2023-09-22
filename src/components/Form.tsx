@@ -1,7 +1,7 @@
 import useValidate from '@/hooks/useValidate';
 import React, { useEffect, useState } from 'react';
 
-const FORM_DEFAULT_ERROR = 'Invalid form';
+const DEFAULT_MESSAGE = 'Invalid form';
 
 interface FormPropsTypes<T extends string> {
     ownProps: PropsType;
@@ -18,6 +18,7 @@ interface PropsType {
     onSubmitInputs: () => Promise<string | undefined | void>;
     legend?: string;
     formError?: string | null;
+    waitMessageToSubmit?: boolean;
 }
 
 export default function FormFormProps<T extends string>({
@@ -26,12 +27,10 @@ export default function FormFormProps<T extends string>({
     validateProps,
 }: FormPropsTypes<T>) {
     const { inputs, setShowInputsMessage } = validateProps;
-    const { onSubmitInputs, legend, formError } = ownProps;
+    const { onSubmitInputs, legend, formError, waitMessageToSubmit } = ownProps;
     const { validateAll } = useValidate(inputs);
     const [showMessage, setShowMessage] = useState<boolean>(false);
-    const [message, setMessage] = useState(
-        formError ? formError : FORM_DEFAULT_ERROR,
-    );
+    const [message, setMessage] = useState(formError ?? DEFAULT_MESSAGE);
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
@@ -84,21 +83,19 @@ export default function FormFormProps<T extends string>({
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) {
         e.preventDefault();
+        if (waitMessageToSubmit && showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
+        setMessage(formError ?? DEFAULT_MESSAGE); // TO SET SUBMIT ERROR
         if (validateAll()) {
-            if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
             const response = await onSubmitInputs();
-            if (response !== undefined) {
-                const conditional =
-                    typeof response === 'string'
-                        ? response
-                        : FORM_DEFAULT_ERROR;
-                setMessage(conditional); // TO SET SUBMIT ERROR
-                setShowMessage(true);
+            if (response === undefined) {
+                setShowInputsMessage(false);
+                setShowMessage(false);
                 return;
             }
-            setShowInputsMessage(false);
-            setShowMessage(false);
-            return;
+            if (typeof response === 'string') {
+                setMessage(response);
+            }
+            setShowMessage(true);
         }
         setShowMessage(true);
         setShowInputsMessage(true);

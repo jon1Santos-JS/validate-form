@@ -70,3 +70,16 @@ export async function changeUserImg(user: UserWithImgType) {
     }
     return { serverResponse: true, body: 'User image has been updated' };
 }
+
+export async function deleteAccount(username: string) {
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.excludeUserAccount(username);
+    if (typeof response === 'string') {
+        console.log('controller error to exclude user account: ', response);
+        return {
+            serverResponse: false,
+            body: 'Error when try to delete user account',
+        };
+    }
+    return { serverResponse: true, body: 'User has been deleted' };
+}

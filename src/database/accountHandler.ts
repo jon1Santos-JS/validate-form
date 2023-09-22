@@ -5,7 +5,7 @@ export default class MiniDBAccountHandler {
     #DB = new MiniDBHandler();
 
     async signIn(userAccount: UserFromClientType) {
-        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
+        if (await this.#onInitDB('sign in user')) return SERVER_ERROR_RESPONSE;
         if (!this.#authAccount(userAccount)) {
             console.log('account was not found');
             return SERVER_ERROR_RESPONSE;
@@ -15,7 +15,7 @@ export default class MiniDBAccountHandler {
     }
 
     async signUp(userAccount: UserFromClientType) {
-        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
+        if (await this.#onInitDB('sign up user')) return SERVER_ERROR_RESPONSE;
         if (this.#authUsername(userAccount.username.value)) {
             console.log('account already exist');
             return SERVER_ERROR_RESPONSE;
@@ -29,7 +29,8 @@ export default class MiniDBAccountHandler {
     }
 
     async updatePassword(userAccount: ChangePasswordFromClientType) {
-        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
+        if (await this.#onInitDB('update password'))
+            return SERVER_ERROR_RESPONSE;
         const currentUserAccount = {
             username: { value: userAccount.username.value },
             password: { value: userAccount.password.value },
@@ -45,7 +46,8 @@ export default class MiniDBAccountHandler {
     }
 
     async updateUsername(user: ChangeUsernameFromClientType) {
-        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
+        if (await this.#onInitDB('update username'))
+            return SERVER_ERROR_RESPONSE;
         const hasUsername = this.#authUsername(user.newUsername.value);
         const currentUserAccount = this.#authUsername(user.username.value);
         if (hasUsername) return SERVER_ERROR_RESPONSE;
@@ -68,7 +70,8 @@ export default class MiniDBAccountHandler {
     }
 
     async updateUserImage({ userName, userImg }: UserWithImgType) {
-        if (await this.#onInitDB()) return SERVER_ERROR_RESPONSE;
+        if (await this.#onInitDB('update user image'))
+            return SERVER_ERROR_RESPONSE;
         const currentUserAccount = this.#authUsername(userName);
         if (!currentUserAccount) return SERVER_ERROR_RESPONSE;
         const response = await this.#changeUserImg({ userName, userImg });
@@ -79,9 +82,20 @@ export default class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
-    async #onInitDB() {
+    async excludeUserAccount(username: string) {
+        if (await this.#onInitDB('delete account'))
+            return SERVER_ERROR_RESPONSE;
+        const response = await this.#deleteAccount(username);
+        if (!response) {
+            console.log('User account has been deleted');
+            return;
+        }
+        return SERVER_ERROR_RESPONSE;
+    }
+
+    async #onInitDB(caller: string) {
         try {
-            await this.#DB.init();
+            await this.#DB.init(caller);
             return;
         } catch {
             return SERVER_ERROR_RESPONSE;
@@ -187,6 +201,17 @@ export default class MiniDBAccountHandler {
         });
         const response = await this.#DB.handleDB('createAndRefreshDB')(
             'MiniDBAccountHandler - changeUserImg',
+        );
+        if (!response) return;
+        return SERVER_ERROR_RESPONSE;
+    }
+
+    async #deleteAccount(username: string) {
+        DATABASE.state.accounts = DATABASE.state.accounts.filter(
+            (account) => account.username.value !== username,
+        );
+        const response = await this.#DB.handleDB('createAndRefreshDB')(
+            'MiniDBAccountHandler - deleteUserAccount',
         );
         if (!response) return;
         return SERVER_ERROR_RESPONSE;

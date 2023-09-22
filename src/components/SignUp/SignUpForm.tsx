@@ -3,6 +3,7 @@ import Form from '../Form';
 import Input from '../Input';
 import { omitFields } from '@/hooks/useInputsHandler';
 import { onOmitProps } from '@/lib/lodashAdapter';
+const API = 'api/signUp';
 
 interface SignUpFormPropsType {
     ownProps: PropsType;
@@ -87,7 +88,6 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     }
 
     async function onSubmitInputs() {
-        const action = process.env.NEXT_PUBLIC_SIGN_UP_LINK as string;
         const handledInputs = omitFields(
             onOmitProps(inputs, ['confirmPassword']) as InputsToValidateType<
                 keyof typeof inputs
@@ -99,7 +99,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledInputs),
         };
-        const response = await fetch(action, options);
+        const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (typeof parsedResponse.serverResponse === 'string') return;
         if (parsedResponse.serverResponse) {

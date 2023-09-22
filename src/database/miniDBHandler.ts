@@ -9,7 +9,7 @@ import {
 export default class MiniDBHandler {
     #StateFunctions = {
         checkDBState: async (caller: string) => {
-            const response = await this.#accessDB(caller);
+            const response = await this.init('check database state');
             if (response) return SERVER_ERROR_RESPONSE;
             if (DATABASE.state.accounts.length >= DATABASE.state.limit) {
                 console.log(
@@ -21,12 +21,14 @@ export default class MiniDBHandler {
             return;
         },
         getUsers: async (caller: string) => {
-            const response = await this.#accessDB(caller);
-            if (response) return SERVER_ERROR_RESPONSE;
+            const response = await this.init('get users');
+            if (response) return response;
             console.log('Users have been gotten by: ', caller);
             return DATABASE.state.accounts;
         },
         createAndRefreshDB: async (caller: string) => {
+            if (process.env.IS_LOCALHOST === 'true')
+                console.log('sim está em um abiente local');
             const json = JSON.stringify(DATABASE.state, undefined, 2);
             try {
                 await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
@@ -37,31 +39,30 @@ export default class MiniDBHandler {
                 return SERVER_ERROR_RESPONSE;
             }
         },
+        accessDB: async (caller: string) => {
+            try {
+                const data = await readFileSync(MINI_DB_FILE_PATH_NAME, 'utf8');
+                DATABASE.state = JSON.parse(data);
+                return;
+            } catch {
+                DATABASE.state = INITIAL_STATE;
+                const response = await this.#StateFunctions.createAndRefreshDB(
+                    caller ?? 'MiniDBHandler - accessDB',
+                );
+                if (response) return SERVER_ERROR_RESPONSE;
+                return;
+            }
+        },
     };
 
-    async init() {
-        const response = await this.#accessDB('Init');
+    async init(caller: string) {
+        if (process.env.IS_LOCALHOST === 'true')
+            console.log('sim está em um abiente local');
+        const response = await this.#StateFunctions.accessDB(caller);
         if (response) return SERVER_ERROR_RESPONSE;
-        return;
     }
 
     handleDB<T extends HandleDBCommandTypes>(command: T) {
         return this.#StateFunctions[command];
-    }
-
-    async #accessDB(caller?: string) {
-        try {
-            const data = await readFileSync(MINI_DB_FILE_PATH_NAME, 'utf8');
-            DATABASE.state = JSON.parse(data);
-            return;
-        } catch (e: unknown) {
-            if (DATABASE.state.accounts.length <= 1) return;
-            DATABASE.state = INITIAL_STATE;
-            const response = await this.#StateFunctions.createAndRefreshDB(
-                (e as string) ?? 'MiniDBHandler - accessDB',
-            );
-            if (response) return SERVER_ERROR_RESPONSE;
-            return;
-        }
     }
 }

@@ -3,6 +3,7 @@ import Head from 'next/head';
 import '../styles/sass/index.scss';
 import { useCallback, useEffect, useState } from 'react';
 import MainNavigationBar from '@/components/MainNavigationBar';
+const API = 'api/signIn';
 
 export default function App({ Component, pageProps }: AppProps) {
     const [userProps, setUserProps] = useState({
@@ -15,8 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
     });
 
     const onCheckUserState = useCallback(async () => {
-        const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
-        const response = await fetch(action, {
+        const response = await fetch(API, {
             method: 'GET',
         });
         const parsedResponse: ServerResponse = await response.json();

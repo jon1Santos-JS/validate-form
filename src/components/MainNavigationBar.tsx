@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+const API = 'api/signIn';
+
 type MainNavigationBarProps = {
     handleUserProps: HandleUserPropsType;
 };
@@ -33,9 +35,8 @@ export default function MainNavigationBar({
     }
 
     async function signOutUser() {
-        const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options = { method: 'DELETE' };
-        await fetch(action, options);
+        await fetch(API, options);
         setUser({ username: '' });
         setHasUser(false);
         window.location.assign('/');

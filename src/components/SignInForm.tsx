@@ -3,11 +3,12 @@ import Form from './Form';
 import Input from './Input';
 import { omitFields } from '@/hooks/useInputsHandler';
 
+const API = 'api/signIn';
+const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
+
 type SignInFormProps = {
     handleUserProps: HandleUserPropsType;
 };
-
-const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
 
 export default function SignInForm({ handleUserProps }: SignInFormProps) {
     const { setUser, setHasUser, setUserStateLoading } = handleUserProps;
@@ -99,7 +100,6 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
     }
 
     async function onSubmitInputs() {
-        const action = process.env.NEXT_PUBLIC_SIGN_IN_LINK as string;
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -107,7 +107,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                 omitFields(inputs, ['errors', 'required', 'validations']),
             ),
         };
-        const response = await fetch(action, options);
+        const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         setUserStateLoading(false);
         setHasUser(parsedResponse.serverResponse);
