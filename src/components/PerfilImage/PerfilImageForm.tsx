@@ -104,7 +104,7 @@ export default function PerfilImageForm({
         if (!imgApiResponse.ok) return;
         const image = await imgApiResponse.json();
         // IMAGE LOCAL API
-        onUpdateUserImageDB(image.data.url);
+        await onUpdateUserImageDB(image.data.url);
         window.location.reload();
     }
 

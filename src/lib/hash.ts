@@ -38,35 +38,16 @@ export async function returnUserByHash(
         message: USER_HASH_ERROR,
     };
 
-    if (users.length > 1) {
-        users.forEach((user) => {
-            const userToCompare = onOmitProps(
-                user,
-                OMIT_INPUTS_FIELDS_TO_COMPARE,
-            );
-            if (compareSync(JSON.stringify(userToCompare), browserHash)) {
-                validation.user = {
-                    username: user.username.value,
-                    userImage: user.userImage,
-                };
-                validation.isValid = true;
-            }
-        });
-    } else {
-        // IF THERE'S NO DATABASE USERS, IT IS COMPARING ADMIN'S ACCOUNT TO HASH
-        const uniqueUser = users[0];
-        const userToCompare = onOmitProps(
-            uniqueUser,
-            OMIT_INPUTS_FIELDS_TO_COMPARE,
-        );
+    users.forEach((user) => {
+        const userToCompare = onOmitProps(user, OMIT_INPUTS_FIELDS_TO_COMPARE);
         if (compareSync(JSON.stringify(userToCompare), browserHash)) {
             validation.user = {
-                username: uniqueUser.username.value,
-                userImage: uniqueUser.userImage,
+                username: user.username.value,
+                userImage: user.userImage,
             };
             validation.isValid = true;
         }
-    }
+    });
 
     const conditional = validation.isValid
         ? validation.user

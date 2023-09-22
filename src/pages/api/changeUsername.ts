@@ -14,11 +14,8 @@ export default async function handler(
             const controllerResponse = await changeUsernameController(
                 userFromClient,
             );
-            if (
-                !controllerResponse.serverResponse ||
-                typeof controllerResponse.body === 'string'
-            ) {
-                return res.status(200).json(controllerResponse);
+            if (typeof controllerResponse.body === 'string') {
+                return res.status(500).json(controllerResponse);
             }
             const newAccountFromDB = controllerResponse.body;
             const hash = createHash(newAccountFromDB);

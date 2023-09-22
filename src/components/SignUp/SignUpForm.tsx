@@ -3,7 +3,14 @@ import Form from '../Form';
 import Input from '../Input';
 import { omitFields } from '@/hooks/useInputsHandler';
 import { onOmitProps } from '@/lib/lodashAdapter';
+
 const API = 'api/signUp';
+const INPUTS_TO_OMIT = ['confirmPassword'] as [InputsType];
+const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
+    'errors',
+    'required',
+    'validations',
+];
 
 interface SignUpFormPropsType {
     ownProps: PropsType;
@@ -13,6 +20,8 @@ interface SignUpFormPropsType {
 interface PropsType {
     setResponse: (data: boolean) => void;
 }
+
+type InputsType = 'confirmPassword' | 'password' | 'username';
 
 export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const { setResponse } = ownProps;
@@ -89,10 +98,10 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
 
     async function onSubmitInputs() {
         const handledInputs = omitFields(
-            onOmitProps(inputs, ['confirmPassword']) as InputsToValidateType<
+            onOmitProps(inputs, INPUTS_TO_OMIT) as InputsToValidateType<
                 keyof typeof inputs
             >,
-            ['errors', 'required', 'validations'],
+            FIELDS_TO_OMIT,
         );
         const options = {
             method: 'POST',
@@ -110,9 +119,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     }
 }
 
-const INPUTS_INITIAL_STATE: InputsToValidateType<
-    'confirmPassword' | 'password' | 'username'
-> = {
+const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
     username: {
         validations: (currentInputValue) => [
             {

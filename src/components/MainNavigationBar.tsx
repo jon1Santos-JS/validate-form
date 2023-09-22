@@ -9,12 +9,17 @@ type MainNavigationBarProps = {
 export default function MainNavigationBar({
     handleUserProps,
 }: MainNavigationBarProps) {
-    const { hasUser, setHasUser, setUser, isUserStateLoading } =
-        handleUserProps;
+    const {
+        hasUser,
+        setHasUser,
+        setUser,
+        isUserStateLoading,
+        isUserImageLoading,
+    } = handleUserProps;
     return <>{renderContent()}</>;
 
     function renderContent() {
-        if (isUserStateLoading) return null;
+        if (isUserStateLoading && !hasUser && isUserImageLoading) return null;
 
         return (
             <div className="o-navigation-bar">
@@ -35,10 +40,11 @@ export default function MainNavigationBar({
     }
 
     async function signOutUser() {
-        const options = { method: 'DELETE' };
-        await fetch(API, options);
+        await fetch(API, { method: 'DELETE' });
         setUser({ username: '' });
         setHasUser(false);
-        window.location.assign('/');
+        if (!hasUser) {
+            window.location.assign('/');
+        }
     }
 }

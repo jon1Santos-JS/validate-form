@@ -19,3 +19,14 @@ export const COOKIES_EXPIRES = new Date(Date.now() + HOUR * 2);
 
 export const DATABASE: MiniDBType<null> = { state: INITIAL_STATE };
 DATABASE.state.accounts.push(DB_ADMIN_ACCOUNT);
+
+import { MongoClient, ServerApiVersion } from 'mongodb';
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+export const MONGODB = new MongoClient(process.env.MONGO_DB_URI as string, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    },
+});

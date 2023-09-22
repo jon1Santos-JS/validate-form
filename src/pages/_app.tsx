@@ -10,9 +10,12 @@ export default function App({ Component, pageProps }: AppProps) {
         user: { username: '' } as UserType,
         hasUser: false,
         isUserStateLoading: true,
+        isUserImageLoading: true,
         setHasUser: onUpdateHasUser,
         setUser: onUpdateUser,
         setUserStateLoading: onUpdateState,
+        setUserImageLoading: (value: boolean) =>
+            setUserProps((prev) => ({ ...prev, isUserImageLoading: value })),
     });
 
     const onCheckUserState = useCallback(async () => {

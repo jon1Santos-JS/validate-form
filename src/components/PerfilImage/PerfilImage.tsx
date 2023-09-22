@@ -8,7 +8,7 @@ export default function PerfilImage({
     handleUserProps,
 }: PerfilImagePropsTypes) {
     const [loading, setLoading] = useState(true);
-    const { isUserStateLoading, user } = handleUserProps;
+    const { isUserStateLoading, user, setUserImageLoading } = handleUserProps;
 
     return <>{renderImage()}</>;
 
@@ -41,5 +41,6 @@ export default function PerfilImage({
 
     function onLoadingImage() {
         setLoading(false);
+        setUserImageLoading(false);
     }
 }

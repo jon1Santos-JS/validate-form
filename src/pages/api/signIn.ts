@@ -13,10 +13,8 @@ export default async function handler(
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
             const controllerResponse = await getUserStateController();
-            // NO DATABASE
             if (typeof controllerResponse.body === 'string')
                 return res.status(200).json(controllerResponse);
-            // DATABASE
             const usersFromDB = controllerResponse.body;
             const hashResponse = await returnUserByHash(
                 browserHash,

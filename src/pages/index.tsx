@@ -1,5 +1,4 @@
 import SignInForm from '@/components/SignInForm';
-import { useRouter } from 'next/router';
 
 type SignInPageProps = {
     handleUserProps: HandleUserPropsType;
@@ -7,13 +6,12 @@ type SignInPageProps = {
 
 export default function SignInPage({ handleUserProps }: SignInPageProps) {
     const { hasUser, isUserStateLoading } = handleUserProps;
-    const router = useRouter();
     return <>{renderContent()}</>;
 
     function renderContent() {
         if (isUserStateLoading) return null;
-        if (!isUserStateLoading && hasUser) {
-            router.push('/dashboard-page');
+        if (hasUser) {
+            window.location.assign('/dashboard-page');
             return null;
         }
 

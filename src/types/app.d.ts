@@ -6,9 +6,11 @@ declare interface HandleUserPropsType {
     user: UserType;
     hasUser: boolean;
     isUserStateLoading: boolean;
+    isUserImageLoading: boolean;
     setHasUser: (value: boolean) => void;
     setUser: SetUserType;
     setUserStateLoading: (value: boolean) => void;
+    setUserImageLoading: (value: boolean) => void;
 }
 
 declare interface UserType {

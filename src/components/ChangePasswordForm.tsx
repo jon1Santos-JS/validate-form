@@ -3,11 +3,19 @@ import Form from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
 import { omitFields } from '@/hooks/useInputsHandler';
+
 const API = 'api/changePassword';
+const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
+    'errors',
+    'required',
+    'validations',
+];
 
 type ChangePasswordFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
 };
+
+type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 
 export default function ChangePasswordForm({
     handleUserProps,
@@ -94,7 +102,7 @@ export default function ChangePasswordForm({
     async function onSubmitInputs() {
         const handledBody = {
             username: { value: user.username },
-            ...omitFields(inputs, ['errors', 'required', 'validations']),
+            ...omitFields(inputs, FIELDS_TO_OMIT),
         };
         const options: FetchOptionsType = {
             method: 'POST',
@@ -108,9 +116,7 @@ export default function ChangePasswordForm({
     }
 }
 
-const INPUTS_INITIAL_STATE: InputsToValidateType<
-    'password' | 'newPassword' | 'confirmNewPassword'
-> = {
+const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
     password: {
         validations: (currentInputValue) => [
             {

@@ -4,7 +4,7 @@ import PerfilImage from '@/components/PerfilImage/PerfilImage';
 import PerfilImageForm from '@/components/PerfilImage/PerfilImageForm';
 import { useRouter } from 'next/router';
 
-const API = 'api/deleteAccount';
+const API = 'api/handleDatabase';
 
 type DashBoardPageProps = {
     handleUserProps: HandleUserPropsType;
@@ -13,6 +13,7 @@ type DashBoardPageProps = {
 export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
     const { hasUser, isUserStateLoading, user } = handleUserProps;
     const router = useRouter();
+    const adminCheck = user.username !== 'admins';
 
     return <>{renderElement()}</>;
 
@@ -36,10 +37,24 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
                             handleUserProps: handleUserProps,
                         }}
                     />
-                    <button onClick={onDeleteAccount}>Delete Account</button>
+                    {adminCheck && (
+                        <button onClick={onDeleteAccount}>
+                            Delete Account
+                        </button>
+                    )}
+                    {!adminCheck && (
+                        <button onClick={onResetDB}>Reset Database</button>
+                    )}
                 </div>
             </div>
         );
+
+        async function onResetDB() {
+            const response = await fetch(API, { method: 'GET' });
+            const parsedResponse = await response.json();
+            if (typeof parsedResponse === 'string') return;
+            window.location.assign('/');
+        }
 
         async function onDeleteAccount() {
             const body = user.username;

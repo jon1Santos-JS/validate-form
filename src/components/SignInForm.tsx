@@ -5,6 +5,11 @@ import { omitFields } from '@/hooks/useInputsHandler';
 
 const API = 'api/signIn';
 const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
+const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
+    'errors',
+    'required',
+    'validations',
+];
 
 type SignInFormProps = {
     handleUserProps: HandleUserPropsType;
@@ -103,9 +108,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(
-                omitFields(inputs, ['errors', 'required', 'validations']),
-            ),
+            body: JSON.stringify(omitFields(inputs, FIELDS_TO_OMIT)),
         };
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
@@ -114,7 +117,6 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         if (!parsedResponse.serverResponse) {
             return SIGN_IN_ERROR_RESPONSE;
         }
-        window.location.assign('/dashboard-page');
         setUser({ username: parsedResponse.body as string });
     }
 }

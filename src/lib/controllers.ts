@@ -58,7 +58,7 @@ export async function changeUsernameController(
     return { serverResponse: true, body: response };
 }
 
-export async function changeUserImg(user: UserWithImgType) {
+export async function changeUserImgController(user: UserWithImgType) {
     const accountHandler = new MiniDBAccountHandler();
     const response = await accountHandler.updateUserImage(user);
     if (typeof response === 'string') {
@@ -71,7 +71,7 @@ export async function changeUserImg(user: UserWithImgType) {
     return { serverResponse: true, body: 'User image has been updated' };
 }
 
-export async function deleteAccount(username: string) {
+export async function deleteAccountController(username: string) {
     const accountHandler = new MiniDBAccountHandler();
     const response = await accountHandler.excludeUserAccount(username);
     if (typeof response === 'string') {
@@ -82,4 +82,22 @@ export async function deleteAccount(username: string) {
         };
     }
     return { serverResponse: true, body: 'User has been deleted' };
+}
+
+export async function resetDBController(username: string) {
+    if (username !== process.env.NEXT_PUBLIC_ADMINS_USERNAME)
+        return {
+            serverResponse: false,
+            body: 'Permission denied',
+        };
+    const DBHandler = new MiniDBHandler();
+    const response = await DBHandler.handleDB('resetDB')('resetDB controller');
+    if (typeof response === 'string') {
+        console.log('controller error to reset Database: ', response);
+        return {
+            serverResponse: false,
+            body: 'Error when try to reset Database',
+        };
+    }
+    return { serverResponse: true, body: 'Database has been reseted' };
 }
