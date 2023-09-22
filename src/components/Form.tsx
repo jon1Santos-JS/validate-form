@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 const DEFAULT_MESSAGE = 'Invalid form';
 
 interface FormPropsTypes<T extends string> {
-    ownProps: PropsType;
+    ownProps: Props;
     validateProps: ValidatePropsType<T>;
     children: JSX.Element[] | JSX.Element;
 }
@@ -14,7 +14,7 @@ interface ValidatePropsType<T extends string> {
     setShowInputsMessage: (value: boolean) => void;
 }
 
-interface PropsType {
+interface Props {
     onSubmitInputs: () => Promise<string | undefined | void>;
     legend?: string;
     formError?: string | null;
