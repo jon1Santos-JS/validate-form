@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { useState } from 'react';
 type PerfilImagePropsTypes = {
     handleUserProps: HandleUserPropsType;
 };
@@ -7,8 +6,12 @@ type PerfilImagePropsTypes = {
 export default function PerfilImage({
     handleUserProps,
 }: PerfilImagePropsTypes) {
-    const [loading, setLoading] = useState(true);
-    const { isUserStateLoading, user, setUserImageLoading } = handleUserProps;
+    const {
+        isUserStateLoading,
+        user,
+        setUserImageLoading,
+        isUserImageLoading,
+    } = handleUserProps;
 
     return <>{renderImage()}</>;
 
@@ -30,7 +33,7 @@ export default function PerfilImage({
                         maxHeight: '200px',
                     }}
                 />
-                {loading && (
+                {isUserImageLoading && (
                     <div className="o-spinner-container">
                         <div className="spinner-element"></div>
                     </div>
@@ -40,7 +43,6 @@ export default function PerfilImage({
     }
 
     function onLoadingImage() {
-        setLoading(false);
         setUserImageLoading(false);
     }
 }

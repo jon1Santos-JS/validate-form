@@ -1,15 +1,12 @@
 import { onConverToBasicLatinLetters, onOmitProps } from '@/lib/lodashAdapter';
 
-export default function useStringHandler() {
-    function handledName(name: string) {
-        const handledName = onConverToBasicLatinLetters(name);
-        const noCedilha = handledName.replace(/[çÇ]/g, (match) =>
-            match === 'ç' ? 'c' : 'C',
-        );
+export function handledName(name: string) {
+    const handledName = onConverToBasicLatinLetters(name);
+    const noCedilha = handledName.replace(/[çÇ]/g, (match) =>
+        match === 'ç' ? 'c' : 'C',
+    );
 
-        return noCedilha;
-    }
-    return { handledName };
+    return noCedilha;
 }
 
 export function onCheckExtensions(extensions: string[], text: string) {
@@ -33,4 +30,12 @@ export function omitFields<T extends string>(
         );
     }
     return handleInputs;
+}
+
+export function preventCompareEmptyField(
+    toCompare: string,
+    condition: boolean,
+) {
+    if (!toCompare) return !condition;
+    return condition;
 }

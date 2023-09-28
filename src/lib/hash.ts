@@ -1,11 +1,9 @@
 import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
-import { onOmitProps } from './lodashAdapter';
 
-const OMIT_INPUTS_FIELDS_TO_COMPARE: ['ID', 'constraint', 'userImage'] = [
-    'ID',
-    'constraint',
-    'userImage',
-];
+// Hash time stamp
+
+const HOUR = 1000 * 60 * 60;
+export const COOKIES_EXPIRES = new Date(Date.now() + HOUR * 2);
 
 export const USER_HASH_NAME = 'user-hash';
 
@@ -39,7 +37,10 @@ export async function returnUserByHash(
     };
 
     users.forEach((user) => {
-        const userToCompare = onOmitProps(user, OMIT_INPUTS_FIELDS_TO_COMPARE);
+        const userToCompare = {
+            username: user.username,
+            password: user.password,
+        };
         if (compareSync(JSON.stringify(userToCompare), browserHash)) {
             validation.user = {
                 username: user.username.value,

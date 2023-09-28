@@ -11,7 +11,7 @@ interface FormPropsTypes<T extends string> {
 
 interface ValidatePropsType<T extends string> {
     inputs: InputsToValidateType<T>;
-    setShowInputsMessage: (value: boolean) => void;
+    onShowInputsMessage: (value: boolean) => void;
 }
 
 interface Props {
@@ -26,9 +26,9 @@ export default function FormFormProps<T extends string>({
     children,
     validateProps,
 }: FormPropsTypes<T>) {
-    const { inputs, setShowInputsMessage } = validateProps;
+    const { inputs, onShowInputsMessage } = validateProps;
     const { onSubmitInputs, legend, formError, waitMessageToSubmit } = ownProps;
-    const { validateAll } = useValidate(inputs);
+    const { manyValidation } = useValidate(inputs);
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(formError ?? DEFAULT_MESSAGE);
 
@@ -42,11 +42,11 @@ export default function FormFormProps<T extends string>({
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
-            setShowInputsMessage(false);
+            onShowInputsMessage(false);
         }, 2750);
 
         return () => clearTimeout(timerDownMessage);
-    }, [setShowInputsMessage]);
+    }, [onShowInputsMessage]);
 
     return (
         <form className="c-form">
@@ -85,10 +85,10 @@ export default function FormFormProps<T extends string>({
         e.preventDefault();
         if (waitMessageToSubmit && showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         setMessage(formError ?? DEFAULT_MESSAGE); // TO SET SUBMIT ERROR
-        if (validateAll()) {
+        if (manyValidation()) {
             const response = await onSubmitInputs();
             if (response === undefined) {
-                setShowInputsMessage(false);
+                onShowInputsMessage(false);
                 setShowMessage(false);
                 return;
             }
@@ -98,6 +98,6 @@ export default function FormFormProps<T extends string>({
             setShowMessage(true);
         }
         setShowMessage(true);
-        setShowInputsMessage(true);
+        onShowInputsMessage(true);
     }
 }

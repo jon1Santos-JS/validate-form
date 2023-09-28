@@ -104,15 +104,12 @@ export default class MiniDBAccountHandler {
 
     // DONT NEED 'TO REFRESH DB (async)' WHEN THE 'INIT FUNCTION' HAVE BEEN CALLED BY PUBLIC FUNCTIONS
     #authAccount(userAccount: UserFromClientType) {
-        const account = DATABASE.state.accounts.find((DBAccount) => {
-            if (
-                DBAccount.username.value !== userAccount.username.value ||
-                DBAccount.password.value !== userAccount.password.value
-            ) {
-                return;
-            }
-            return DBAccount;
-        });
+        const account = DATABASE.state.accounts.find((DBAccount) =>
+            DBAccount.username.value !== userAccount.username.value ||
+            DBAccount.password.value !== userAccount.password.value
+                ? undefined
+                : DBAccount,
+        );
         return account;
     }
 
@@ -127,21 +124,15 @@ export default class MiniDBAccountHandler {
     }
 
     async #changePassword(userAccount: ChangePasswordFromClientType) {
-        DATABASE.state.accounts = DATABASE.state.accounts.map((account) => {
-            if (
-                account.username.value === userAccount.username.value &&
-                account.password.value === userAccount.password.value
-            ) {
-                return {
-                    ID: account.ID,
-                    constraint: account.constraint,
-                    username: { value: userAccount.username.value },
-                    password: { value: userAccount.newPassword.value },
-                    userImage: account.userImage,
-                };
-            }
-            return account;
-        });
+        DATABASE.state.accounts = DATABASE.state.accounts.map((account) =>
+            account.username.value === userAccount.username.value &&
+            account.password.value === userAccount.password.value
+                ? {
+                      ...account,
+                      password: { value: userAccount.newPassword.value },
+                  }
+                : account,
+        );
         const handleResponse = await this.#DB.handleDB('createAndRefreshDB')(
             'MiniDBAccountHandler - changePassword',
         );
@@ -150,18 +141,11 @@ export default class MiniDBAccountHandler {
     }
 
     async #changeUsername(user: ChangeUsernameFromClientType) {
-        DATABASE.state.accounts = DATABASE.state.accounts.map((account) => {
-            if (account.username.value === user.username.value) {
-                return {
-                    ID: account.ID,
-                    constraint: account.constraint,
-                    username: { value: user.newUsername.value },
-                    password: { value: account.password.value },
-                    userImage: account.userImage,
-                };
-            }
-            return account;
-        });
+        DATABASE.state.accounts = DATABASE.state.accounts.map((account) =>
+            account.username.value === user.username.value
+                ? { ...account, username: { value: user.newUsername.value } }
+                : account,
+        );
         const handleResponse = await this.#DB.handleDB('createAndRefreshDB')(
             'MiniDBAccountHandler - changeUsername',
         );
@@ -187,18 +171,11 @@ export default class MiniDBAccountHandler {
     }
 
     async #changeUserImg({ userName, userImg }: UserWithImgType) {
-        DATABASE.state.accounts = DATABASE.state.accounts.map((account) => {
-            if (account.username.value === userName) {
-                return {
-                    ID: account.ID,
-                    constraint: account.constraint,
-                    username: { value: account.username.value },
-                    password: { value: account.password.value },
-                    userImage: userImg,
-                };
-            }
-            return account;
-        });
+        DATABASE.state.accounts = DATABASE.state.accounts.map((account) =>
+            account.username.value === userName
+                ? { ...account, userImage: userImg }
+                : account,
+        );
         const response = await this.#DB.handleDB('createAndRefreshDB')(
             'MiniDBAccountHandler - changeUserImg',
         );

@@ -17,7 +17,7 @@ type SignInFormProps = {
 
 export default function SignInForm({ handleUserProps }: SignInFormProps) {
     const { setUser, setHasUser, setUserStateLoading } = handleUserProps;
-    const [areValid, setAreValid] = useState(false);
+    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
     const [inputs, setInputs] = useState({
         username: {
             validations: (currentInputValue: string) => [
@@ -54,7 +54,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                         formError: SIGN_IN_ERROR_RESPONSE,
                     }}
                     validateProps={{
-                        setShowInputsMessage,
+                        onShowInputsMessage,
                         inputs,
                     }}
                 >
@@ -66,7 +66,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                         }}
                         validateProps={{
                             input: inputs.username,
-                            showInputMessagesFromOutside: areValid,
+                            showInputMessagesFromOutside: ShowInputsMessage,
                             inputs,
                         }}
                     />
@@ -78,7 +78,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                         }}
                         validateProps={{
                             input: inputs.password,
-                            showInputMessagesFromOutside: areValid,
+                            showInputMessagesFromOutside: ShowInputsMessage,
                             inputs,
                         }}
                     />
@@ -91,17 +91,14 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         e: React.ChangeEvent<HTMLInputElement>,
         name: keyof typeof inputs,
     ) {
-        setInputs((prev) => {
-            const newObj = {
-                ...prev,
-                [name]: { ...prev[name], value: e.target.value },
-            };
-            return { ...newObj };
-        });
+        setInputs((prev) => ({
+            ...prev,
+            [name]: { ...prev[name], value: e.target.value },
+        }));
     }
 
-    function setShowInputsMessage(value: boolean) {
-        setAreValid(value);
+    function onShowInputsMessage(value: boolean) {
+        setShowInputsMessage(value);
     }
 
     async function onSubmitInputs() {

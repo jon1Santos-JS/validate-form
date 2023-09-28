@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { changeUsernameController } from '@/lib/controllers';
 import Cookies from 'cookies';
-import { USER_HASH_NAME, createHash } from '@/lib/hash';
-import { COOKIES_EXPIRES } from '@/database/miniDB';
+import { COOKIES_EXPIRES, USER_HASH_NAME, createHash } from '@/lib/hash';
 
 export default async function handler(
     req: NextApiRequest,
@@ -19,7 +18,6 @@ export default async function handler(
             }
             const newAccountFromDB = controllerResponse.body;
             const hash = createHash(newAccountFromDB);
-            const newUsername = newAccountFromDB.username.value;
             const cookies = new Cookies(req, res);
             cookies.set(USER_HASH_NAME, hash, {
                 expires: COOKIES_EXPIRES,
@@ -27,7 +25,7 @@ export default async function handler(
             });
             return res.status(200).json({
                 serverResponse: true,
-                body: newUsername,
+                body: newAccountFromDB.username.value,
             });
         }
         default: {

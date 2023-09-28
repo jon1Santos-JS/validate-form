@@ -14,7 +14,7 @@ export default function SignUpContent({
         <>
             <SignUpForm
                 ownProps={{
-                    setResponse: (data: boolean) => setSignUpResponse(data),
+                    onShowModal: (data: boolean) => setSignUpResponse(data),
                 }}
                 handleUserProps={handleUserProps}
             />

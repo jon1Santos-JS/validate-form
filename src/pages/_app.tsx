@@ -28,15 +28,11 @@ export default function App({ Component, pageProps }: AppProps) {
             hasUser: parsedResponse.serverResponse,
             isUserStateLoading: false,
         }));
-        if (
-            parsedResponse.serverResponse &&
-            typeof parsedResponse.body !== 'string'
-        ) {
+        if (typeof parsedResponse.body !== 'string') {
             setUserProps((prev) => ({
                 ...prev,
                 user: parsedResponse.body as UserType,
             }));
-            return;
         }
     }, []);
 

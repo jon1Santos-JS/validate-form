@@ -96,7 +96,7 @@ export async function resetDBController(username: string) {
         console.log('controller error to reset Database: ', response);
         return {
             serverResponse: false,
-            body: 'Error when try to reset Database',
+            body: SERVER_ERROR_RESPONSE,
         };
     }
     return { serverResponse: true, body: 'Database has been reseted' };

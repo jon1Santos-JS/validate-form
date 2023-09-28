@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import Form from '../Form';
 import Input from '../Input';
-import { omitFields } from '@/hooks/useInputsHandler';
+import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
 import { onOmitProps } from '@/lib/lodashAdapter';
 
 const API = 'api/signUp';
-const INPUTS_TO_OMIT = ['confirmPassword'] as [InputsType];
+const INPUTS_TO_OMIT = ['confirmPassword'] as InputsType[];
 const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
     'errors',
     'required',
@@ -18,16 +18,15 @@ interface SignUpFormPropsType {
 }
 
 interface PropsType {
-    setResponse: (data: boolean) => void;
+    onShowModal: (data: boolean) => void;
 }
 
 type InputsType = 'confirmPassword' | 'password' | 'username';
 
 export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
-    const { setResponse } = ownProps;
-    const [areValid, setAreValid] = useState(false);
+    const { onShowModal } = ownProps;
+    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
     const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
-
     return (
         <div className="o-sign-up-form">
             <div className="c-container">
@@ -38,7 +37,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                     }}
                     validateProps={{
                         inputs,
-                        setShowInputsMessage,
+                        onShowInputsMessage,
                     }}
                 >
                     <Input
@@ -50,7 +49,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         validateProps={{
                             inputs,
                             input: inputs.username,
-                            showInputMessagesFromOutside: areValid,
+                            showInputMessagesFromOutside: ShowInputsMessage,
                         }}
                     />
                     <Input
@@ -61,7 +60,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         }}
                         validateProps={{
                             input: inputs.password,
-                            showInputMessagesFromOutside: areValid,
+                            showInputMessagesFromOutside: ShowInputsMessage,
                             inputs,
                         }}
                     />
@@ -73,7 +72,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         }}
                         validateProps={{
                             input: inputs.confirmPassword,
-                            showInputMessagesFromOutside: areValid,
+                            showInputMessagesFromOutside: ShowInputsMessage,
                             inputs,
                         }}
                     />
@@ -92,8 +91,8 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         }));
     }
 
-    function setShowInputsMessage(value: boolean) {
-        setAreValid(value);
+    function onShowInputsMessage(value: boolean) {
+        setShowInputsMessage(value);
     }
 
     async function onSubmitInputs() {
@@ -110,12 +109,11 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         };
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
-        if (typeof parsedResponse.serverResponse === 'string') return;
-        if (parsedResponse.serverResponse) {
-            window.location.assign('/'); // USING ASSIGN JUST FOR THE SIMULATION
+        if (!parsedResponse.serverResponse) {
+            onShowModal(true);
             return;
         }
-        setResponse(true);
+        window.location.assign('/'); // WINDOW.ASSIGN JUST FOR THE SIMULATION
     }
 }
 
@@ -142,8 +140,10 @@ const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
                 message: 'Password must has 6 characters at least',
             },
             {
-                coditional:
+                coditional: preventCompareEmptyField(
+                    hookInputs?.confirmPassword.value,
                     currentInputValue !== hookInputs?.confirmPassword.value,
+                ),
                 message: 'This field has to be equal to the confirm password',
             },
         ],

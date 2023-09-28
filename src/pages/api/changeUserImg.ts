@@ -10,6 +10,7 @@ export default async function handler(
             const response = await changeUserImgController(
                 req.body as UserWithImgType,
             );
+            if (!response.serverResponse) return res.status(500).json(response);
             return res.status(200).json(response);
         }
         default:

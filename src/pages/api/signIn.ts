@@ -1,8 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { USER_HASH_NAME, createHash, returnUserByHash } from '@/lib/hash';
+import {
+    COOKIES_EXPIRES,
+    USER_HASH_NAME,
+    createHash,
+    returnUserByHash,
+} from '@/lib/hash';
 import { getUserStateController, signInController } from '@/lib/controllers';
 import Cookies from 'cookies';
-import { COOKIES_EXPIRES } from '@/database/miniDB';
 
 export default async function handler(
     req: NextApiRequest,
@@ -14,24 +18,26 @@ export default async function handler(
             const browserHash = cookies.get(USER_HASH_NAME);
             const controllerResponse = await getUserStateController();
             if (typeof controllerResponse.body === 'string')
-                return res.status(200).json(controllerResponse);
+                return res.status(500).json(controllerResponse);
             const usersFromDB = controllerResponse.body;
             const hashResponse = await returnUserByHash(
                 browserHash,
                 usersFromDB,
             );
+            if (!hashResponse.serverResponse)
+                return res.status(500).json(hashResponse);
             return res.status(200).json(hashResponse);
         }
         case 'POST': {
             const user: UserFromClientType = req.body;
             const controllerResponse = await signInController(user); //
-            if (controllerResponse.serverResponse) {
-                const hash = createHash(user);
-                cookies.set(USER_HASH_NAME, hash, {
-                    expires: COOKIES_EXPIRES,
-                    sameSite: 'lax',
-                });
-            }
+            if (!controllerResponse.serverResponse)
+                return res.status(500).json(controllerResponse);
+            const hash = createHash(user);
+            cookies.set(USER_HASH_NAME, hash, {
+                expires: COOKIES_EXPIRES,
+                sameSite: 'lax',
+            });
             return res.status(200).json(controllerResponse);
         }
         case 'DELETE': {

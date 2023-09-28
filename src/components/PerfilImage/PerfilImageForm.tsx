@@ -1,21 +1,20 @@
 import { useState } from 'react';
 import Form from '../Form';
 import Input from '../Input';
-import useStringHandler, { onCheckExtensions } from '@/hooks/useInputsHandler';
+import { handledName, onCheckExtensions } from '@/hooks/useInputsHandler';
 
 const API = 'api/changeUserImg';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
-type PerfilImageFormPropsTypes = {
+type PerfilImageFormProps = {
     handleUserProps: HandleUserPropsType;
 };
 
 export default function PerfilImageForm({
     handleUserProps,
-}: PerfilImageFormPropsTypes) {
+}: PerfilImageFormProps) {
     const { user } = handleUserProps;
-    const { handledName } = useStringHandler();
-    const [areValid, setAreValid] = useState(false);
+    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
     const [inputs, setInputs] = useState({
         imageInput: {
             validations: (currentInputValue: string) => [
@@ -46,20 +45,19 @@ export default function PerfilImageForm({
                 }}
                 validateProps={{
                     inputs,
-                    setShowInputsMessage,
+                    onShowInputsMessage,
                 }}
             >
                 <Input
                     ownProps={{
                         label: 'image',
                         inputType: 'file',
-                        inputName: 'image',
                         inputAccept: 'image/*',
                         onChange: (e) => onChange(e, 'imageInput'),
                     }}
                     validateProps={{
                         input: inputs.imageInput,
-                        showInputMessagesFromOutside: areValid,
+                        showInputMessagesFromOutside: ShowInputsMessage,
                         inputs,
                     }}
                 />
@@ -81,8 +79,8 @@ export default function PerfilImageForm({
         }));
     }
 
-    function setShowInputsMessage(value: boolean) {
-        setAreValid(value);
+    function onShowInputsMessage(value: boolean) {
+        setShowInputsMessage(value);
     }
     async function onSubmitInputs() {
         if (!inputs.imageInput.files) return;
@@ -96,9 +94,7 @@ export default function PerfilImageForm({
         };
         // IMAGE THIRTY PARTY API
         const imgApiResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_IMGBB_API_LINK}${
-                process.env.NEXT_PUBLIC_IMGBB_API_KEY as string
-            }`,
+            process.env.NEXT_PUBLIC_IMGBB_API_LINK as string,
             fetchOptions,
         );
         if (!imgApiResponse.ok) return;

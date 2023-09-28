@@ -16,7 +16,9 @@ export default async function handler(
         case 'POST': {
             const username = req.body;
             const controllerResponse = await deleteAccountController(username);
-            if (controllerResponse.serverResponse) cookies.set(USER_HASH_NAME);
+            if (!controllerResponse.serverResponse)
+                return res.status(500).json(controllerResponse);
+            cookies.set(USER_HASH_NAME);
             return res.status(200).json(controllerResponse);
         }
         case 'GET': {
@@ -34,7 +36,9 @@ export default async function handler(
             const resetDBControllerResponse = await resetDBController(
                 hashResponse.body.username,
             );
-            return res.status(500).json(resetDBControllerResponse);
+            if (!resetDBControllerResponse.serverResponse)
+                return res.status(500).json(resetDBControllerResponse);
+            return res.status(200).json(resetDBControllerResponse);
         }
         default: {
             return res

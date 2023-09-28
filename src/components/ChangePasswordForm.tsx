@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Form from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
-import { omitFields } from '@/hooks/useInputsHandler';
+import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
 
 const API = 'api/changePassword';
 const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
@@ -22,7 +22,7 @@ export default function ChangePasswordForm({
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
     const { user } = handleUserProps;
-    const [areValid, setAreValid] = useState(false);
+    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
     const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
 
     return <>{renderContent()}</>;
@@ -42,7 +42,7 @@ export default function ChangePasswordForm({
                 }}
                 validateProps={{
                     inputs,
-                    setShowInputsMessage,
+                    onShowInputsMessage,
                 }}
             >
                 <Input
@@ -54,7 +54,7 @@ export default function ChangePasswordForm({
                     validateProps={{
                         inputs,
                         input: inputs.password,
-                        showInputMessagesFromOutside: areValid,
+                        showInputMessagesFromOutside: ShowInputsMessage,
                     }}
                 />
                 <Input
@@ -66,7 +66,7 @@ export default function ChangePasswordForm({
                     validateProps={{
                         inputs,
                         input: inputs.newPassword,
-                        showInputMessagesFromOutside: areValid,
+                        showInputMessagesFromOutside: ShowInputsMessage,
                     }}
                 />
                 <Input
@@ -78,7 +78,7 @@ export default function ChangePasswordForm({
                     validateProps={{
                         inputs,
                         input: inputs.confirmNewPassword,
-                        showInputMessagesFromOutside: areValid,
+                        showInputMessagesFromOutside: ShowInputsMessage,
                     }}
                 />
             </Form>
@@ -95,8 +95,8 @@ export default function ChangePasswordForm({
         }));
     }
 
-    function setShowInputsMessage(value: boolean) {
-        setAreValid(value);
+    function onShowInputsMessage(value: boolean) {
+        setShowInputsMessage(value);
     }
 
     async function onSubmitInputs() {
@@ -139,8 +139,10 @@ const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
                 message: 'This field have to be different than the password',
             },
             {
-                coditional:
+                coditional: preventCompareEmptyField(
+                    hookInputs?.confirmNewPassword.value,
                     currentInputValue !== hookInputs?.confirmNewPassword.value,
+                ),
                 message:
                     'This field has to be equal to the confirm new password',
             },

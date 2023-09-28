@@ -16,7 +16,6 @@ interface PropsType {
     label: string;
     inputType: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    inputName?: string;
     inputAccept?: string;
 }
 
@@ -24,23 +23,23 @@ export default function Input<T extends string>({
     ownProps,
     validateProps,
 }: InputPropsTypes<T>) {
-    const { label, inputType, onChange, inputName, inputAccept } = ownProps;
+    const { label, inputType, onChange, inputAccept } = ownProps;
     const { input, showInputMessagesFromOutside, inputs } = validateProps;
     const { value } = input;
 
-    const { preValidate } = useValidate(inputs);
+    const { uniqueValidation } = useValidate(inputs);
     const [showMessage, setShowMessage] = useState(false);
     const [errorList, setErrorList] = useState<string[]>([]);
 
     useEffect(() => {
-        setErrorList(preValidate(input));
-    }, [preValidate, input]);
+        setErrorList(uniqueValidation(input));
+    }, [uniqueValidation, input]);
 
     useEffect(() => {
         if (!value) return; // DONT SHOW THE MESSAGE ON FIRST RENDER
         setShowMessage(false); // RESET THE MESSAGE AS THE ERROR LIST POP AN ERROR OFF
         if (errorList?.length >= 1) {
-            const currentTimer = setMessageWithTimer(true, 850);
+            const currentTimer = setMessageWithTimer(true, 950);
             return () => clearTimeout(currentTimer);
         }
     }, [errorList, value]);
@@ -62,7 +61,7 @@ export default function Input<T extends string>({
             <input
                 id={label}
                 className="input"
-                name={inputName && inputName}
+                placeholder={label}
                 accept={inputAccept && inputAccept}
                 onChange={onChange}
                 value={value}

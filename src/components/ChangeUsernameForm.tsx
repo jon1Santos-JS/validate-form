@@ -19,7 +19,7 @@ export default function ChangeUsernameForm({
 }: OwnPropsType) {
     const router = useRouter();
     const { user, setUser } = handleUserProps;
-    const [areValid, setAreValid] = useState(false);
+    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
     const [inputs, setInputs] = useState({
         newUsername: {
             validations: (currentInputValue: string) => [
@@ -50,7 +50,7 @@ export default function ChangeUsernameForm({
                     formError: DEFAULT_ERROR_MESSAGE,
                     waitMessageToSubmit: true,
                 }}
-                validateProps={{ inputs, setShowInputsMessage }}
+                validateProps={{ inputs, onShowInputsMessage }}
             >
                 <Input
                     ownProps={{
@@ -61,7 +61,7 @@ export default function ChangeUsernameForm({
                     validateProps={{
                         inputs,
                         input: inputs.newUsername,
-                        showInputMessagesFromOutside: areValid,
+                        showInputMessagesFromOutside: ShowInputsMessage,
                     }}
                 />
             </Form>
@@ -78,8 +78,8 @@ export default function ChangeUsernameForm({
         }));
     }
 
-    function setShowInputsMessage(value: boolean) {
-        setAreValid(value);
+    function onShowInputsMessage(value: boolean) {
+        setShowInputsMessage(value);
     }
 
     async function onSubmitInputs() {

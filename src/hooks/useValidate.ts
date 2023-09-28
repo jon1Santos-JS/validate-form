@@ -3,7 +3,7 @@ const EMPTY_INPUT_ERROR_RESPONSE = 'This field is required';
 export default function useValidate<T extends string>(
     inputs: InputsToValidateType<T>,
 ) {
-    function validateAll() {
+    function manyValidation() {
         let isValid = true;
         for (const i in inputs) {
             if (inputs[i].errors.length > 0) isValid = false;
@@ -11,7 +11,7 @@ export default function useValidate<T extends string>(
         return isValid;
     }
 
-    function preValidate(input: ValidateInputType<T>) {
+    function uniqueValidation(input: ValidateInputType<T>) {
         const { value, required, errors } = input;
         cleanArray(errors);
         if (!value && required) {
@@ -37,7 +37,7 @@ export default function useValidate<T extends string>(
         return errors;
     }
 
-    return { preValidate, validateAll };
+    return { uniqueValidation, manyValidation };
 }
 
 function cleanArray(arrayToClean: string[]) {

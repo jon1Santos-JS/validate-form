@@ -11,6 +11,17 @@ export default function SignUpModal({
 
     function renderContent() {
         if (!isModalOpen()) return null;
+        const advice = {
+            warningTittle: 'Failed to sign up account',
+            warning:
+                'Account already exist or The limit to create account reached.',
+            advise: "The limit to create account reached: You can access the app using the admin's account: [ username: admins / password: admins ] and reset database.",
+            stepsTittle:
+                'If the error persist: Try to execute this application in "localhost", you can clone this project just by following the steps below:',
+        };
+
+        const steps = createSteps();
+
         return (
             <>
                 <div className="o-modal o-sign-up-modal" onClick={onCloseModal}>
@@ -18,40 +29,47 @@ export default function SignUpModal({
                         className="l-base-bg-color content"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <h3>{MODAL_TEXT.warningTittle}</h3>
-                        <h4>{MODAL_TEXT.warning}</h4>
-                        <h4>{MODAL_TEXT.advise}</h4>
-                        <h4>{MODAL_TEXT.stepsTittle}</h4>
-                        <div>
-                            {MODAL_TEXT.step1}{' '}
-                            <a
-                                href="https://github.com/jon1Santos/validate-form-refactoring"
-                                target="blank"
-                            >
-                                LINK
-                            </a>
-                        </div>
-                        <div>{MODAL_TEXT.step2}</div>
-                        <div>{MODAL_TEXT.step3}</div>
-                        <div>{MODAL_TEXT.step4}</div>
-                        <div>{MODAL_TEXT.step5}</div>
+                        <h3>{advice.warningTittle}</h3>
+                        <h4>{advice.warning}</h4>
+                        <h4>{advice.advise}</h4>
+                        <h4>{advice.stepsTittle}</h4>
+                        <>
+                            {steps.map((step) => {
+                                if (step.includes('GitHub link'))
+                                    return (
+                                        <div key={step}>
+                                            {step}
+                                            <a
+                                                href="https://github.com/jon1Santos/validate-form-refactoring"
+                                                target="blank"
+                                            >
+                                                LINK
+                                            </a>
+                                        </div>
+                                    );
+                                return <div key={step}>{step}</div>;
+                            })}
+                        </>
                     </div>
                 </div>
             </>
         );
+
+        function createSteps() {
+            const steps = [
+                `Access the following GitHub link: `,
+                'Click in "code", choose which one you prefer: "https" or "command line" to clone this repository.',
+                'Clone the repository to a folder.',
+                'Follow the steps to set ENV variables in the link',
+                'Execute "npm install" on "cli" inside of the folder you have cloned.',
+                'Execute "npm run dev"(to execute it in "development mode") or "npm run build" and then "npm run start"(to execute it in "production mode").',
+            ];
+
+            const newSteps = steps.map(
+                (step, index) => `${(index + 1).toString()} - ${step}`,
+            );
+
+            return newSteps;
+        }
     }
 }
-
-const MODAL_TEXT = {
-    warningTittle: 'Failed to sign up account',
-    warning:
-        'Account already exist / You are not in "localhost" server / The limit to create account reached.',
-    advise: 'You can access the app using the admin\'s account: [ username: admin1 / password: admin1 ] or execute the app in "localhost".',
-    stepsTittle:
-        'To execute this application in "localhost", you can clone this project, It\'s just follow the steps below:',
-    step1: '1 - Access the following GitHub link: ',
-    step2: '2 - Click in "code", choose which one you prefer: "https" or "command line" to clone this repository.',
-    step3: '3 - Clone the repository to a folder.',
-    step4: '4 - Execute "npm install" on "cli" inside of the folder you have cloned.',
-    step5: '5 - Execute "npm run dev"(to execute it in "development mode") or "npm run build" and then "npm run start"(to execute it in "production mode").',
-};
