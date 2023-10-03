@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Form, { ElementsToAddProps } from '../Form';
 import Input from '../Input';
 import { handledName, onCheckExtensions } from '@/hooks/useInputsHandler';
+import useValidate from '@/hooks/useValidate';
 
 const API = 'api/changeUserImg';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
@@ -14,7 +14,10 @@ export default function PerfilImageForm({
     handleUserProps,
 }: PerfilImageFormProps) {
     const { user } = handleUserProps;
-    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
+    const { uniqueValidation, manyValidation } = useValidate();
+    const [showInputsMessage, onShowInputsMessage] = useState(false);
+    const [highlightInput, onHighlightInput] = useState(false);
+    const [showMessage, onShowMessage] = useState<boolean>(false);
     const [inputs, setInputs] = useState({
         imageInput: {
             validations: (currentInputValue: string) => [
@@ -38,32 +41,35 @@ export default function PerfilImageForm({
     return (
         <>
             <h4>Upload image</h4>
-            <Form
-                ownProps={{
-                    onSubmitInputs: onSubmitInputs,
-                    formError: null,
-                    elementsToAdd: elementsToAddFn,
-                    className: 'o-perfil-image-form',
-                }}
-                validateProps={{
-                    inputs,
-                    onShowInputsMessage,
-                }}
-            >
-                <Input
-                    ownProps={{
-                        label: 'image',
-                        inputType: 'file',
-                        inputAccept: 'image/*',
-                        onChange: (e) => onChange(e, 'imageInput'),
-                    }}
-                    validateProps={{
-                        input: inputs.imageInput,
-                        showInputMessagesFromOutside: ShowInputsMessage,
-                        inputs,
-                    }}
-                />
-            </Form>
+
+            <form className="o-perfil-image-form">
+                <fieldset className="container">
+                    <div className="inputs">
+                        <Input
+                            ownProps={{
+                                label: 'image',
+                                inputType: 'file',
+                                inputAccept: 'image/*',
+                                onChange: (e) => onChange(e, 'imageInput'),
+                            }}
+                            validateProps={{
+                                input: uniqueValidation(inputs.imageInput),
+                                showInputMessagesFromOutside: showInputsMessage,
+                                hightlightInputFromOutside: highlightInput,
+                            }}
+                        />
+                    </div>
+                    <div>
+                        <button
+                            key={'submitButton'}
+                            className="c-button"
+                            onClick={onClick}
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
         </>
     );
 
@@ -81,9 +87,18 @@ export default function PerfilImageForm({
         }));
     }
 
-    function onShowInputsMessage(value: boolean) {
-        setShowInputsMessage(value);
+    async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
+        if (manyValidation(inputs)) {
+            await onSubmitInputs();
+            return;
+        }
+        onHighlightInput(true);
+        onShowMessage(true);
+        onShowInputsMessage(true);
     }
+
     async function onSubmitInputs() {
         if (!inputs.imageInput.files) return;
         const file = inputs.imageInput.files[0];
@@ -103,6 +118,8 @@ export default function PerfilImageForm({
         const image = await imgApiResponse.json();
         // IMAGE LOCAL API
         await onUpdateUserImageDB(image.data.url);
+        onShowInputsMessage(false);
+        onShowMessage(false);
         window.location.reload();
     }
 
@@ -117,19 +134,5 @@ export default function PerfilImageForm({
             body: JSON.stringify(handledUser),
         };
         await fetch(API, options);
-    }
-
-    function elementsToAddFn(props: ElementsToAddProps) {
-        return (
-            <div>
-                <button
-                    key={'submitButton'}
-                    className="c-button"
-                    onClick={props.onClick}
-                >
-                    Submit
-                </button>
-            </div>
-        );
     }
 }

@@ -9,7 +9,7 @@ declare type InputsToValidateType<T extends string> = {
 declare interface ValidateInputType<T extends string> {
     validations?: (
         currentInputValue: string,
-        conditionalInputValue?: string,
+        conditionalInputValue?: InputsToValidateType<T>,
     ) => Validation[];
     required?: boolean | string;
     errors: string[];

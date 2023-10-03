@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import Form, { ElementsToAddProps } from './Form';
+import { useEffect, useState } from 'react';
 import Input from './Input';
 import { omitFields } from '@/hooks/useInputsHandler';
 import Link from 'next/link';
+import useValidate from '@/hooks/useValidate';
 
 const API = 'api/signIn';
-const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
+const DEFAULT_MESSAGE = 'Incorrect username or password';
 const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
     'errors',
     'required',
@@ -19,7 +19,11 @@ type SignInFormProps = {
 export default function SignInForm({ handleUserProps }: SignInFormProps) {
     const { setUser, setHasUser, hasUser, setUserStateLoading } =
         handleUserProps;
-    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
+    const { uniqueValidation, manyValidation } = useValidate();
+    const [showInputsMessage, onShowInputsMessage] = useState(false);
+    const [highlightInput, onHighlightInput] = useState(false);
+    const [showMessage, onShowMessage] = useState<boolean>(false);
+    const [message, setMessage] = useState(DEFAULT_MESSAGE);
     const [inputs, setInputs] = useState({
         username: {
             validations: (currentInputValue: string) => [
@@ -46,45 +50,71 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         },
     });
 
+    useEffect(() => {
+        const timerDownMessage = setTimeout(() => {
+            onShowMessage(false);
+        }, 2750);
+
+        return () => clearTimeout(timerDownMessage);
+    }, [showMessage]);
+
+    useEffect(() => {
+        const timerDownMessage = setTimeout(() => {
+            onHighlightInput(false);
+        }, 2750);
+
+        return () => clearTimeout(timerDownMessage);
+    }, [highlightInput]);
+
     return (
-        <Form
-            ownProps={{
-                legend: 'Sign in',
-                onSubmitInputs: onSubmitInputs,
-                elementsToAdd: elementsToAddFn,
-                formError: SIGN_IN_ERROR_RESPONSE,
-                className: 'o-sign-in-form',
-            }}
-            validateProps={{
-                onShowInputsMessage,
-                inputs,
-            }}
-        >
-            <Input
-                ownProps={{
-                    label: 'Username',
-                    inputType: 'text',
-                    onChange: (e) => onChange(e, 'username'),
-                }}
-                validateProps={{
-                    input: inputs.username,
-                    showInputMessagesFromOutside: ShowInputsMessage,
-                    inputs,
-                }}
-            />
-            <Input
-                ownProps={{
-                    label: 'Password',
-                    inputType: 'password',
-                    onChange: (e) => onChange(e, 'password'),
-                }}
-                validateProps={{
-                    input: inputs.password,
-                    showInputMessagesFromOutside: ShowInputsMessage,
-                    inputs,
-                }}
-            />
-        </Form>
+        <form className="o-sign-in-form">
+            <fieldset className="container">
+                <div className="legend">
+                    <legend>Sign in</legend>
+                </div>
+                <div className="inputs">
+                    <Input
+                        ownProps={{
+                            label: 'Username',
+                            inputType: 'text',
+                            onChange: (e) => onChange(e, 'username'),
+                        }}
+                        validateProps={{
+                            input: uniqueValidation(inputs.username),
+                            showInputMessagesFromOutside: showInputsMessage,
+                            hightlightInputFromOutside: highlightInput,
+                        }}
+                    />
+                    <Input
+                        ownProps={{
+                            label: 'Password',
+                            inputType: 'password',
+                            onChange: (e) => onChange(e, 'password'),
+                        }}
+                        validateProps={{
+                            input: uniqueValidation(inputs.password),
+                            showInputMessagesFromOutside: showInputsMessage,
+                            hightlightInputFromOutside: highlightInput,
+                        }}
+                    />
+                </div>
+                {renderError()}
+                <div className="buttons">
+                    <button
+                        key={'submitButton'}
+                        className="c-button"
+                        onClick={onClick}
+                    >
+                        Submit
+                    </button>
+                    {!hasUser && (
+                        <Link href="/sign-up-page">
+                            <button className="c-button">Sign up</button>
+                        </Link>
+                    )}
+                </div>
+            </fieldset>
+        </form>
     );
 
     function onChange(
@@ -97,8 +127,21 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         }));
     }
 
-    function onShowInputsMessage(value: boolean) {
-        setShowInputsMessage(value);
+    function renderError() {
+        if (!showMessage) return <div className="form-error-message"></div>;
+        return <div className="form-error-message">{message}</div>;
+    }
+
+    async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
+        if (manyValidation(inputs)) {
+            await onSubmitInputs();
+            return;
+        }
+        onShowMessage(true);
+        onHighlightInput(true);
+        onShowInputsMessage(true);
     }
 
     async function onSubmitInputs() {
@@ -112,27 +155,11 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         setUserStateLoading(false);
         setHasUser(parsedResponse.serverResponse);
         if (!parsedResponse.serverResponse) {
-            return SIGN_IN_ERROR_RESPONSE;
+            setMessage(DEFAULT_MESSAGE);
+            return;
         }
+        onShowInputsMessage(false);
+        onShowMessage(false);
         setUser({ username: parsedResponse.body as string });
-    }
-
-    function elementsToAddFn(props: ElementsToAddProps) {
-        return (
-            <div className="buttons">
-                <button
-                    key={'submitButton'}
-                    className="c-button"
-                    onClick={props.onClick}
-                >
-                    Submit
-                </button>
-                {!hasUser && (
-                    <Link href="/sign-up-page">
-                        <button className="c-button">Sign up</button>
-                    </Link>
-                )}
-            </div>
-        );
     }
 }

@@ -1,5 +1,5 @@
-export default function useValidate<T extends string>() {
-    function manyValidation(inputs: InputsToValidateType<T>) {
+export default function useValidate() {
+    function manyValidation<T extends string>(inputs: InputsToValidateType<T>) {
         let isValid = true;
         for (const i in inputs) {
             if (inputs[i].errors.length > 0) isValid = false;
@@ -7,9 +7,9 @@ export default function useValidate<T extends string>() {
         return isValid;
     }
 
-    function uniqueValidation(
+    function uniqueValidation<T extends string>(
         input: ValidateInputType<T>,
-        conditionalInput?: ValidateInputType<T>,
+        inputs?: InputsToValidateType<T>,
     ) {
         const { value, required, errors } = input;
         cleanArray(errors);
@@ -21,24 +21,22 @@ export default function useValidate<T extends string>() {
             errors.push('');
             return input;
         }
-        return validate(input, conditionalInput);
+        return validate(input, inputs);
     }
 
-    function validate(
+    function validate<T extends string>(
         input: ValidateInputType<T>,
-        conditionalInput?: ValidateInputType<T>,
+        inputs?: InputsToValidateType<T>,
     ) {
         const { value, validations, errors } = input;
 
         if (!validations) return input;
         if (!value) return input;
 
-        validations(value, conditionalInput && conditionalInput.value).map(
-            (validation) => {
-                const message = validation.message ? validation.message : '';
-                if (validation.coditional) errors.push(message);
-            },
-        );
+        validations(value, inputs && inputs).map((validation) => {
+            const message = validation.message ? validation.message : '';
+            if (validation.coditional) errors.push(message);
+        });
         return input;
     }
 

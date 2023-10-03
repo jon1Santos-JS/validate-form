@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Form, { ElementsToAddProps } from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
+import useValidate from '@/hooks/useValidate';
 const API = 'api/changeUsername';
 
-const DEFAULT_ERROR_MESSAGE = 'Invalid username';
+const DEFAULT_MESSAGE = 'Invalid username';
 
 type OwnPropsType = {
     ownProps: ChangeUsernameFormPropsTypes;
@@ -19,7 +19,10 @@ export default function ChangeUsernameForm({
 }: OwnPropsType) {
     const router = useRouter();
     const { user, setUser } = handleUserProps;
-    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
+    const [showInputsMessage, onShowInputsMessage] = useState(false);
+    const [highlightInput, onHighlightInput] = useState(false);
+    const [showMessage, onShowMessage] = useState<boolean>(false);
+    const { uniqueValidation, manyValidation } = useValidate();
     const [inputs, setInputs] = useState({
         newUsername: {
             validations: (currentInputValue: string) => [
@@ -43,30 +46,37 @@ export default function ChangeUsernameForm({
             return null;
 
         return (
-            <Form
-                ownProps={{
-                    legend: 'Change Username',
-                    onSubmitInputs: onSubmitInputs,
-                    formError: DEFAULT_ERROR_MESSAGE,
-                    waitMessageToSubmit: true,
-                    elementsToAdd: elementsToAddFn,
-                    className: 'o-change-username-form',
-                }}
-                validateProps={{ inputs, onShowInputsMessage }}
-            >
-                <Input
-                    ownProps={{
-                        label: 'New Username',
-                        inputType: 'text',
-                        onChange: (e) => onChange(e, 'newUsername'),
-                    }}
-                    validateProps={{
-                        inputs,
-                        input: inputs.newUsername,
-                        showInputMessagesFromOutside: ShowInputsMessage,
-                    }}
-                />
-            </Form>
+            <form className="o-change-username-form">
+                <fieldset className="container">
+                    <div className="legend">
+                        <legend>Change Username</legend>
+                    </div>
+                    <div className="inputs">
+                        <Input
+                            ownProps={{
+                                label: 'New Username',
+                                inputType: 'text',
+                                onChange: (e) => onChange(e, 'newUsername'),
+                            }}
+                            validateProps={{
+                                input: uniqueValidation(inputs.newUsername),
+                                showInputMessagesFromOutside: showInputsMessage,
+                                hightlightInputFromOutside: highlightInput,
+                            }}
+                        />
+                    </div>
+                    {renderError()}
+                    <div>
+                        <button
+                            key={'submitButton'}
+                            className="c-button"
+                            onClick={onClick}
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
         );
     }
 
@@ -80,8 +90,21 @@ export default function ChangeUsernameForm({
         }));
     }
 
-    function onShowInputsMessage(value: boolean) {
-        setShowInputsMessage(value);
+    function renderError() {
+        if (!showMessage) return <div className="form-error-message"></div>;
+        return <div className="form-error-message">{DEFAULT_MESSAGE}</div>;
+    }
+
+    async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
+        if (manyValidation(inputs)) {
+            await onSubmitInputs();
+            return;
+        }
+        onHighlightInput(true);
+        onShowMessage(true);
+        onShowInputsMessage(true);
     }
 
     async function onSubmitInputs() {
@@ -99,23 +122,11 @@ export default function ChangeUsernameForm({
         if (!parsedResponse.serverResponse) {
             return parsedResponse.body as string;
         }
+        onShowInputsMessage(false);
+        onShowMessage(false);
         router.reload();
         window.addEventListener('load', () => {
             setUser({ username: parsedResponse.body as string });
         });
-    }
-
-    function elementsToAddFn(props: ElementsToAddProps) {
-        return (
-            <div>
-                <button
-                    key={'submitButton'}
-                    className="c-button"
-                    onClick={props.onClick}
-                >
-                    Submit
-                </button>
-            </div>
-        );
     }
 }

@@ -8,13 +8,12 @@ type InputPropsTypes<T extends string> = {
 
 type ValidatePropsType<T extends string> = {
     input: ValidateInputType<T>;
-    // inputs: InputsToValidateType<T>;
     showInputMessagesFromOutside: boolean;
-    highLightInputFromOutside: boolean;
+    hightlightInputFromOutside: boolean;
 };
 
 type PropsType = {
-    label: string;
+    label?: string;
     inputType: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     inputAccept?: string;
@@ -24,36 +23,26 @@ export default function Input<T extends string>({
     ownProps,
     validateProps,
 }: InputPropsTypes<T>) {
+    const [showMessage, onShowMessage] = useState(false);
     const isFirstRender = useFirstRender();
     const { label, inputType, onChange, inputAccept } = ownProps;
-    const { input, showInputMessagesFromOutside, highLightInputFromOutside } =
+    const { input, showInputMessagesFromOutside, hightlightInputFromOutside } =
         validateProps;
     const { value, errors } = input;
 
-    const [showMessage, setShowMessage] = useState(false);
-    const [showHighlight, setShowHighlight] = useState(false);
-
+    // IF THERE ARE STILL ERRORS IN THE INPUT THE HIGHLIGHT CONTINUES
     // (isFirstRender) USED INSTEAD OF (value) TO HIGHLIGHT THE INPUT EVEN EMPTY
-    const classHighlightErrorCondition =
-        showHighlight && !isFirstRender && errors.length >= 1
-            ? 'has-error'
-            : '';
+    const classHighlightCondition =
+        !isFirstRender && errors.length ? 'has-error' : '';
+    const classHighlighConditionFromOutside = hightlightInputFromOutside
+        ? 'has-error'
+        : '';
 
     useEffect(() => {
         if (!value) return;
         if (errors.length >= 1) {
             const currentTimer = setTimeout(() => {
-                setShowMessage(true);
-            }, 950);
-            return () => clearTimeout(currentTimer);
-        }
-    }, [errors, value]);
-
-    useEffect(() => {
-        if (!value) return;
-        if (errors.length >= 1) {
-            const currentTimer = setTimeout(() => {
-                setShowHighlight(true);
+                onShowMessage(true);
             }, 950);
             return () => clearTimeout(currentTimer);
         }
@@ -61,25 +50,22 @@ export default function Input<T extends string>({
 
     useEffect(() => {
         if (!showMessage && errors.length >= 1) {
-            setShowMessage(showInputMessagesFromOutside);
+            onShowMessage(showInputMessagesFromOutside);
         }
     }, [errors.length, showInputMessagesFromOutside, showMessage]);
 
-    useEffect(() => {
-        if (!showHighlight && errors.length >= 1) {
-            setShowHighlight(highLightInputFromOutside);
-        }
-    }, [errors.length, highLightInputFromOutside, showHighlight]);
-
-    console.log('renderizou');
     return (
-        <>
-            <label htmlFor={label} className="label">
-                {label}
-            </label>
+        <div className="field">
+            {label ? (
+                <label htmlFor={label} className="label">
+                    {label}
+                </label>
+            ) : null}
             <input
                 id={label}
-                className={`input ${classHighlightErrorCondition}`}
+                className={`input ${
+                    classHighlightCondition || classHighlighConditionFromOutside
+                }`}
                 placeholder={label}
                 accept={inputAccept && inputAccept}
                 onChange={onChange}
@@ -87,7 +73,7 @@ export default function Input<T extends string>({
                 type={inputType}
             />
             {renderErrors()}
-        </>
+        </div>
     );
 
     function renderErrors() {

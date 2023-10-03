@@ -49,12 +49,12 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
                     )}
 
                     {hasUser && (
-                        <div
+                        <button
                             className="c-button sign-out"
                             onClick={signOutUser}
                         >
                             Sign out
-                        </div>
+                        </button>
                     )}
                 </div>
             </div>

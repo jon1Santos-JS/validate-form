@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import Form, { ElementsToAddProps } from '../Form';
+import { useEffect, useState } from 'react';
 import Input from '../Input';
 import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
 import { onOmitProps } from '@/lib/lodashAdapter';
@@ -13,6 +12,7 @@ const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
     'required',
     'validations',
 ];
+const REQUIRED_MESSAGE = 'This field is required';
 
 interface SignUpFormPropsType {
     ownProps: PropsType;
@@ -32,72 +32,81 @@ export default function SignUpForm({
     const { setModalState } = ownProps;
     const { hasUser } = handleUserProps;
     const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
-    const [showInputsMessage, setShowInputsMessage] = useState(false);
-    const [highlightInputClass, setHighlightInputsClass] = useState(false);
     const { uniqueValidation, manyValidation } = useValidate();
+    const [highlightInput, onHighlightInput] = useState(false);
+    const [showInputsMessage, onShowInputsMessage] = useState(false);
 
-    // useEffect(() => {
-    //     console.log(inputs);
-    // }, [inputs]);
+    useEffect(() => {
+        const timerDownMessage = setTimeout(() => {
+            onHighlightInput(false);
+        }, 2750);
+
+        return () => clearTimeout(timerDownMessage);
+    }, [highlightInput]);
 
     return (
-        <Form
-            ownProps={{
-                legend: 'Sign up',
-                onSubmitInputs: onSubmitInputs,
-                elementsToAdd: elementsToAddFn,
-                className: 'o-sign-up-form',
-                formError: null,
-            }}
-            validateProps={{
-                areInputsValid: () => manyValidation(inputs),
-                onShowInputsMessage,
-                setHighlightInputsClass,
-            }}
-        >
-            <Input
-                ownProps={{
-                    label: 'Username',
-                    inputType: 'text',
-                    onChange: (e) => onChange(e, 'username'),
-                }}
-                validateProps={{
-                    input: uniqueValidation(inputs.username),
-                    showInputMessagesFromOutside: showInputsMessage,
-                    highLightInputFromOutside: highlightInputClass,
-                }}
-            />
-            <Input
-                ownProps={{
-                    label: 'Password',
-                    inputType: 'password',
-                    onChange: (e) => onChange(e, 'password'),
-                }}
-                validateProps={{
-                    input: uniqueValidation(
-                        inputs.password,
-                        inputs.confirmPassword,
-                    ),
-                    showInputMessagesFromOutside: showInputsMessage,
-                    highLightInputFromOutside: highlightInputClass,
-                }}
-            />
-            <Input
-                ownProps={{
-                    label: 'Confirm Password',
-                    inputType: 'password',
-                    onChange: (e) => onChange(e, 'confirmPassword'),
-                }}
-                validateProps={{
-                    input: uniqueValidation(
-                        inputs.confirmPassword,
-                        inputs.password,
-                    ),
-                    showInputMessagesFromOutside: showInputsMessage,
-                    highLightInputFromOutside: highlightInputClass,
-                }}
-            />
-        </Form>
+        <form className="o-sign-up-form">
+            <fieldset className="container">
+                <div className="legend">
+                    <legend>Sign up</legend>
+                </div>
+                <div className="inputs">
+                    <Input
+                        ownProps={{
+                            label: 'Username',
+                            inputType: 'text',
+                            onChange: (e) => onChange(e, 'username'),
+                        }}
+                        validateProps={{
+                            input: uniqueValidation(inputs.username),
+                            hightlightInputFromOutside: highlightInput,
+                            showInputMessagesFromOutside: showInputsMessage,
+                        }}
+                    />
+                    <Input
+                        ownProps={{
+                            label: 'Password',
+                            inputType: 'password',
+                            onChange: (e) => onChange(e, 'password'),
+                        }}
+                        validateProps={{
+                            input: uniqueValidation(inputs.password, inputs),
+                            showInputMessagesFromOutside: showInputsMessage,
+                            hightlightInputFromOutside: highlightInput,
+                        }}
+                    />
+                    <Input
+                        ownProps={{
+                            label: 'Confirm Password',
+                            inputType: 'password',
+                            onChange: (e) => onChange(e, 'confirmPassword'),
+                        }}
+                        validateProps={{
+                            input: uniqueValidation(
+                                inputs.confirmPassword,
+                                inputs,
+                            ),
+                            showInputMessagesFromOutside: showInputsMessage,
+                            hightlightInputFromOutside: highlightInput,
+                        }}
+                    />
+                </div>
+                <div className="buttons">
+                    <button
+                        key={'submitButton'}
+                        className="c-button"
+                        onClick={onClick}
+                    >
+                        Submit
+                    </button>
+                    {!hasUser && (
+                        <Link key={'signInButton'} href="/">
+                            <button className="c-button">Sign In</button>
+                        </Link>
+                    )}
+                </div>
+            </fieldset>
+        </form>
     );
 
     function onChange(
@@ -110,8 +119,14 @@ export default function SignUpForm({
         }));
     }
 
-    function onShowInputsMessage(value: boolean) {
-        setShowInputsMessage(value);
+    async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        if (manyValidation(inputs)) {
+            await onSubmitInputs();
+            return;
+        }
+        onHighlightInput(true);
+        onShowInputsMessage(true);
     }
 
     async function onSubmitInputs() {
@@ -132,26 +147,8 @@ export default function SignUpForm({
             setModalState(true);
             return;
         }
-        window.location.assign('/'); // WINDOW.ASSIGN JUST FOR THE SIMULATION
-    }
-
-    function elementsToAddFn(props: ElementsToAddProps) {
-        return (
-            <div className="buttons">
-                <button
-                    key={'submitButton'}
-                    className="c-button"
-                    onClick={props.onClick}
-                >
-                    Submit
-                </button>
-                {!hasUser && (
-                    <Link key={'signInButton'} href="/">
-                        <button className="c-button">Sign In</button>
-                    </Link>
-                )}
-            </div>
-        );
+        onShowInputsMessage(false);
+        window.location.assign('/'); // WINDOW.ASSIGN JUST TO SIMULATE
     }
 }
 
@@ -167,36 +164,36 @@ const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
                 message: 'Only characters',
             },
         ],
-        required: true,
+        required: REQUIRED_MESSAGE,
         value: '',
         errors: [],
     },
     password: {
-        validations: (currentInputValue, conditionalInputValue) => [
+        validations: (currentInputValue, inputs) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password must has 6 characters at least',
             },
             {
                 coditional: preventCompareEmptyField(
-                    currentInputValue !== conditionalInputValue,
-                    conditionalInputValue,
+                    currentInputValue !== inputs?.confirmPassword.value,
+                    inputs?.confirmPassword.value,
                 ),
                 message: 'This field has to be equal to the confirm password',
             },
         ],
-        required: true,
+        required: REQUIRED_MESSAGE,
         value: '',
         errors: [],
     },
     confirmPassword: {
-        validations: (currentInputValue, conditionalInputValue) => [
+        validations: (currentInputValue, inputs) => [
             {
-                coditional: currentInputValue !== conditionalInputValue,
+                coditional: currentInputValue !== inputs?.password.value,
                 message: 'This field has to be equal to the password',
             },
         ],
-        required: true,
+        required: REQUIRED_MESSAGE,
         value: '',
         errors: [],
     },

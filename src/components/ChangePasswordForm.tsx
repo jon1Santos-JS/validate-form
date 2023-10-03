@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import Form, { ElementsToAddProps } from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
 import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
+import useValidate from '@/hooks/useValidate';
 
 const API = 'api/changePassword';
 const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
@@ -22,7 +22,10 @@ export default function ChangePasswordForm({
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
     const { user } = handleUserProps;
-    const [ShowInputsMessage, setShowInputsMessage] = useState(false);
+    const [showInputsMessage, onShowInputsMessage] = useState(false);
+    const [highlightInput, onHighlightInput] = useState(false);
+    const [showMessage, onShowMessage] = useState<boolean>(false);
+    const { uniqueValidation, manyValidation } = useValidate();
     const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
 
     return <>{renderContent()}</>;
@@ -35,55 +38,67 @@ export default function ChangePasswordForm({
             return null;
 
         return (
-            <Form
-                ownProps={{
-                    legend: 'Change Password',
-                    onSubmitInputs: onSubmitInputs,
-                    elementsToAdd: elementsToAddFn,
-                    className: 'o-change-password-form',
-                }}
-                validateProps={{
-                    inputs,
-                    onShowInputsMessage,
-                }}
-            >
-                <Input
-                    ownProps={{
-                        label: 'Password',
-                        inputType: 'password',
-                        onChange: (e) => onChange(e, 'password'),
-                    }}
-                    validateProps={{
-                        inputs,
-                        input: inputs.password,
-                        showInputMessagesFromOutside: ShowInputsMessage,
-                    }}
-                />
-                <Input
-                    ownProps={{
-                        label: 'New Password',
-                        inputType: 'password',
-                        onChange: (e) => onChange(e, 'newPassword'),
-                    }}
-                    validateProps={{
-                        inputs,
-                        input: inputs.newPassword,
-                        showInputMessagesFromOutside: ShowInputsMessage,
-                    }}
-                />
-                <Input
-                    ownProps={{
-                        label: 'Confirm New Password',
-                        inputType: 'password',
-                        onChange: (e) => onChange(e, 'confirmNewPassword'),
-                    }}
-                    validateProps={{
-                        inputs,
-                        input: inputs.confirmNewPassword,
-                        showInputMessagesFromOutside: ShowInputsMessage,
-                    }}
-                />
-            </Form>
+            <form className="o-change-password-form">
+                <fieldset className="container">
+                    <div className="legend">
+                        <legend>Change Password</legend>
+                    </div>
+                    <div className="inputs">
+                        <Input
+                            ownProps={{
+                                label: 'Password',
+                                inputType: 'password',
+                                onChange: (e) => onChange(e, 'password'),
+                            }}
+                            validateProps={{
+                                input: uniqueValidation(inputs.password),
+                                showInputMessagesFromOutside: showInputsMessage,
+                                hightlightInputFromOutside: highlightInput,
+                            }}
+                        />
+                        <Input
+                            ownProps={{
+                                label: 'New Password',
+                                inputType: 'password',
+                                onChange: (e) => onChange(e, 'newPassword'),
+                            }}
+                            validateProps={{
+                                input: uniqueValidation(
+                                    inputs.newPassword,
+                                    inputs,
+                                ),
+                                showInputMessagesFromOutside: showInputsMessage,
+                                hightlightInputFromOutside: highlightInput,
+                            }}
+                        />
+                        <Input
+                            ownProps={{
+                                label: 'Confirm New Password',
+                                inputType: 'password',
+                                onChange: (e) =>
+                                    onChange(e, 'confirmNewPassword'),
+                            }}
+                            validateProps={{
+                                input: uniqueValidation(
+                                    inputs.confirmNewPassword,
+                                    inputs,
+                                ),
+                                showInputMessagesFromOutside: showInputsMessage,
+                                hightlightInputFromOutside: highlightInput,
+                            }}
+                        />
+                    </div>
+                    <div>
+                        <button
+                            key={'submitButton'}
+                            className="c-button"
+                            onClick={onClick}
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
         );
     }
 
@@ -97,8 +112,16 @@ export default function ChangePasswordForm({
         }));
     }
 
-    function onShowInputsMessage(value: boolean) {
-        setShowInputsMessage(value);
+    async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
+        if (manyValidation(inputs)) {
+            await onSubmitInputs();
+            return;
+        }
+        onHighlightInput(true);
+        onShowMessage(true);
+        onShowInputsMessage(true);
     }
 
     async function onSubmitInputs() {
@@ -114,21 +137,9 @@ export default function ChangePasswordForm({
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) return;
+        onShowInputsMessage(false);
+        onShowMessage(false);
         router.reload();
-    }
-
-    function elementsToAddFn(props: ElementsToAddProps) {
-        return (
-            <div>
-                <button
-                    key={'submitButton'}
-                    className="c-button"
-                    onClick={props.onClick}
-                >
-                    Submit
-                </button>
-            </div>
-        );
     }
 }
 
@@ -145,19 +156,19 @@ const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
         errors: [],
     },
     newPassword: {
-        validations: (currentInputValue, hookInputs) => [
+        validations: (currentInputValue, inputs) => [
             {
                 coditional: !currentInputValue.match(/.{6,}/),
                 message: 'Password must has 6 characters at least',
             },
             {
-                coditional: currentInputValue === hookInputs?.password.value,
+                coditional: currentInputValue === inputs?.password.value,
                 message: 'This field have to be different than the password',
             },
             {
                 coditional: preventCompareEmptyField(
-                    hookInputs?.confirmNewPassword.value,
-                    currentInputValue !== hookInputs?.confirmNewPassword.value,
+                    currentInputValue !== inputs?.confirmNewPassword.value,
+                    inputs?.confirmNewPassword.value,
                 ),
                 message:
                     'This field has to be equal to the confirm new password',
