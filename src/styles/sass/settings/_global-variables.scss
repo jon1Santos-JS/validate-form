@@ -1,9 +1,10 @@
 :root {
     // COLORS
 
-    --primary-color: #818181;
+    --primary-color: #5e5e5e;
     --secondary-color: #fff;
     --thirty-color: #000;
+    --danger-color: rgb(219 25 25);
 
     // MEASURES
 
@@ -14,6 +15,7 @@
         1.5vw + var(--app-base-measure)
     );
     --app-base-image: 200px;
+    --app-base-border-size: 2px;
 
     // SHADOW-EFFECT
 

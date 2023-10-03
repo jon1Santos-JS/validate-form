@@ -1,34 +1,47 @@
-import useValidate from '@/hooks/useValidate';
 import React, { useEffect, useState } from 'react';
 
 const DEFAULT_MESSAGE = 'Invalid form';
 
-interface FormPropsTypes<T extends string> {
+type FormPropsTypes = {
     ownProps: Props;
-    validateProps: ValidatePropsType<T>;
+    validateProps: ValidatePropsType;
     children: JSX.Element[] | JSX.Element;
-}
+};
 
-interface ValidatePropsType<T extends string> {
-    inputs: InputsToValidateType<T>;
+type ValidatePropsType = {
+    areInputsValid: () => boolean;
     onShowInputsMessage: (value: boolean) => void;
-}
+    setHighlightInputsClass: (value: boolean) => void;
+};
 
-interface Props {
+type Props = {
     onSubmitInputs: () => Promise<string | undefined | void>;
     legend?: string;
     formError?: string | null;
     waitMessageToSubmit?: boolean;
-}
+    elementsToAdd?: (props: ElementsToAddProps) => JSX.Element;
+    className: string;
+};
 
-export default function FormFormProps<T extends string>({
+export type ElementsToAddProps = {
+    onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+};
+
+export default function FormFormProps({
     ownProps,
     children,
     validateProps,
-}: FormPropsTypes<T>) {
-    const { inputs, onShowInputsMessage } = validateProps;
-    const { onSubmitInputs, legend, formError, waitMessageToSubmit } = ownProps;
-    const { manyValidation } = useValidate(inputs);
+}: FormPropsTypes) {
+    const { areInputsValid, onShowInputsMessage, setHighlightInputsClass } =
+        validateProps;
+    const {
+        onSubmitInputs,
+        legend,
+        formError,
+        waitMessageToSubmit,
+        elementsToAdd,
+        className,
+    } = ownProps;
     const [showMessage, setShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(formError ?? DEFAULT_MESSAGE);
 
@@ -49,34 +62,42 @@ export default function FormFormProps<T extends string>({
     }, [onShowInputsMessage]);
 
     return (
-        <form className="c-form">
-            <fieldset>
-                <legend>{legend}</legend>
-                {renderElements()}
+        <form className={className}>
+            <fieldset className="container">
+                <div className="legend">
+                    <legend>{legend}</legend>
+                </div>
+                {renderInputs()}
                 {renderError()}
-                <button
-                    className="button is-primary"
-                    onClick={(e) => handleClick(e)}
-                >
-                    Submit
-                </button>
+                {elementsToAdd && elementsToAdd({ onClick: handleClick })}
             </fieldset>
         </form>
     );
 
-    function renderElements() {
+    function renderInputs() {
         const inputsElements = children as JSX.Element[];
-        if (inputsElements?.length > 1) {
-            return inputsElements.map((child) => (
-                <div key={child.props.ownProps.label}>{child}</div>
-            ));
-        }
-        return children;
+        return (
+            <div className="inputs">
+                {inputsElements?.length > 1
+                    ? inputsElements.map((child) => {
+                          return (
+                              <div
+                                  className="field"
+                                  key={child.props.ownProps.label}
+                              >
+                                  {child}
+                              </div>
+                          );
+                      })
+                    : children}
+            </div>
+        );
     }
 
     function renderError() {
-        if (!showMessage || formError === null) return null;
-        return <div className="notification is-danger">{message}</div>;
+        if (formError === null) return null;
+        if (!showMessage) return <div className="form-error-message"></div>;
+        return <div className="form-error-message">{message}</div>;
     }
 
     async function handleClick(
@@ -85,9 +106,10 @@ export default function FormFormProps<T extends string>({
         e.preventDefault();
         if (waitMessageToSubmit && showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         setMessage(formError ?? DEFAULT_MESSAGE); // TO SET SUBMIT ERROR
-        if (manyValidation()) {
+        if (areInputsValid()) {
             const response = await onSubmitInputs();
             if (response === undefined) {
+                setHighlightInputsClass(false);
                 onShowInputsMessage(false);
                 setShowMessage(false);
                 return;
@@ -98,6 +120,7 @@ export default function FormFormProps<T extends string>({
             setShowMessage(true);
         }
         setShowMessage(true);
+        setHighlightInputsClass(true);
         onShowInputsMessage(true);
     }
 }

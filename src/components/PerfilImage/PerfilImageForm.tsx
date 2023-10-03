@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Form from '../Form';
+import Form, { ElementsToAddProps } from '../Form';
 import Input from '../Input';
 import { handledName, onCheckExtensions } from '@/hooks/useInputsHandler';
 
@@ -42,6 +42,8 @@ export default function PerfilImageForm({
                 ownProps={{
                     onSubmitInputs: onSubmitInputs,
                     formError: null,
+                    elementsToAdd: elementsToAddFn,
+                    className: 'o-perfil-image-form',
                 }}
                 validateProps={{
                     inputs,
@@ -115,5 +117,19 @@ export default function PerfilImageForm({
             body: JSON.stringify(handledUser),
         };
         await fetch(API, options);
+    }
+
+    function elementsToAddFn(props: ElementsToAddProps) {
+        return (
+            <div>
+                <button
+                    key={'submitButton'}
+                    className="c-button"
+                    onClick={props.onClick}
+                >
+                    Submit
+                </button>
+            </div>
+        );
     }
 }

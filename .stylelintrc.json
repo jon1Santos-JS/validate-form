@@ -3,8 +3,8 @@
     "plugins": ["stylelint-order"],
     "rules": {
         "order/properties-alphabetical-order": true,
-        "selector-max-compound-selectors": 4,
-        "max-nesting-depth": 4,
+        "selector-max-compound-selectors": 6,
+        "max-nesting-depth": 6,
         "scss/selector-no-redundant-nesting-selector": true
     }
 }

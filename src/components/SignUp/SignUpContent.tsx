@@ -9,18 +9,18 @@ interface SignUpContentPropsType {
 export default function SignUpContent({
     handleUserProps,
 }: SignUpContentPropsType) {
-    const [signUpResponse, setSignUpResponse] = useState(false); // SHOW MODAL
+    const [modalState, setModalState] = useState(false); // SHOW MODAL
     return (
         <>
             <SignUpForm
                 ownProps={{
-                    onShowModal: (data: boolean) => setSignUpResponse(data),
+                    setModalState,
                 }}
                 handleUserProps={handleUserProps}
             />
             <SignUpModal
-                isModalOpen={() => signUpResponse}
-                onCloseModal={() => setSignUpResponse(false)}
+                isModalOpen={modalState}
+                onCloseModal={() => setModalState(false)}
             />
         </>
     );

@@ -4,14 +4,16 @@ import PerfilImage from '@/components/PerfilImage/PerfilImage';
 import PerfilImageForm from '@/components/PerfilImage/PerfilImageForm';
 import { useRouter } from 'next/router';
 
-const API = 'api/handleDatabase';
+const HANDLE_DB_API = 'api/handleDatabase';
+const SIGN_IN_API = 'api/signIn';
 
 type DashBoardPageProps = {
     handleUserProps: HandleUserPropsType;
 };
 
 export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
-    const { hasUser, isUserStateLoading, user } = handleUserProps;
+    const { hasUser, isUserStateLoading, user, setHasUser, setUser } =
+        handleUserProps;
     const router = useRouter();
     const adminCheck = user.username !== 'admins';
 
@@ -45,12 +47,21 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
                     {!adminCheck && (
                         <button onClick={onResetDB}>Reset Database</button>
                     )}
+
+                    {hasUser && (
+                        <div
+                            className="c-button sign-out"
+                            onClick={signOutUser}
+                        >
+                            Sign out
+                        </div>
+                    )}
                 </div>
             </div>
         );
 
         async function onResetDB() {
-            const response = await fetch(API, { method: 'GET' });
+            const response = await fetch(HANDLE_DB_API, { method: 'GET' });
             const parsedResponse = await response.json();
             if (typeof parsedResponse === 'string') return;
             window.location.assign('/');
@@ -58,10 +69,21 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
 
         async function onDeleteAccount() {
             const body = user.username;
-            const response = await fetch(API, { body: body, method: 'POST' });
+            const response = await fetch(HANDLE_DB_API, {
+                body: body,
+                method: 'POST',
+            });
             const parsedResponse = await response.json();
             if (typeof parsedResponse === 'string') return;
             window.location.assign('/');
+        }
+        async function signOutUser() {
+            await fetch(SIGN_IN_API, { method: 'DELETE' });
+            setUser({ username: '' });
+            setHasUser(false);
+            if (!hasUser) {
+                window.location.assign('/');
+            }
         }
     }
 }

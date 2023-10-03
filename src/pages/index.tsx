@@ -15,10 +15,6 @@ export default function SignInPage({ handleUserProps }: SignInPageProps) {
             return null;
         }
 
-        return (
-            <div>
-                <SignInForm handleUserProps={handleUserProps} />
-            </div>
-        );
+        return <SignInForm handleUserProps={handleUserProps} />;
     }
 }

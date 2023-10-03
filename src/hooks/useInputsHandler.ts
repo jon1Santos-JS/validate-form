@@ -33,8 +33,8 @@ export function omitFields<T extends string>(
 }
 
 export function preventCompareEmptyField(
-    toCompare: string,
     condition: boolean,
+    toCompare?: string,
 ) {
     if (!toCompare) return !condition;
     return condition;

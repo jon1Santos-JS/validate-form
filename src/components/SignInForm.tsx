@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import Form from './Form';
+import Form, { ElementsToAddProps } from './Form';
 import Input from './Input';
 import { omitFields } from '@/hooks/useInputsHandler';
+import Link from 'next/link';
 
 const API = 'api/signIn';
 const SIGN_IN_ERROR_RESPONSE = 'Incorrect username or password';
@@ -16,7 +17,8 @@ type SignInFormProps = {
 };
 
 export default function SignInForm({ handleUserProps }: SignInFormProps) {
-    const { setUser, setHasUser, setUserStateLoading } = handleUserProps;
+    const { setUser, setHasUser, hasUser, setUserStateLoading } =
+        handleUserProps;
     const [ShowInputsMessage, setShowInputsMessage] = useState(false);
     const [inputs, setInputs] = useState({
         username: {
@@ -45,46 +47,44 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
     });
 
     return (
-        <div className="o-sign-in-form">
-            <div className="c-container">
-                <Form
-                    ownProps={{
-                        legend: 'SignIn',
-                        onSubmitInputs: onSubmitInputs,
-                        formError: SIGN_IN_ERROR_RESPONSE,
-                    }}
-                    validateProps={{
-                        onShowInputsMessage,
-                        inputs,
-                    }}
-                >
-                    <Input
-                        ownProps={{
-                            label: 'Username',
-                            inputType: 'text',
-                            onChange: (e) => onChange(e, 'username'),
-                        }}
-                        validateProps={{
-                            input: inputs.username,
-                            showInputMessagesFromOutside: ShowInputsMessage,
-                            inputs,
-                        }}
-                    />
-                    <Input
-                        ownProps={{
-                            label: 'Password',
-                            inputType: 'password',
-                            onChange: (e) => onChange(e, 'password'),
-                        }}
-                        validateProps={{
-                            input: inputs.password,
-                            showInputMessagesFromOutside: ShowInputsMessage,
-                            inputs,
-                        }}
-                    />
-                </Form>
-            </div>
-        </div>
+        <Form
+            ownProps={{
+                legend: 'Sign in',
+                onSubmitInputs: onSubmitInputs,
+                elementsToAdd: elementsToAddFn,
+                formError: SIGN_IN_ERROR_RESPONSE,
+                className: 'o-sign-in-form',
+            }}
+            validateProps={{
+                onShowInputsMessage,
+                inputs,
+            }}
+        >
+            <Input
+                ownProps={{
+                    label: 'Username',
+                    inputType: 'text',
+                    onChange: (e) => onChange(e, 'username'),
+                }}
+                validateProps={{
+                    input: inputs.username,
+                    showInputMessagesFromOutside: ShowInputsMessage,
+                    inputs,
+                }}
+            />
+            <Input
+                ownProps={{
+                    label: 'Password',
+                    inputType: 'password',
+                    onChange: (e) => onChange(e, 'password'),
+                }}
+                validateProps={{
+                    input: inputs.password,
+                    showInputMessagesFromOutside: ShowInputsMessage,
+                    inputs,
+                }}
+            />
+        </Form>
     );
 
     function onChange(
@@ -115,5 +115,24 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
             return SIGN_IN_ERROR_RESPONSE;
         }
         setUser({ username: parsedResponse.body as string });
+    }
+
+    function elementsToAddFn(props: ElementsToAddProps) {
+        return (
+            <div className="buttons">
+                <button
+                    key={'submitButton'}
+                    className="c-button"
+                    onClick={props.onClick}
+                >
+                    Submit
+                </button>
+                {!hasUser && (
+                    <Link href="/sign-up-page">
+                        <button className="c-button">Sign up</button>
+                    </Link>
+                )}
+            </div>
+        );
     }
 }

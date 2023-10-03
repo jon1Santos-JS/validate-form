@@ -1,9 +1,5 @@
-const EMPTY_INPUT_ERROR_RESPONSE = 'This field is required';
-
-export default function useValidate<T extends string>(
-    inputs: InputsToValidateType<T>,
-) {
-    function manyValidation() {
+export default function useValidate<T extends string>() {
+    function manyValidation(inputs: InputsToValidateType<T>) {
         let isValid = true;
         for (const i in inputs) {
             if (inputs[i].errors.length > 0) isValid = false;
@@ -11,30 +7,39 @@ export default function useValidate<T extends string>(
         return isValid;
     }
 
-    function uniqueValidation(input: ValidateInputType<T>) {
+    function uniqueValidation(
+        input: ValidateInputType<T>,
+        conditionalInput?: ValidateInputType<T>,
+    ) {
         const { value, required, errors } = input;
         cleanArray(errors);
         if (!value && required) {
             if (typeof required === 'string') {
                 errors.push(required);
-                return errors;
+                return input;
             }
-            errors.push(EMPTY_INPUT_ERROR_RESPONSE);
-            return errors;
+            errors.push('');
+            return input;
         }
-        return validate(input);
+        return validate(input, conditionalInput);
     }
 
-    function validate(input: ValidateInputType<T>) {
+    function validate(
+        input: ValidateInputType<T>,
+        conditionalInput?: ValidateInputType<T>,
+    ) {
         const { value, validations, errors } = input;
-        if (!validations) return errors;
-        if (!value) return errors;
 
-        validations(value, inputs).map((validation) => {
-            const message = validation.message ? validation.message : '';
-            if (validation.coditional) errors.push(message);
-        });
-        return errors;
+        if (!validations) return input;
+        if (!value) return input;
+
+        validations(value, conditionalInput && conditionalInput.value).map(
+            (validation) => {
+                const message = validation.message ? validation.message : '';
+                if (validation.coditional) errors.push(message);
+            },
+        );
+        return input;
     }
 
     return { uniqueValidation, manyValidation };

@@ -1,5 +1,5 @@
 interface SignUpModalPropsType {
-    isModalOpen: () => boolean;
+    isModalOpen: boolean;
     onCloseModal: () => void;
 }
 
@@ -10,7 +10,7 @@ export default function SignUpModal({
     return <>{renderContent()}</>;
 
     function renderContent() {
-        if (!isModalOpen()) return null;
+        if (!isModalOpen) return null;
         const advice = {
             warningTittle: 'Failed to sign up account',
             warning:

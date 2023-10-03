@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Form from './Form';
+import Form, { ElementsToAddProps } from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
 import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
@@ -39,6 +39,8 @@ export default function ChangePasswordForm({
                 ownProps={{
                     legend: 'Change Password',
                     onSubmitInputs: onSubmitInputs,
+                    elementsToAdd: elementsToAddFn,
+                    className: 'o-change-password-form',
                 }}
                 validateProps={{
                     inputs,
@@ -113,6 +115,20 @@ export default function ChangePasswordForm({
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) return;
         router.reload();
+    }
+
+    function elementsToAddFn(props: ElementsToAddProps) {
+        return (
+            <div>
+                <button
+                    key={'submitButton'}
+                    className="c-button"
+                    onClick={props.onClick}
+                >
+                    Submit
+                </button>
+            </div>
+        );
     }
 }
 

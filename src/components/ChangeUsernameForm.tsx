@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Form from './Form';
+import Form, { ElementsToAddProps } from './Form';
 import Input from './Input';
 import { useRouter } from 'next/router';
 const API = 'api/changeUsername';
@@ -49,6 +49,8 @@ export default function ChangeUsernameForm({
                     onSubmitInputs: onSubmitInputs,
                     formError: DEFAULT_ERROR_MESSAGE,
                     waitMessageToSubmit: true,
+                    elementsToAdd: elementsToAddFn,
+                    className: 'o-change-username-form',
                 }}
                 validateProps={{ inputs, onShowInputsMessage }}
             >
@@ -101,5 +103,19 @@ export default function ChangeUsernameForm({
         window.addEventListener('load', () => {
             setUser({ username: parsedResponse.body as string });
         });
+    }
+
+    function elementsToAddFn(props: ElementsToAddProps) {
+        return (
+            <div>
+                <button
+                    key={'submitButton'}
+                    className="c-button"
+                    onClick={props.onClick}
+                >
+                    Submit
+                </button>
+            </div>
+        );
     }
 }

@@ -18,10 +18,6 @@ export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
             return null;
         }
 
-        return (
-            <div className="o-sign-up-page">
-                <SignUpContent handleUserProps={handleUserProps} />
-            </div>
-        );
+        return <SignUpContent handleUserProps={handleUserProps} />;
     }
 }

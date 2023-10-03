@@ -1,0 +1,12 @@
+.has-error {
+    border: calc(var(--app-base-border-size) / 1.4) solid var(--danger-color);
+
+    @media screen and (width >= 768px) {
+        border: var(--app-base-border-size) solid var(--danger-color);
+    }
+
+    &:focus {
+        outline: calc(var(--app-base-border-size) / 2.5) solid
+            var(--danger-color);
+    }
+}
