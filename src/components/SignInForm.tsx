@@ -24,9 +24,11 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
     const [highlightInput, onHighlightInput] = useState(false);
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const [message, setMessage] = useState(DEFAULT_MESSAGE);
-    const [inputs, setInputs] = useState({
+    const [inputs, setInputs] = useState<
+        InputsToValidateType<'username' | 'password'>
+    >({
         username: {
-            validations: (currentInputValue: string) => [
+            validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
                 },
@@ -39,7 +41,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
             errors: [],
         },
         password: {
-            validations: (currentInputValue: string) => [
+            validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
                 },
@@ -82,7 +84,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                         validateProps={{
                             input: uniqueValidation(inputs.username),
                             showInputMessagesFromOutside: showInputsMessage,
-                            hightlightInputFromOutside: highlightInput,
+                            highlightInput,
                         }}
                     />
                     <Input
@@ -94,7 +96,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                         validateProps={{
                             input: uniqueValidation(inputs.password),
                             showInputMessagesFromOutside: showInputsMessage,
-                            hightlightInputFromOutside: highlightInput,
+                            highlightInput,
                         }}
                     />
                 </div>
@@ -137,7 +139,6 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (manyValidation(inputs)) {
             await onSubmitInputs();
-            return;
         }
         onShowMessage(true);
         onHighlightInput(true);
@@ -156,6 +157,13 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         setHasUser(parsedResponse.serverResponse);
         if (!parsedResponse.serverResponse) {
             setMessage(DEFAULT_MESSAGE);
+            setInputs((prev) => {
+                prev.username.cleanErrors = false;
+                prev.password.cleanErrors = false;
+                prev.username.errors.push('');
+                prev.password.errors.push('');
+                return prev;
+            });
             return;
         }
         onShowInputsMessage(false);

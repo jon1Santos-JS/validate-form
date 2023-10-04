@@ -9,7 +9,7 @@ type InputPropsTypes<T extends string> = {
 type ValidatePropsType<T extends string> = {
     input: ValidateInputType<T>;
     showInputMessagesFromOutside: boolean;
-    hightlightInputFromOutside: boolean;
+    highlightInput: boolean;
 };
 
 type PropsType = {
@@ -26,27 +26,28 @@ export default function Input<T extends string>({
     const [showMessage, onShowMessage] = useState(false);
     const isFirstRender = useFirstRender();
     const { label, inputType, onChange, inputAccept } = ownProps;
-    const { input, showInputMessagesFromOutside, hightlightInputFromOutside } =
+    const { input, showInputMessagesFromOutside, highlightInput } =
         validateProps;
     const { value, errors } = input;
 
     // IF THERE ARE STILL ERRORS IN THE INPUT THE HIGHLIGHT CONTINUES
     // (isFirstRender) USED INSTEAD OF (value) TO HIGHLIGHT THE INPUT EVEN EMPTY
-    const classHighlightCondition =
-        !isFirstRender && errors.length ? 'has-error' : '';
-    const classHighlighConditionFromOutside = hightlightInputFromOutside
-        ? 'has-error'
-        : '';
+    const insideHighlightCondition =
+        !isFirstRender && value && showMessage ? 'has-error' : '';
+    const outsideHighlightCondition = highlightInput ? 'has-error' : '';
+    const generalHighlightCondition =
+        errors.length >= 1 &&
+        (insideHighlightCondition || outsideHighlightCondition);
 
     useEffect(() => {
-        if (!value) return;
+        if (isFirstRender) return;
         if (errors.length >= 1) {
             const currentTimer = setTimeout(() => {
                 onShowMessage(true);
             }, 950);
             return () => clearTimeout(currentTimer);
         }
-    }, [errors, value]);
+    }, [errors, isFirstRender, value]);
 
     useEffect(() => {
         if (!showMessage && errors.length >= 1) {
@@ -63,9 +64,7 @@ export default function Input<T extends string>({
             ) : null}
             <input
                 id={label}
-                className={`input ${
-                    classHighlightCondition || classHighlighConditionFromOutside
-                }`}
+                className={`input ${generalHighlightCondition}`}
                 placeholder={label}
                 accept={inputAccept && inputAccept}
                 onChange={onChange}

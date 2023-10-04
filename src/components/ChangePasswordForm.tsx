@@ -53,7 +53,7 @@ export default function ChangePasswordForm({
                             validateProps={{
                                 input: uniqueValidation(inputs.password),
                                 showInputMessagesFromOutside: showInputsMessage,
-                                hightlightInputFromOutside: highlightInput,
+                                highlightInput,
                             }}
                         />
                         <Input
@@ -68,7 +68,7 @@ export default function ChangePasswordForm({
                                     inputs,
                                 ),
                                 showInputMessagesFromOutside: showInputsMessage,
-                                hightlightInputFromOutside: highlightInput,
+                                highlightInput,
                             }}
                         />
                         <Input
@@ -84,7 +84,7 @@ export default function ChangePasswordForm({
                                     inputs,
                                 ),
                                 showInputMessagesFromOutside: showInputsMessage,
-                                hightlightInputFromOutside: highlightInput,
+                                highlightInput,
                             }}
                         />
                     </div>

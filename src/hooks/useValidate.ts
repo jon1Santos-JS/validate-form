@@ -2,7 +2,8 @@ export default function useValidate() {
     function manyValidation<T extends string>(inputs: InputsToValidateType<T>) {
         let isValid = true;
         for (const i in inputs) {
-            if (inputs[i].errors.length > 0) isValid = false;
+            const validatedInput = uniqueValidation(inputs[i], inputs);
+            if (validatedInput.errors.length > 0) isValid = false;
         }
         return isValid;
     }
@@ -11,16 +12,10 @@ export default function useValidate() {
         input: ValidateInputType<T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        const { value, required, errors } = input;
-        cleanArray(errors);
-        if (!value && required) {
-            if (typeof required === 'string') {
-                errors.push(required);
-                return input;
-            }
-            errors.push('');
-            return input;
-        }
+        const { errors, cleanErrors } = input;
+        if (typeof cleanErrors === 'undefined' || cleanErrors === true)
+            cleanArray(errors);
+        delete input.cleanErrors;
         return validate(input, inputs);
     }
 
@@ -31,7 +26,6 @@ export default function useValidate() {
         const { value, validations, errors } = input;
 
         if (!validations) return input;
-        if (!value) return input;
 
         validations(value, inputs && inputs).map((validation) => {
             const message = validation.message ? validation.message : '';

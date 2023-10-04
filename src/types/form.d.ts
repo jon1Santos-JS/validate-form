@@ -14,6 +14,7 @@ declare interface ValidateInputType<T extends string> {
     required?: boolean | string;
     errors: string[];
     value: string;
+    cleanErrors?: boolean;
 }
 
 declare interface Validation {

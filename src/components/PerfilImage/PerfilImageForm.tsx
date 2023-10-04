@@ -55,7 +55,7 @@ export default function PerfilImageForm({
                             validateProps={{
                                 input: uniqueValidation(inputs.imageInput),
                                 showInputMessagesFromOutside: showInputsMessage,
-                                hightlightInputFromOutside: highlightInput,
+                                highlightInput,
                             }}
                         />
                     </div>

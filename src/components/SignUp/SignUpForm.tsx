@@ -31,18 +31,74 @@ export default function SignUpForm({
 }: SignUpFormPropsType) {
     const { setModalState } = ownProps;
     const { hasUser } = handleUserProps;
-    const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
     const { uniqueValidation, manyValidation } = useValidate();
+
     const [highlightInput, onHighlightInput] = useState(false);
     const [showInputsMessage, onShowInputsMessage] = useState(false);
+    const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
+        username: {
+            validations: (currentInputValue) => [
+                {
+                    coditional: !currentInputValue,
+                    message: REQUIRED_MESSAGE,
+                },
+                {
+                    coditional: !currentInputValue.match(/.{6,}/),
+                    message: 'Username must has 6 characters at least',
+                },
+                {
+                    coditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
+                    message: 'Only characters',
+                },
+            ],
+            value: '',
+            errors: [],
+        },
+        password: {
+            validations: (currentInputValue, inputs) => [
+                {
+                    coditional: !currentInputValue,
+                    message: REQUIRED_MESSAGE,
+                },
+                {
+                    coditional: !currentInputValue.match(/.{6,}/),
+                    message: 'Password must has 6 characters at least',
+                },
+                {
+                    coditional: preventCompareEmptyField(
+                        currentInputValue !== inputs?.confirmPassword.value,
+                        inputs?.confirmPassword.value,
+                    ),
+                    message:
+                        'This field has to be equal to the confirm password',
+                },
+            ],
+            value: '',
+            errors: [],
+        },
+        confirmPassword: {
+            validations: (currentInputValue, inputs) => [
+                {
+                    coditional: !currentInputValue,
+                    message: REQUIRED_MESSAGE,
+                },
+                {
+                    coditional: currentInputValue !== inputs?.password.value,
+                    message: 'This field has to be equal to the password',
+                },
+            ],
+            value: '',
+            errors: [],
+        },
+    });
 
-    useEffect(() => {
-        const timerDownMessage = setTimeout(() => {
-            onHighlightInput(false);
-        }, 2750);
+    // useEffect(() => {
+    //     const timerDownMessage = setTimeout(() => {
+    //         onHighlightInput(false);
+    //     }, 2750);
 
-        return () => clearTimeout(timerDownMessage);
-    }, [highlightInput]);
+    //     return () => clearTimeout(timerDownMessage);
+    // }, [highlightInput]);
 
     return (
         <form className="o-sign-up-form">
@@ -59,7 +115,7 @@ export default function SignUpForm({
                         }}
                         validateProps={{
                             input: uniqueValidation(inputs.username),
-                            hightlightInputFromOutside: highlightInput,
+                            highlightInput,
                             showInputMessagesFromOutside: showInputsMessage,
                         }}
                     />
@@ -71,8 +127,8 @@ export default function SignUpForm({
                         }}
                         validateProps={{
                             input: uniqueValidation(inputs.password, inputs),
+                            highlightInput,
                             showInputMessagesFromOutside: showInputsMessage,
-                            hightlightInputFromOutside: highlightInput,
                         }}
                     />
                     <Input
@@ -87,7 +143,7 @@ export default function SignUpForm({
                                 inputs,
                             ),
                             showInputMessagesFromOutside: showInputsMessage,
-                            hightlightInputFromOutside: highlightInput,
+                            highlightInput,
                         }}
                     />
                 </div>
@@ -123,7 +179,6 @@ export default function SignUpForm({
         e.preventDefault();
         if (manyValidation(inputs)) {
             await onSubmitInputs();
-            return;
         }
         onHighlightInput(true);
         onShowInputsMessage(true);
@@ -151,50 +206,3 @@ export default function SignUpForm({
         window.location.assign('/'); // WINDOW.ASSIGN JUST TO SIMULATE
     }
 }
-
-const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
-    username: {
-        validations: (currentInputValue) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Username must has 6 characters at least',
-            },
-            {
-                coditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
-                message: 'Only characters',
-            },
-        ],
-        required: REQUIRED_MESSAGE,
-        value: '',
-        errors: [],
-    },
-    password: {
-        validations: (currentInputValue, inputs) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Password must has 6 characters at least',
-            },
-            {
-                coditional: preventCompareEmptyField(
-                    currentInputValue !== inputs?.confirmPassword.value,
-                    inputs?.confirmPassword.value,
-                ),
-                message: 'This field has to be equal to the confirm password',
-            },
-        ],
-        required: REQUIRED_MESSAGE,
-        value: '',
-        errors: [],
-    },
-    confirmPassword: {
-        validations: (currentInputValue, inputs) => [
-            {
-                coditional: currentInputValue !== inputs?.password.value,
-                message: 'This field has to be equal to the password',
-            },
-        ],
-        required: REQUIRED_MESSAGE,
-        value: '',
-        errors: [],
-    },
-};

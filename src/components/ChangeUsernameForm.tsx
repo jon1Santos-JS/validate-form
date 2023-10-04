@@ -61,7 +61,7 @@ export default function ChangeUsernameForm({
                             validateProps={{
                                 input: uniqueValidation(inputs.newUsername),
                                 showInputMessagesFromOutside: showInputsMessage,
-                                hightlightInputFromOutside: highlightInput,
+                                highlightInput,
                             }}
                         />
                     </div>
