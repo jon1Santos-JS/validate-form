@@ -2,8 +2,7 @@ export default function useValidate() {
     function manyValidation<T extends string>(inputs: InputsToValidateType<T>) {
         let isValid = true;
         for (const i in inputs) {
-            const validatedInput = uniqueValidation(inputs[i], inputs);
-            if (validatedInput.errors.length > 0) isValid = false;
+            if (inputs[i].errors.length > 0) isValid = false;
         }
         return isValid;
     }

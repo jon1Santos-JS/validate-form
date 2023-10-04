@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Input from '../Input';
 import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
 import { onOmitProps } from '@/lib/lodashAdapter';
@@ -91,14 +91,6 @@ export default function SignUpForm({
             errors: [],
         },
     });
-
-    // useEffect(() => {
-    //     const timerDownMessage = setTimeout(() => {
-    //         onHighlightInput(false);
-    //     }, 2750);
-
-    //     return () => clearTimeout(timerDownMessage);
-    // }, [highlightInput]);
 
     return (
         <form className="o-sign-up-form">

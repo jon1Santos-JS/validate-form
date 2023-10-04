@@ -41,11 +41,15 @@ export default function Input<T extends string>({
 
     useEffect(() => {
         if (isFirstRender) return;
+        if (!value) return;
         if (errors.length >= 1) {
             const currentTimer = setTimeout(() => {
                 onShowMessage(true);
             }, 950);
-            return () => clearTimeout(currentTimer);
+            return () => {
+                onShowMessage(false);
+                clearTimeout(currentTimer);
+            };
         }
     }, [errors, isFirstRender, value]);
 
