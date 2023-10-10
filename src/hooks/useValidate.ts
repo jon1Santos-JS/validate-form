@@ -11,9 +11,9 @@ export default function useValidate() {
         input: ValidateInputType<T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        const { errors, cleanErrors } = input;
+        const { cleanErrors } = input;
         if (typeof cleanErrors === 'undefined' || cleanErrors === true)
-            cleanArray(errors);
+            input.errors = [];
         delete input.cleanErrors;
         return validate(input, inputs);
     }
@@ -22,22 +22,17 @@ export default function useValidate() {
         input: ValidateInputType<T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        const { value, validations, errors } = input;
+        const { value, validations } = input;
 
         if (!validations) return input;
 
+        const newErrors: string[] = [];
         validations(value, inputs && inputs).map((validation) => {
-            const message = validation.message ? validation.message : '';
-            if (validation.coditional) errors.push(message);
+            if (validation.coditional) newErrors.push(validation.message);
         });
+        input.errors = [...newErrors];
         return input;
     }
 
     return { uniqueValidation, manyValidation };
-}
-
-function cleanArray(arrayToClean: string[]) {
-    while (arrayToClean.length > 0) {
-        arrayToClean.pop();
-    }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Input from './Input';
 import { omitFields } from '@/hooks/useInputsHandler';
 import Link from 'next/link';
@@ -8,7 +8,6 @@ const API = 'api/signIn';
 const DEFAULT_MESSAGE = 'Incorrect username or password';
 const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
     'errors',
-    'required',
     'validations',
 ];
 
@@ -16,41 +15,135 @@ type SignInFormProps = {
     handleUserProps: HandleUserPropsType;
 };
 
+type InputsType = 'username' | 'password';
+
 export default function SignInForm({ handleUserProps }: SignInFormProps) {
     const { setUser, setHasUser, hasUser, setUserStateLoading } =
         handleUserProps;
     const { uniqueValidation, manyValidation } = useValidate();
-    const [showInputsMessage, onShowInputsMessage] = useState(false);
-    const [highlightInput, onHighlightInput] = useState(false);
     const [showMessage, onShowMessage] = useState<boolean>(false);
-    const [message, setMessage] = useState(DEFAULT_MESSAGE);
-    const [inputs, setInputs] = useState<
-        InputsToValidateType<'username' | 'password'>
-    >({
+    const [isButtonClickable, setClickableButton] = useState(true);
+    const [inputState, setInputState] = useState({
+        username: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            justHighlight: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    username: { ...prev.username, showInputMessage: value },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    username: { ...prev.username, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    username: {
+                        ...prev.username,
+                        isControlledFromOutside: value,
+                    },
+                })),
+            setJustHighlight: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    username: {
+                        ...prev.username,
+                        justHighlight: value,
+                    },
+                })),
+        },
+        password: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            justHighlight: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: { ...prev.password, showInputMessage: value },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: { ...prev.password, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: {
+                        ...prev.password,
+                        isControlledFromOutside: value,
+                    },
+                })),
+            setJustHighlight: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: {
+                        ...prev.password,
+                        justHighlight: value,
+                    },
+                })),
+        },
+    });
+    const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: {
             validations: (currentInputValue) => [
                 {
+                    coditional: !currentInputValue,
+                    message: '',
+                },
+                {
                     coditional: !currentInputValue.match(/.{6,}/),
+                    message: '',
                 },
                 {
                     coditional: !currentInputValue.match(/^[A-Za-z]+$/),
+                    message: '',
                 },
             ],
-            required: true,
             value: '',
             errors: [],
         },
         password: {
             validations: (currentInputValue) => [
                 {
+                    coditional: !currentInputValue,
+                    message: '',
+                },
+                {
                     coditional: !currentInputValue.match(/.{6,}/),
+                    message: '',
                 },
             ],
-            required: true,
             value: '',
             errors: [],
         },
     });
+
+    const onControlInputState = useCallback(
+        (value: boolean) => {
+            for (const i in inputState) {
+                const typedIndex = i as InputsType;
+                inputState[typedIndex].onHighlightInput(value);
+                inputState[typedIndex].onShowInputMessage(value);
+                inputState[typedIndex].setControlledFromOutside(value);
+                inputState[typedIndex].setJustHighlight(value);
+            }
+        },
+        [inputState],
+    );
+
+    useEffect(() => {
+        const timerDownMessage = setTimeout(() => {
+            onControlInputState(false);
+        }, 2750);
+
+        return () => clearTimeout(timerDownMessage);
+    }, [onControlInputState]);
 
     useEffect(() => {
         const timerDownMessage = setTimeout(() => {
@@ -59,14 +152,6 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
 
         return () => clearTimeout(timerDownMessage);
     }, [showMessage]);
-
-    useEffect(() => {
-        const timerDownMessage = setTimeout(() => {
-            onHighlightInput(false);
-        }, 2750);
-
-        return () => clearTimeout(timerDownMessage);
-    }, [highlightInput]);
 
     return (
         <form className="o-sign-in-form">
@@ -81,10 +166,9 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                             inputType: 'text',
                             onChange: (e) => onChange(e, 'username'),
                         }}
-                        validateProps={{
+                        inputStateProps={{
                             input: uniqueValidation(inputs.username),
-                            showInputMessagesFromOutside: showInputsMessage,
-                            highlightInput,
+                            inputState: inputState.username,
                         }}
                     />
                     <Input
@@ -93,10 +177,9 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
                             inputType: 'password',
                             onChange: (e) => onChange(e, 'password'),
                         }}
-                        validateProps={{
+                        inputStateProps={{
                             input: uniqueValidation(inputs.password),
-                            showInputMessagesFromOutside: showInputsMessage,
-                            highlightInput,
+                            inputState: inputState.password,
                         }}
                     />
                 </div>
@@ -131,18 +214,19 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
 
     function renderError() {
         if (!showMessage) return <div className="form-error-message"></div>;
-        return <div className="form-error-message">{message}</div>;
+        return <div className="form-error-message">{DEFAULT_MESSAGE}</div>;
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (manyValidation(inputs)) {
+            if (!isButtonClickable) return;
+            setClickableButton(false);
             await onSubmitInputs();
         }
         onShowMessage(true);
-        onHighlightInput(true);
-        onShowInputsMessage(true);
+        onControlInputState(true);
+        setClickableButton(true);
     }
 
     async function onSubmitInputs() {
@@ -156,17 +240,16 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         setUserStateLoading(false);
         setHasUser(parsedResponse.serverResponse);
         if (!parsedResponse.serverResponse) {
-            setMessage(DEFAULT_MESSAGE);
-            setInputs((prev) => {
-                prev.username.cleanErrors = false;
-                prev.password.cleanErrors = false;
-                prev.username.errors.push('');
-                prev.password.errors.push('');
-                return prev;
-            });
+            onShowMessage(true);
+            for (const i in inputState) {
+                const typedIndex = i as InputsType;
+                inputState[typedIndex].onHighlightInput(true);
+                inputState[typedIndex].setJustHighlight(true);
+                inputState[typedIndex].setControlledFromOutside(true);
+            }
             return;
         }
-        onShowInputsMessage(false);
+        onControlInputState(false);
         onShowMessage(false);
         setUser({ username: parsedResponse.body as string });
     }

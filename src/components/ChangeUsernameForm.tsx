@@ -19,10 +19,37 @@ export default function ChangeUsernameForm({
 }: OwnPropsType) {
     const router = useRouter();
     const { user, setUser } = handleUserProps;
-    const [showInputsMessage, onShowInputsMessage] = useState(false);
-    const [highlightInput, onHighlightInput] = useState(false);
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const { uniqueValidation, manyValidation } = useValidate();
+    const [isButtonClickable, setClickableButton] = useState(true);
+    const [inputState, setInputState] = useState({
+        newUsername: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    newUsername: {
+                        ...prev.newUsername,
+                        showInputMessage: value,
+                    },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    newUsername: { ...prev.newUsername, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    newUsername: {
+                        ...prev.newUsername,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+    });
     const [inputs, setInputs] = useState({
         newUsername: {
             validations: (currentInputValue: string) => [
@@ -58,10 +85,9 @@ export default function ChangeUsernameForm({
                                 inputType: 'text',
                                 onChange: (e) => onChange(e, 'newUsername'),
                             }}
-                            validateProps={{
+                            inputStateProps={{
                                 input: uniqueValidation(inputs.newUsername),
-                                showInputMessagesFromOutside: showInputsMessage,
-                                highlightInput,
+                                inputState: inputState.newUsername,
                             }}
                         />
                     </div>
@@ -99,12 +125,16 @@ export default function ChangeUsernameForm({
         e.preventDefault();
         if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (manyValidation(inputs)) {
+            if (!isButtonClickable) return;
             await onSubmitInputs();
+            setClickableButton(false);
             return;
         }
-        onHighlightInput(true);
+        inputState.newUsername.onHighlightInput(true);
+        inputState.newUsername.onShowInputMessage(true);
+        inputState.newUsername.setControlledFromOutside(true);
         onShowMessage(true);
-        onShowInputsMessage(true);
+        setClickableButton(true);
     }
 
     async function onSubmitInputs() {
@@ -122,7 +152,7 @@ export default function ChangeUsernameForm({
         if (!parsedResponse.serverResponse) {
             return parsedResponse.body as string;
         }
-        onShowInputsMessage(false);
+        inputState.newUsername.onShowInputMessage(true);
         onShowMessage(false);
         router.reload();
         window.addEventListener('load', () => {

@@ -15,9 +15,33 @@ export default function PerfilImageForm({
 }: PerfilImageFormProps) {
     const { user } = handleUserProps;
     const { uniqueValidation, manyValidation } = useValidate();
-    const [showInputsMessage, onShowInputsMessage] = useState(false);
-    const [highlightInput, onHighlightInput] = useState(false);
     const [showMessage, onShowMessage] = useState<boolean>(false);
+    const [isButtonClickable, setClickableButton] = useState(true);
+    const [inputState, setInputState] = useState({
+        imageInput: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    imageInput: { ...prev.imageInput, showInputMessage: value },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    imageInput: { ...prev.imageInput, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    imageInput: {
+                        ...prev.imageInput,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+    });
     const [inputs, setInputs] = useState({
         imageInput: {
             validations: (currentInputValue: string) => [
@@ -52,10 +76,9 @@ export default function PerfilImageForm({
                                 inputAccept: 'image/*',
                                 onChange: (e) => onChange(e, 'imageInput'),
                             }}
-                            validateProps={{
+                            inputStateProps={{
                                 input: uniqueValidation(inputs.imageInput),
-                                showInputMessagesFromOutside: showInputsMessage,
-                                highlightInput,
+                                inputState: inputState.imageInput,
                             }}
                         />
                     </div>
@@ -91,12 +114,15 @@ export default function PerfilImageForm({
         e.preventDefault();
         if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (manyValidation(inputs)) {
+            if (!isButtonClickable) return;
             await onSubmitInputs();
-            return;
+            setClickableButton(false);
         }
-        onHighlightInput(true);
+        inputState.imageInput.onShowInputMessage(true);
+        inputState.imageInput.onHighlightInput(true);
+        inputState.imageInput.setControlledFromOutside(true);
         onShowMessage(true);
-        onShowInputsMessage(true);
+        setClickableButton(true);
     }
 
     async function onSubmitInputs() {
@@ -118,7 +144,7 @@ export default function PerfilImageForm({
         const image = await imgApiResponse.json();
         // IMAGE LOCAL API
         await onUpdateUserImageDB(image.data.url);
-        onShowInputsMessage(false);
+        inputState.imageInput.onShowInputMessage(true);
         onShowMessage(false);
         window.location.reload();
     }

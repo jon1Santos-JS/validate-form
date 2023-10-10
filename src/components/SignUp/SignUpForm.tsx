@@ -9,7 +9,6 @@ const API = 'api/signUp';
 const INPUTS_TO_OMIT = ['confirmPassword'] as InputsType[];
 const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
     'errors',
-    'required',
     'validations',
 ];
 const REQUIRED_MESSAGE = 'This field is required';
@@ -32,9 +31,84 @@ export default function SignUpForm({
     const { setModalState } = ownProps;
     const { hasUser } = handleUserProps;
     const { uniqueValidation, manyValidation } = useValidate();
-
-    const [highlightInput, onHighlightInput] = useState(false);
-    const [showInputsMessage, onShowInputsMessage] = useState(false);
+    const [isButtonClickable, setClickableButton] = useState(true);
+    const [inputState, setInputState] = useState({
+        username: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    username: { ...prev.username, showInputMessage: value },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    username: { ...prev.username, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    username: {
+                        ...prev.username,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+        password: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: { ...prev.password, showInputMessage: value },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: { ...prev.password, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: {
+                        ...prev.password,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+        confirmPassword: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    confirmPassword: {
+                        ...prev.confirmPassword,
+                        showInputMessage: value,
+                    },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    confirmPassword: {
+                        ...prev.confirmPassword,
+                        highlightInput: value,
+                    },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    confirmPassword: {
+                        ...prev.confirmPassword,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+    });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: {
             validations: (currentInputValue) => [
@@ -105,10 +179,9 @@ export default function SignUpForm({
                             inputType: 'text',
                             onChange: (e) => onChange(e, 'username'),
                         }}
-                        validateProps={{
+                        inputStateProps={{
                             input: uniqueValidation(inputs.username),
-                            highlightInput,
-                            showInputMessagesFromOutside: showInputsMessage,
+                            inputState: inputState.username,
                         }}
                     />
                     <Input
@@ -117,10 +190,9 @@ export default function SignUpForm({
                             inputType: 'password',
                             onChange: (e) => onChange(e, 'password'),
                         }}
-                        validateProps={{
+                        inputStateProps={{
                             input: uniqueValidation(inputs.password, inputs),
-                            highlightInput,
-                            showInputMessagesFromOutside: showInputsMessage,
+                            inputState: inputState.password,
                         }}
                     />
                     <Input
@@ -129,13 +201,12 @@ export default function SignUpForm({
                             inputType: 'password',
                             onChange: (e) => onChange(e, 'confirmPassword'),
                         }}
-                        validateProps={{
+                        inputStateProps={{
                             input: uniqueValidation(
                                 inputs.confirmPassword,
                                 inputs,
                             ),
-                            showInputMessagesFromOutside: showInputsMessage,
-                            highlightInput,
+                            inputState: inputState.confirmPassword,
                         }}
                     />
                 </div>
@@ -159,21 +230,28 @@ export default function SignUpForm({
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: keyof typeof inputs,
+        inputKey: InputsType,
     ) {
         setInputs((prev) => ({
             ...prev,
-            [name]: { ...prev[name], value: e.target.value },
+            [inputKey]: { ...prev[inputKey], value: e.target.value },
         }));
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (manyValidation(inputs)) {
+            if (!isButtonClickable) return;
+            setClickableButton(false);
             await onSubmitInputs();
         }
-        onHighlightInput(true);
-        onShowInputsMessage(true);
+        for (const i in inputState) {
+            const typedIndex = i as InputsType;
+            inputState[typedIndex].onHighlightInput(true);
+            inputState[typedIndex].onShowInputMessage(true);
+            inputState[typedIndex].setControlledFromOutside(true);
+        }
+        setClickableButton(true);
     }
 
     async function onSubmitInputs() {
@@ -194,7 +272,11 @@ export default function SignUpForm({
             setModalState(true);
             return;
         }
-        onShowInputsMessage(false);
-        window.location.assign('/'); // WINDOW.ASSIGN JUST TO SIMULATE
+        for (const i in inputState) {
+            const typedIndex = i as InputsType;
+            inputState[typedIndex].onShowInputMessage(true);
+            inputState[typedIndex].setControlledFromOutside(true);
+        }
+        window.location.assign('/dashboard-page');
     }
 }

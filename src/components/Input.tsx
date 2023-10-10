@@ -1,15 +1,13 @@
-import useFirstRender from '@/hooks/useFirstRender';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type InputPropsTypes<T extends string> = {
     ownProps: PropsType;
-    validateProps: ValidatePropsType<T>;
+    inputStateProps: inputStatePropsType<T>;
 };
 
-type ValidatePropsType<T extends string> = {
+type inputStatePropsType<T extends string> = {
     input: ValidateInputType<T>;
-    showInputMessagesFromOutside: boolean;
-    highlightInput: boolean;
+    inputState: InputState;
 };
 
 type PropsType = {
@@ -21,43 +19,50 @@ type PropsType = {
 
 export default function Input<T extends string>({
     ownProps,
-    validateProps,
+    inputStateProps,
 }: InputPropsTypes<T>) {
-    const [showMessage, onShowMessage] = useState(false);
-    const isFirstRender = useFirstRender();
     const { label, inputType, onChange, inputAccept } = ownProps;
-    const { input, showInputMessagesFromOutside, highlightInput } =
-        validateProps;
+    const { input, inputState } = inputStateProps;
     const { value, errors } = input;
-
-    // IF THERE ARE STILL ERRORS IN THE INPUT THE HIGHLIGHT CONTINUES
-    // (isFirstRender) USED INSTEAD OF (value) TO HIGHLIGHT THE INPUT EVEN EMPTY
-    const insideHighlightCondition =
-        !isFirstRender && value && showMessage ? 'has-error' : '';
-    const outsideHighlightCondition = highlightInput ? 'has-error' : '';
-    const generalHighlightCondition =
-        errors.length >= 1 &&
-        (insideHighlightCondition || outsideHighlightCondition);
+    const [errorMessage, setErrorMessage] = useState<null | string>(null);
+    const {
+        showInputMessage,
+        highlightInput,
+        isControlledFromOutside,
+        justHighlight,
+        onShowInputMessage,
+        onHighlightInput,
+        setControlledFromOutside,
+    } = inputState;
+    const highlightConditional =
+        errorMessage || errorMessage === '' || justHighlight;
 
     useEffect(() => {
-        if (isFirstRender) return;
+        if (isControlledFromOutside) {
+            setErrorMessage(errors[0]);
+            setControlledFromOutside(false);
+            return;
+        }
+    }, [errors, isControlledFromOutside, setControlledFromOutside]);
+
+    useEffect(() => {
         if (!value) return;
-        if (errors.length >= 1) {
-            const currentTimer = setTimeout(() => {
-                onShowMessage(true);
-            }, 950);
-            return () => {
-                onShowMessage(false);
-                clearTimeout(currentTimer);
-            };
-        }
-    }, [errors, isFirstRender, value]);
+        const timeout = setTimeout(() => {
+            setErrorMessage(errors[0]);
+        }, 950);
+        return () => clearTimeout(timeout);
+    }, [errors, value, isControlledFromOutside]);
 
     useEffect(() => {
-        if (!showMessage && errors.length >= 1) {
-            onShowMessage(showInputMessagesFromOutside);
+        if (!value) return;
+        if (errorMessage) {
+            onShowInputMessage(true);
+            onHighlightInput(true);
+            return;
         }
-    }, [errors.length, showInputMessagesFromOutside, showMessage]);
+        onHighlightInput(false);
+        onShowInputMessage(false);
+    }, [errorMessage, onHighlightInput, onShowInputMessage, value]);
 
     return (
         <div className="field">
@@ -68,7 +73,9 @@ export default function Input<T extends string>({
             ) : null}
             <input
                 id={label}
-                className={`input ${generalHighlightCondition}`}
+                className={`input ${
+                    highlightConditional && highlightInput && 'has-error'
+                }`}
                 placeholder={label}
                 accept={inputAccept && inputAccept}
                 onChange={onChange}
@@ -80,10 +87,10 @@ export default function Input<T extends string>({
     );
 
     function renderErrors() {
-        // (errorList[0] === '') IS TO PREVENT TO SUBMIT WHILE THE INPUT IS REQUIRED
-        if (!showMessage || errors[0] === '')
-            return <div className="input-error-message"></div>;
-
-        return <div className="input-error-message">{errors[0]}</div>;
+        return (
+            <div className="input-error-message">
+                {errorMessage && showInputMessage && errorMessage}
+            </div>
+        );
     }
 }

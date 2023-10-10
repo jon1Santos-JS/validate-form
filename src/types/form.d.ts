@@ -11,7 +11,6 @@ declare interface ValidateInputType<T extends string> {
         currentInputValue: string,
         conditionalInputValue?: InputsToValidateType<T>,
     ) => Validation[];
-    required?: boolean | string;
     errors: string[];
     value: string;
     cleanErrors?: boolean;
@@ -19,5 +18,15 @@ declare interface ValidateInputType<T extends string> {
 
 declare interface Validation {
     coditional: boolean | RegExpMatchArray | null;
-    message?: string;
+    message: string;
 }
+
+declare type InputState = {
+    isControlledFromOutside: boolean;
+    showInputMessage: boolean;
+    highlightInput: boolean;
+    justHighlight?: boolean;
+    onShowInputMessage: (value: boolean) => void;
+    onHighlightInput: (value: boolean) => void;
+    setControlledFromOutside: (value: boolean) => void;
+};

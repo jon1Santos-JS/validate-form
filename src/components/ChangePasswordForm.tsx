@@ -22,10 +22,89 @@ export default function ChangePasswordForm({
 }: ChangePasswordFormPropsTypes) {
     const router = useRouter();
     const { user } = handleUserProps;
-    const [showInputsMessage, onShowInputsMessage] = useState(false);
-    const [highlightInput, onHighlightInput] = useState(false);
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const { uniqueValidation, manyValidation } = useValidate();
+    const [isButtonClickable, setClickableButton] = useState(true);
+    const [inputState, setInputState] = useState({
+        password: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: { ...prev.password, showInputMessage: value },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: { ...prev.password, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    password: {
+                        ...prev.password,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+        newPassword: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    newPassword: {
+                        ...prev.newPassword,
+                        showInputMessage: value,
+                    },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    newPassword: { ...prev.newPassword, highlightInput: value },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    newPassword: {
+                        ...prev.newPassword,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+        confirmNewPassword: {
+            isControlledFromOutside: false,
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    confirmNewPassword: {
+                        ...prev.confirmNewPassword,
+                        showInputMessage: value,
+                    },
+                })),
+            onHighlightInput: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    confirmNewPassword: {
+                        ...prev.confirmNewPassword,
+                        highlightInput: value,
+                    },
+                })),
+            setControlledFromOutside: (value: boolean) =>
+                setInputState((prev) => ({
+                    ...prev,
+                    confirmNewPassword: {
+                        ...prev.confirmNewPassword,
+                        isControlledFromOutside: value,
+                    },
+                })),
+        },
+    });
     const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
 
     return <>{renderContent()}</>;
@@ -50,10 +129,9 @@ export default function ChangePasswordForm({
                                 inputType: 'password',
                                 onChange: (e) => onChange(e, 'password'),
                             }}
-                            validateProps={{
+                            inputStateProps={{
                                 input: uniqueValidation(inputs.password),
-                                showInputMessagesFromOutside: showInputsMessage,
-                                highlightInput,
+                                inputState: inputState.password,
                             }}
                         />
                         <Input
@@ -62,13 +140,12 @@ export default function ChangePasswordForm({
                                 inputType: 'password',
                                 onChange: (e) => onChange(e, 'newPassword'),
                             }}
-                            validateProps={{
+                            inputStateProps={{
                                 input: uniqueValidation(
                                     inputs.newPassword,
                                     inputs,
                                 ),
-                                showInputMessagesFromOutside: showInputsMessage,
-                                highlightInput,
+                                inputState: inputState.newPassword,
                             }}
                         />
                         <Input
@@ -78,13 +155,12 @@ export default function ChangePasswordForm({
                                 onChange: (e) =>
                                     onChange(e, 'confirmNewPassword'),
                             }}
-                            validateProps={{
+                            inputStateProps={{
                                 input: uniqueValidation(
                                     inputs.confirmNewPassword,
                                     inputs,
                                 ),
-                                showInputMessagesFromOutside: showInputsMessage,
-                                highlightInput,
+                                inputState: inputState.confirmNewPassword,
                             }}
                         />
                     </div>
@@ -116,12 +192,18 @@ export default function ChangePasswordForm({
         e.preventDefault();
         if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (manyValidation(inputs)) {
+            if (!isButtonClickable) return;
+            setClickableButton(false);
             await onSubmitInputs();
-            return;
         }
-        onHighlightInput(true);
+        for (const i in inputState) {
+            const typedIndex = i as InputsType;
+            inputState[typedIndex].onHighlightInput(true);
+            inputState[typedIndex].onShowInputMessage(true);
+            inputState[typedIndex].setControlledFromOutside(true);
+        }
         onShowMessage(true);
-        onShowInputsMessage(true);
+        setClickableButton(true);
     }
 
     async function onSubmitInputs() {
@@ -137,7 +219,11 @@ export default function ChangePasswordForm({
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) return;
-        onShowInputsMessage(false);
+        for (const i in inputState) {
+            const typedIndex = i as InputsType;
+            inputState[typedIndex].onShowInputMessage(true);
+            inputState[typedIndex].setControlledFromOutside(true);
+        }
         onShowMessage(false);
         router.reload();
     }
