@@ -1,16 +1,12 @@
 import { useState } from 'react';
 import Input from '../Input';
-import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
 import { onOmitProps } from '@/lib/lodashAdapter';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
+import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
 
 const API = 'api/signUp';
 const INPUTS_TO_OMIT = ['confirmPassword'] as InputsType[];
-const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
-    'errors',
-    'validations',
-];
 const REQUIRED_MESSAGE = 'This field is required';
 
 interface SignUpFormPropsType {
@@ -31,91 +27,32 @@ export default function SignUpForm({
     const { setModalState } = ownProps;
     const { hasUser } = handleUserProps;
     const { uniqueValidation, manyValidation } = useValidate();
+    const { omitFields, onHighlightManyInputs, onSetTimeOut } =
+        useInputHandler();
     const [isButtonClickable, setClickableButton] = useState(true);
     const [inputState, setInputState] = useState({
         username: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
-            onShowInputMessage: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    username: { ...prev.username, showInputMessage: value },
-                })),
-            onHighlightInput: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    username: { ...prev.username, highlightInput: value },
-                })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    username: {
-                        ...prev.username,
-                        isControlledFromOutside: value,
-                    },
-                })),
+            onShowInputMessage: onShowInputMessage,
+            onHighlightInput: onHighlightInput,
         },
         password: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
-            onShowInputMessage: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    password: { ...prev.password, showInputMessage: value },
-                })),
-            onHighlightInput: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    password: { ...prev.password, highlightInput: value },
-                })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    password: {
-                        ...prev.password,
-                        isControlledFromOutside: value,
-                    },
-                })),
+            onShowInputMessage: onShowInputMessage,
+            onHighlightInput: onHighlightInput,
         },
         confirmPassword: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
-            onShowInputMessage: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    confirmPassword: {
-                        ...prev.confirmPassword,
-                        showInputMessage: value,
-                    },
-                })),
-            onHighlightInput: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    confirmPassword: {
-                        ...prev.confirmPassword,
-                        highlightInput: value,
-                    },
-                })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    confirmPassword: {
-                        ...prev.confirmPassword,
-                        isControlledFromOutside: value,
-                    },
-                })),
+            onShowInputMessage: onShowInputMessage,
+            onHighlightInput: onHighlightInput,
         },
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: {
             validations: (currentInputValue) => [
-                {
-                    coditional: !currentInputValue,
-                    message: REQUIRED_MESSAGE,
-                },
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
                     message: 'Username must has 6 characters at least',
@@ -125,42 +62,37 @@ export default function SignUpForm({
                     message: 'Only characters',
                 },
             ],
+            required: REQUIRED_MESSAGE,
             value: '',
             errors: [],
         },
         password: {
             validations: (currentInputValue, inputs) => [
                 {
-                    coditional: !currentInputValue,
-                    message: REQUIRED_MESSAGE,
-                },
-                {
                     coditional: !currentInputValue.match(/.{6,}/),
                     message: 'Password must has 6 characters at least',
                 },
                 {
-                    coditional: preventCompareEmptyField(
+                    coditional:
                         currentInputValue !== inputs?.confirmPassword.value,
-                        inputs?.confirmPassword.value,
-                    ),
                     message:
                         'This field has to be equal to the confirm password',
+                    crossfield: 'confirmPassword',
                 },
             ],
+            required: REQUIRED_MESSAGE,
             value: '',
             errors: [],
         },
         confirmPassword: {
             validations: (currentInputValue, inputs) => [
                 {
-                    coditional: !currentInputValue,
-                    message: REQUIRED_MESSAGE,
-                },
-                {
                     coditional: currentInputValue !== inputs?.password.value,
                     message: 'This field has to be equal to the password',
+                    crossfield: 'password',
                 },
             ],
+            required: REQUIRED_MESSAGE,
             value: '',
             errors: [],
         },
@@ -180,8 +112,11 @@ export default function SignUpForm({
                             onChange: (e) => onChange(e, 'username'),
                         }}
                         inputStateProps={{
-                            input: uniqueValidation(inputs.username),
+                            input: inputs.username,
                             inputState: inputState.username,
+                        }}
+                        formProps={{
+                            hasError: false,
                         }}
                     />
                     <Input
@@ -191,8 +126,11 @@ export default function SignUpForm({
                             onChange: (e) => onChange(e, 'password'),
                         }}
                         inputStateProps={{
-                            input: uniqueValidation(inputs.password, inputs),
+                            input: inputs.password,
                             inputState: inputState.password,
+                        }}
+                        formProps={{
+                            hasError: false,
                         }}
                     />
                     <Input
@@ -202,11 +140,11 @@ export default function SignUpForm({
                             onChange: (e) => onChange(e, 'confirmPassword'),
                         }}
                         inputStateProps={{
-                            input: uniqueValidation(
-                                inputs.confirmPassword,
-                                inputs,
-                            ),
+                            input: inputs.confirmPassword,
                             inputState: inputState.confirmPassword,
+                        }}
+                        formProps={{
+                            hasError: false,
                         }}
                     />
                 </div>
@@ -228,13 +166,38 @@ export default function SignUpForm({
         </form>
     );
 
-    function onChange(
-        e: React.ChangeEvent<HTMLInputElement>,
-        inputKey: InputsType,
-    ) {
+    function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
         setInputs((prev) => ({
             ...prev,
-            [inputKey]: { ...prev[inputKey], value: e.target.value },
+            [key]: { ...prev[key], value: e.target.value },
+        }));
+        onSetTimeOut(() => {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: uniqueValidation({ ...prev[key] }, prev),
+            }));
+        }, 950);
+        inputState[key].onHighlightInput(true, key);
+        inputState[key].onShowInputMessage(true, key);
+    }
+
+    function onShowInputMessage(value: boolean, key: InputsType) {
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                showInputMessage: value,
+            },
+        }));
+    }
+
+    function onHighlightInput(value: boolean, key: InputsType) {
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                highlightInput: value,
+            },
         }));
     }
 
@@ -245,12 +208,7 @@ export default function SignUpForm({
             setClickableButton(false);
             await onSubmitInputs();
         }
-        for (const i in inputState) {
-            const typedIndex = i as InputsType;
-            inputState[typedIndex].onHighlightInput(true);
-            inputState[typedIndex].onShowInputMessage(true);
-            inputState[typedIndex].setControlledFromOutside(true);
-        }
+        onHighlightManyInputs(inputState, true, 2);
         setClickableButton(true);
     }
 
@@ -272,11 +230,7 @@ export default function SignUpForm({
             setModalState(true);
             return;
         }
-        for (const i in inputState) {
-            const typedIndex = i as InputsType;
-            inputState[typedIndex].onShowInputMessage(true);
-            inputState[typedIndex].setControlledFromOutside(true);
-        }
+        onHighlightManyInputs(inputState, false, 2);
         window.location.assign('/dashboard-page');
     }
 }

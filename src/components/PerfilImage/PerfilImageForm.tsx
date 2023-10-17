@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import Input from '../Input';
-import { handledName, onCheckExtensions } from '@/hooks/useInputsHandler';
 import useValidate from '@/hooks/useValidate';
+import useString from '@/hooks/useString';
+import useInputHandler from '@/hooks/useInputHandler';
 
 const API = 'api/changeUserImg';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
@@ -10,16 +11,19 @@ type PerfilImageFormProps = {
     handleUserProps: HandleUserPropsType;
 };
 
+type InputsType = 'imageInput';
+
 export default function PerfilImageForm({
     handleUserProps,
 }: PerfilImageFormProps) {
     const { user } = handleUserProps;
     const { uniqueValidation, manyValidation } = useValidate();
+    const { onHighlightManyInputs } = useInputHandler();
+    const { handledName, onCheckExtensions } = useString();
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const [isButtonClickable, setClickableButton] = useState(true);
     const [inputState, setInputState] = useState({
         imageInput: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
             onShowInputMessage: (value: boolean) =>
@@ -32,17 +36,9 @@ export default function PerfilImageForm({
                     ...prev,
                     imageInput: { ...prev.imageInput, highlightInput: value },
                 })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    imageInput: {
-                        ...prev.imageInput,
-                        isControlledFromOutside: value,
-                    },
-                })),
         },
     });
-    const [inputs, setInputs] = useState({
+    const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         imageInput: {
             validations: (currentInputValue: string) => [
                 {
@@ -55,10 +51,10 @@ export default function PerfilImageForm({
                     )}`,
                 },
             ],
-            required: 'No image loaded',
+            required: true,
             value: '',
             errors: [],
-            files: null as FileList | null,
+            files: null,
         },
     });
 
@@ -77,8 +73,11 @@ export default function PerfilImageForm({
                                 onChange: (e) => onChange(e, 'imageInput'),
                             }}
                             inputStateProps={{
-                                input: uniqueValidation(inputs.imageInput),
+                                input: inputs.imageInput,
                                 inputState: inputState.imageInput,
+                            }}
+                            formProps={{
+                                hasError: false,
                             }}
                         />
                     </div>
@@ -98,15 +97,19 @@ export default function PerfilImageForm({
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: keyof typeof inputs,
+        key: keyof typeof inputs,
     ) {
         setInputs((prev) => ({
             ...prev,
-            [name]: {
-                ...prev[name],
+            [key]: {
+                ...prev[key],
                 value: e.target.value,
                 files: e.target.files,
             },
+        }));
+        setInputs((prev) => ({
+            ...prev,
+            [key]: uniqueValidation({ ...prev[key] }),
         }));
     }
 
@@ -118,9 +121,7 @@ export default function PerfilImageForm({
             await onSubmitInputs();
             setClickableButton(false);
         }
-        inputState.imageInput.onShowInputMessage(true);
-        inputState.imageInput.onHighlightInput(true);
-        inputState.imageInput.setControlledFromOutside(true);
+        onHighlightManyInputs(inputState, true, 2);
         onShowMessage(true);
         setClickableButton(true);
     }

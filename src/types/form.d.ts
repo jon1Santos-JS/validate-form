@@ -10,23 +10,22 @@ declare interface ValidateInputType<T extends string> {
     validations?: (
         currentInputValue: string,
         conditionalInputValue?: InputsToValidateType<T>,
-    ) => Validation[];
+    ) => Validation<T>[];
     errors: string[];
     value: string;
-    cleanErrors?: boolean;
+    files?: FileList | null;
+    required?: string | boolean;
 }
 
-declare interface Validation {
+declare interface Validation<T extends string> {
     coditional: boolean | RegExpMatchArray | null;
     message: string;
+    crossfield?: T;
 }
 
-declare type InputState = {
-    isControlledFromOutside: boolean;
+declare type InputState<T extends string> = {
     showInputMessage: boolean;
     highlightInput: boolean;
-    justHighlight?: boolean;
-    onShowInputMessage: (value: boolean) => void;
-    onHighlightInput: (value: boolean) => void;
-    setControlledFromOutside: (value: boolean) => void;
+    onShowInputMessage: (value: boolean, key: T) => void;
+    onHighlightInput: (value: boolean, key: T) => void;
 };

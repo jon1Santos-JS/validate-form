@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Input from './Input';
 import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
+import useInputHandler from '@/hooks/useInputHandler';
 const API = 'api/changeUsername';
 
 const DEFAULT_MESSAGE = 'Invalid username';
@@ -14,6 +15,8 @@ type ChangeUsernameFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
 };
 
+type InputsType = 'newUsername';
+
 export default function ChangeUsernameForm({
     ownProps: { handleUserProps },
 }: OwnPropsType) {
@@ -21,40 +24,22 @@ export default function ChangeUsernameForm({
     const { user, setUser } = handleUserProps;
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const { uniqueValidation, manyValidation } = useValidate();
+    const { onHighlightManyInputs } = useInputHandler();
     const [isButtonClickable, setClickableButton] = useState(true);
     const [inputState, setInputState] = useState({
         newUsername: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
-            onShowInputMessage: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    newUsername: {
-                        ...prev.newUsername,
-                        showInputMessage: value,
-                    },
-                })),
-            onHighlightInput: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    newUsername: { ...prev.newUsername, highlightInput: value },
-                })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    newUsername: {
-                        ...prev.newUsername,
-                        isControlledFromOutside: value,
-                    },
-                })),
+            onShowInputMessage: onShowInputMessage,
+            onHighlightInput: onHighlightInput,
         },
     });
-    const [inputs, setInputs] = useState({
+    const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         newUsername: {
             validations: (currentInputValue: string) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
+                    message: '',
                 },
             ],
             required: true,
@@ -86,8 +71,11 @@ export default function ChangeUsernameForm({
                                 onChange: (e) => onChange(e, 'newUsername'),
                             }}
                             inputStateProps={{
-                                input: uniqueValidation(inputs.newUsername),
+                                input: inputs.newUsername,
                                 inputState: inputState.newUsername,
+                            }}
+                            formProps={{
+                                hasError: false,
                             }}
                         />
                     </div>
@@ -114,6 +102,30 @@ export default function ChangeUsernameForm({
             ...prev,
             [name]: { ...prev[name], value: e.target.value },
         }));
+        setInputs((prev) => ({
+            ...prev,
+            [name]: uniqueValidation({ ...prev[name] }),
+        }));
+    }
+
+    function onShowInputMessage(value: boolean, key: InputsType) {
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                showInputMessage: value,
+            },
+        }));
+    }
+
+    function onHighlightInput(value: boolean, key: InputsType) {
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                highlightInput: value,
+            },
+        }));
     }
 
     function renderError() {
@@ -130,9 +142,7 @@ export default function ChangeUsernameForm({
             setClickableButton(false);
             return;
         }
-        inputState.newUsername.onHighlightInput(true);
-        inputState.newUsername.onShowInputMessage(true);
-        inputState.newUsername.setControlledFromOutside(true);
+        onHighlightManyInputs(inputState, true, 2);
         onShowMessage(true);
         setClickableButton(true);
     }
@@ -152,11 +162,12 @@ export default function ChangeUsernameForm({
         if (!parsedResponse.serverResponse) {
             return parsedResponse.body as string;
         }
-        inputState.newUsername.onShowInputMessage(true);
+        inputState.newUsername.onShowInputMessage(true, 'newUsername');
         onShowMessage(false);
         router.reload();
-        window.addEventListener('load', () => {
+        window.addEventListener('load', function () {
             setUser({ username: parsedResponse.body as string });
+            window.removeEventListener('load', () => this);
         });
     }
 }

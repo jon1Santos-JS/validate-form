@@ -1,15 +1,10 @@
-import { useState } from 'react';
 import Input from './Input';
 import { useRouter } from 'next/router';
-import { omitFields, preventCompareEmptyField } from '@/hooks/useInputsHandler';
 import useValidate from '@/hooks/useValidate';
+import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
+import { useState } from 'react';
 
 const API = 'api/changePassword';
-const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
-    'errors',
-    'required',
-    'validations',
-];
 
 type ChangePasswordFormPropsTypes = {
     handleUserProps: HandleUserPropsType;
@@ -24,88 +19,75 @@ export default function ChangePasswordForm({
     const { user } = handleUserProps;
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const { uniqueValidation, manyValidation } = useValidate();
+    const { omitFields, onHighlightManyInputs } = useInputHandler();
     const [isButtonClickable, setClickableButton] = useState(true);
     const [inputState, setInputState] = useState({
         password: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
-            onShowInputMessage: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    password: { ...prev.password, showInputMessage: value },
-                })),
-            onHighlightInput: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    password: { ...prev.password, highlightInput: value },
-                })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    password: {
-                        ...prev.password,
-                        isControlledFromOutside: value,
-                    },
-                })),
+            onShowInputMessage: onShowInputMessage,
+            onHighlightInput: onHighlightInput,
         },
         newPassword: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
-            onShowInputMessage: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    newPassword: {
-                        ...prev.newPassword,
-                        showInputMessage: value,
-                    },
-                })),
-            onHighlightInput: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    newPassword: { ...prev.newPassword, highlightInput: value },
-                })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    newPassword: {
-                        ...prev.newPassword,
-                        isControlledFromOutside: value,
-                    },
-                })),
+            onShowInputMessage: onShowInputMessage,
+            onHighlightInput: onHighlightInput,
         },
         confirmNewPassword: {
-            isControlledFromOutside: false,
             showInputMessage: false,
             highlightInput: false,
-            onShowInputMessage: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    confirmNewPassword: {
-                        ...prev.confirmNewPassword,
-                        showInputMessage: value,
-                    },
-                })),
-            onHighlightInput: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    confirmNewPassword: {
-                        ...prev.confirmNewPassword,
-                        highlightInput: value,
-                    },
-                })),
-            setControlledFromOutside: (value: boolean) =>
-                setInputState((prev) => ({
-                    ...prev,
-                    confirmNewPassword: {
-                        ...prev.confirmNewPassword,
-                        isControlledFromOutside: value,
-                    },
-                })),
+            onShowInputMessage: onShowInputMessage,
+            onHighlightInput: onHighlightInput,
         },
     });
-    const [inputs, setInputs] = useState(INPUTS_INITIAL_STATE);
+    const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
+        password: {
+            validations: (currentInputValue) => [
+                {
+                    coditional: !currentInputValue.match(/.{6,}/),
+                    message: 'Password incorrect',
+                },
+            ],
+            required: true,
+            value: '',
+            errors: [],
+        },
+        newPassword: {
+            validations: (currentInputValue, inputs) => [
+                {
+                    coditional: !currentInputValue.match(/.{6,}/),
+                    message: 'Password must has 6 characters at least',
+                },
+                {
+                    coditional: currentInputValue === inputs?.password.value,
+                    message:
+                        'This field have to be different than the password',
+                },
+                {
+                    coditional:
+                        currentInputValue !== inputs?.confirmNewPassword.value,
+                    message:
+                        'This field has to be equal to the confirm new password',
+                },
+            ],
+            required: true,
+            value: '',
+            errors: [],
+        },
+        confirmNewPassword: {
+            validations: (currentInputValue, hookInputs) => [
+                {
+                    coditional:
+                        currentInputValue !== hookInputs?.newPassword.value,
+                    message: 'This field has to be equal to the new password',
+                },
+            ],
+            required: true,
+            value: '',
+            errors: [],
+        },
+    });
 
     return <>{renderContent()}</>;
 
@@ -130,8 +112,11 @@ export default function ChangePasswordForm({
                                 onChange: (e) => onChange(e, 'password'),
                             }}
                             inputStateProps={{
-                                input: uniqueValidation(inputs.password),
+                                input: inputs.password,
                                 inputState: inputState.password,
+                            }}
+                            formProps={{
+                                hasError: false,
                             }}
                         />
                         <Input
@@ -141,11 +126,11 @@ export default function ChangePasswordForm({
                                 onChange: (e) => onChange(e, 'newPassword'),
                             }}
                             inputStateProps={{
-                                input: uniqueValidation(
-                                    inputs.newPassword,
-                                    inputs,
-                                ),
+                                input: inputs.newPassword,
                                 inputState: inputState.newPassword,
+                            }}
+                            formProps={{
+                                hasError: false,
                             }}
                         />
                         <Input
@@ -156,11 +141,11 @@ export default function ChangePasswordForm({
                                     onChange(e, 'confirmNewPassword'),
                             }}
                             inputStateProps={{
-                                input: uniqueValidation(
-                                    inputs.confirmNewPassword,
-                                    inputs,
-                                ),
+                                input: inputs.confirmNewPassword,
                                 inputState: inputState.confirmNewPassword,
+                            }}
+                            formProps={{
+                                hasError: false,
                             }}
                         />
                     </div>
@@ -180,11 +165,35 @@ export default function ChangePasswordForm({
 
     function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        name: keyof typeof inputs,
+        key: keyof typeof inputs,
     ) {
         setInputs((prev) => ({
             ...prev,
-            [name]: { ...prev[name], value: e.target.value },
+            [key]: { ...prev[key], value: e.target.value },
+        }));
+        setInputs((prev) => ({
+            ...prev,
+            [key]: uniqueValidation({ ...prev[key] }),
+        }));
+    }
+
+    function onShowInputMessage(value: boolean, key: InputsType) {
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                showInputMessage: value,
+            },
+        }));
+    }
+
+    function onHighlightInput(value: boolean, key: InputsType) {
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                highlightInput: value,
+            },
         }));
     }
 
@@ -196,12 +205,7 @@ export default function ChangePasswordForm({
             setClickableButton(false);
             await onSubmitInputs();
         }
-        for (const i in inputState) {
-            const typedIndex = i as InputsType;
-            inputState[typedIndex].onHighlightInput(true);
-            inputState[typedIndex].onShowInputMessage(true);
-            inputState[typedIndex].setControlledFromOutside(true);
-        }
+        onHighlightManyInputs(inputState, true, 2);
         onShowMessage(true);
         setClickableButton(true);
     }
@@ -219,60 +223,8 @@ export default function ChangePasswordForm({
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) return;
-        for (const i in inputState) {
-            const typedIndex = i as InputsType;
-            inputState[typedIndex].onShowInputMessage(true);
-            inputState[typedIndex].setControlledFromOutside(true);
-        }
+        onHighlightManyInputs(inputState, true, 2);
         onShowMessage(false);
         router.reload();
     }
 }
-
-const INPUTS_INITIAL_STATE: InputsToValidateType<InputsType> = {
-    password: {
-        validations: (currentInputValue) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Password incorrect',
-            },
-        ],
-        required: 'Password incorrect',
-        value: '',
-        errors: [],
-    },
-    newPassword: {
-        validations: (currentInputValue, inputs) => [
-            {
-                coditional: !currentInputValue.match(/.{6,}/),
-                message: 'Password must has 6 characters at least',
-            },
-            {
-                coditional: currentInputValue === inputs?.password.value,
-                message: 'This field have to be different than the password',
-            },
-            {
-                coditional: preventCompareEmptyField(
-                    currentInputValue !== inputs?.confirmNewPassword.value,
-                    inputs?.confirmNewPassword.value,
-                ),
-                message:
-                    'This field has to be equal to the confirm new password',
-            },
-        ],
-        required: 'New password incorrect',
-        value: '',
-        errors: [],
-    },
-    confirmNewPassword: {
-        validations: (currentInputValue, hookInputs) => [
-            {
-                coditional: currentInputValue !== hookInputs?.newPassword.value,
-                message: 'This field has to be equal to the new password',
-            },
-        ],
-        required: 'Confirm new password incorrect',
-        value: '',
-        errors: [],
-    },
-};
