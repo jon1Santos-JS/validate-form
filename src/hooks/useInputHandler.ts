@@ -41,12 +41,12 @@ export default function useInputHandler() {
     function onHighlightManyInputs<T extends string>(
         inputs: { [key in T]: InputState<T> },
         value: boolean,
-        highLightLevel: 1 | 2,
+        highLightLevel: 1 | 2 | 3,
     ) {
         if (highLightLevel === 1) {
             for (const i in inputs) {
                 const typedIndex = i as T;
-                inputs[typedIndex].onHighlightInput(value, typedIndex);
+                inputs[typedIndex].onShowInputMessage(value, typedIndex);
             }
             return;
         }
@@ -54,7 +54,14 @@ export default function useInputHandler() {
             for (const i in inputs) {
                 const typedIndex = i as T;
                 inputs[typedIndex].onHighlightInput(value, typedIndex);
+            }
+            return;
+        }
+        if (highLightLevel === 3) {
+            for (const i in inputs) {
+                const typedIndex = i as T;
                 inputs[typedIndex].onShowInputMessage(value, typedIndex);
+                inputs[typedIndex].onHighlightInput(value, typedIndex);
             }
             return;
         }

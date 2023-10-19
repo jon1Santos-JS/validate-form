@@ -105,10 +105,10 @@ export default class MiniDBAccountHandler {
     // DONT NEED 'TO REFRESH DB (async)' WHEN THE 'INIT FUNCTION' HAVE BEEN CALLED BY PUBLIC FUNCTIONS
     #authAccount(userAccount: UserFromClientType) {
         const account = DATABASE.state.accounts.find((DBAccount) =>
-            DBAccount.username.value !== userAccount.username.value ||
-            DBAccount.password.value !== userAccount.password.value
-                ? undefined
-                : DBAccount,
+            DBAccount.username.value === userAccount.username.value &&
+            DBAccount.password.value === userAccount.password.value
+                ? DBAccount
+                : undefined,
         );
         return account;
     }

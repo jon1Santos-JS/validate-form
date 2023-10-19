@@ -1,11 +1,10 @@
 import SignInForm from '@/components/SignInForm';
+import { useUser } from '@/context/UserContext';
 
-type SignInPageProps = {
-    handleUserProps: HandleUserPropsType;
-};
-
-export default function SignInPage({ handleUserProps }: SignInPageProps) {
-    const { hasUser, isUserStateLoading } = handleUserProps;
+export default function SignInPage() {
+    const {
+        userState: { hasUser, isUserStateLoading },
+    } = useUser();
     return <>{renderContent()}</>;
 
     function renderContent() {
@@ -15,6 +14,6 @@ export default function SignInPage({ handleUserProps }: SignInPageProps) {
             return null;
         }
 
-        return <SignInForm handleUserProps={handleUserProps} />;
+        return <SignInForm />;
     }
 }

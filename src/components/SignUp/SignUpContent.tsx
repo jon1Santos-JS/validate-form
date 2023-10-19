@@ -2,13 +2,7 @@ import { useState } from 'react';
 import SignUpForm from './SignUpForm';
 import SignUpModal from './SignUpModal';
 
-interface SignUpContentPropsType {
-    handleUserProps: HandleUserPropsType;
-}
-
-export default function SignUpContent({
-    handleUserProps,
-}: SignUpContentPropsType) {
+export default function SignUpContent() {
     const [modalState, setModalState] = useState(false); // SHOW MODAL
     return (
         <>
@@ -16,7 +10,6 @@ export default function SignUpContent({
                 ownProps={{
                     setModalState,
                 }}
-                handleUserProps={handleUserProps}
             />
             <SignUpModal
                 isModalOpen={modalState}

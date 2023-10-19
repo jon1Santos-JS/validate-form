@@ -1,39 +1,34 @@
 import Image from 'next/image';
-type PerfilImagePropsTypes = {
-    handleUserProps: HandleUserPropsType;
-};
+import { useUser } from '../../context/UserContext';
 
-export default function PerfilImage({
-    handleUserProps,
-}: PerfilImagePropsTypes) {
+export default function PerfilImage() {
     const {
-        isUserStateLoading,
-        user,
-        setUserImageLoading,
-        isUserImageLoading,
-    } = handleUserProps;
+        user: { userImage, isUserImageLoading, setUserImageLoading },
+        userState: { isUserStateLoading },
+    } = useUser();
 
     return <>{renderImage()}</>;
 
     function renderImage() {
-        if (isUserStateLoading || !user.userImage) return null;
+        if (isUserStateLoading) return null;
         return (
             <div className="o-perfil-image-container">
-                <Image
-                    src={user.userImage}
-                    alt="test image"
-                    width={200}
-                    height={200}
-                    onLoad={onLoadingImage}
-                    priority
-                    style={{
-                        width: 'auto',
-                        height: 'auto',
-                        maxWidth: '200px',
-                        maxHeight: '200px',
-                    }}
-                />
-                {isUserImageLoading && (
+                {!isUserImageLoading ? (
+                    <Image
+                        src={userImage}
+                        alt="test image"
+                        width={200}
+                        height={200}
+                        onLoad={onLoadingImage}
+                        priority
+                        style={{
+                            width: 'auto',
+                            height: 'auto',
+                            maxWidth: '200px',
+                            maxHeight: '200px',
+                        }}
+                    />
+                ) : (
                     <div className="o-spinner-container">
                         <div className="spinner-element"></div>
                     </div>

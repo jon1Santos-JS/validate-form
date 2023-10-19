@@ -2,25 +2,19 @@ import { useState } from 'react';
 import Input from '../Input';
 import useValidate from '@/hooks/useValidate';
 import useString from '@/hooks/useString';
-import useInputHandler from '@/hooks/useInputHandler';
+import { useUser } from '../../context/UserContext';
 
 const API = 'api/changeUserImg';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
-type PerfilImageFormProps = {
-    handleUserProps: HandleUserPropsType;
-};
-
 type InputsType = 'imageInput';
 
-export default function PerfilImageForm({
-    handleUserProps,
-}: PerfilImageFormProps) {
-    const { user } = handleUserProps;
+export default function PerfilImageForm() {
+    const {
+        user: { username, setUserimage, setUserImageLoading },
+    } = useUser();
     const { uniqueValidation, manyValidation } = useValidate();
-    const { onHighlightManyInputs } = useInputHandler();
     const { handledName, onCheckExtensions } = useString();
-    const [showMessage, onShowMessage] = useState<boolean>(false);
     const [isButtonClickable, setClickableButton] = useState(true);
     const [inputState, setInputState] = useState({
         imageInput: {
@@ -46,12 +40,12 @@ export default function PerfilImageForm({
                         ALLOWED_EXTENSIONS,
                         currentInputValue,
                     ),
-                    message: `Allowed extensions: ${ALLOWED_EXTENSIONS.join(
+                    message: `Supported extensions: ${ALLOWED_EXTENSIONS.join(
                         ', ',
                     )}`,
                 },
             ],
-            required: true,
+            required: 'No image uploaded',
             value: '',
             errors: [],
             files: null,
@@ -61,7 +55,6 @@ export default function PerfilImageForm({
     return (
         <>
             <h4>Upload image</h4>
-
             <form className="o-perfil-image-form">
                 <fieldset className="container">
                     <div className="inputs">
@@ -111,18 +104,18 @@ export default function PerfilImageForm({
             ...prev,
             [key]: uniqueValidation({ ...prev[key] }),
         }));
+        inputState.imageInput.onHighlightInput(false);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (manyValidation(inputs)) {
             if (!isButtonClickable) return;
+            setUserImageLoading(true);
             await onSubmitInputs();
             setClickableButton(false);
         }
-        onHighlightManyInputs(inputState, true, 2);
-        onShowMessage(true);
+        inputState.imageInput.onShowInputMessage(true);
         setClickableButton(true);
     }
 
@@ -143,16 +136,16 @@ export default function PerfilImageForm({
         );
         if (!imgApiResponse.ok) return;
         const image = await imgApiResponse.json();
+        setUserimage(image.data.url);
+        setUserImageLoading(false);
         // IMAGE LOCAL API
         await onUpdateUserImageDB(image.data.url);
         inputState.imageInput.onShowInputMessage(true);
-        onShowMessage(false);
-        window.location.reload();
     }
 
     async function onUpdateUserImageDB(img: string) {
         const handledUser = {
-            userName: user.username,
+            userName: username,
             userImg: img,
         };
         const options: FetchOptionsType = {

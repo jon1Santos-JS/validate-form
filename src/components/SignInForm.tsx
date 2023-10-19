@@ -3,19 +3,18 @@ import Input from './Input';
 import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
+import { useUser } from '../context/UserContext';
 
 const API = 'api/signIn';
 const DEFAULT_MESSAGE = 'Incorrect username or password';
 
-type SignInFormProps = {
-    handleUserProps: HandleUserPropsType;
-};
-
 type InputsType = 'username' | 'password';
 
-export default function SignInForm({ handleUserProps }: SignInFormProps) {
-    const { setUser, setHasUser, hasUser, setUserStateLoading } =
-        handleUserProps;
+export default function SignInForm() {
+    const {
+        user,
+        userState: { setHasUser, hasUser, setUserStateLoading },
+    } = useUser();
     const { uniqueValidation, manyValidation } = useValidate();
     const { omitFields, onHighlightManyInputs } = useInputHandler();
     const [showMessage, onShowMessage] = useState<boolean>(false);
@@ -190,7 +189,7 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
             await onSubmitInputs();
         }
         onShowMessage(true);
-        onHighlightManyInputs(inputState, true, 2);
+        onHighlightManyInputs(inputState, true, 3);
         setClickableButton(true);
     }
 
@@ -206,11 +205,11 @@ export default function SignInForm({ handleUserProps }: SignInFormProps) {
         setHasUser(parsedResponse.serverResponse);
         if (!parsedResponse.serverResponse) {
             onShowMessage(true);
-            onHighlightManyInputs(inputState, true, 1);
+            onHighlightManyInputs(inputState, true, 2);
             return;
         }
-        onHighlightManyInputs(inputState, false, 2);
+        onHighlightManyInputs(inputState, false, 3);
         onShowMessage(false);
-        setUser({ username: parsedResponse.body as string });
+        user.setUsername(parsedResponse.body as string);
     }
 }

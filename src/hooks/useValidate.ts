@@ -3,7 +3,7 @@ export default function useValidate() {
         let isValid = true;
         for (const i in inputs) {
             if (inputs[i].required && !inputs[i].value)
-                setRequiredMessage(inputs[i].errors, inputs[i].required);
+                onCheckRequired(inputs[i].errors, inputs[i].required);
             if (inputs[i].errors.length > 0) isValid = false;
         }
         return isValid;
@@ -25,8 +25,9 @@ export default function useValidate() {
         const newErrors: string[] = [];
 
         if (isCrossField && !value) return input;
+
         if (required && !value) {
-            setRequiredMessage(input.errors, required);
+            onCheckRequired(input.errors, required);
             return input;
         }
         if (!validations) return input;
@@ -45,7 +46,7 @@ export default function useValidate() {
         return input;
     }
 
-    function setRequiredMessage(errors: string[], required?: string | boolean) {
+    function onCheckRequired(errors: string[], required?: string | boolean) {
         const conditional = typeof required === 'string' ? required : '';
         errors.push(conditional);
         return errors;

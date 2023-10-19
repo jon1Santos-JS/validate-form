@@ -2,20 +2,19 @@ import ChangePasswordForm from '@/components/ChangePasswordForm';
 import ChangeUsernameForm from '@/components/ChangeUsernameForm';
 import PerfilImage from '@/components/PerfilImage/PerfilImage';
 import PerfilImageForm from '@/components/PerfilImage/PerfilImageForm';
+import { useUser } from '@/context/UserContext';
 import { useRouter } from 'next/router';
 
 const HANDLE_DB_API = 'api/handleDatabase';
 const SIGN_IN_API = 'api/signIn';
 
-type DashBoardPageProps = {
-    handleUserProps: HandleUserPropsType;
-};
-
-export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
-    const { hasUser, isUserStateLoading, user, setHasUser, setUser } =
-        handleUserProps;
+export default function DashBoardPage() {
+    const {
+        user: { username, setUsername },
+        userState: { hasUser, isUserStateLoading, setHasUser },
+    } = useUser();
     const router = useRouter();
-    const adminCheck = user.username !== 'admins';
+    const adminCheck = username !== 'admins';
 
     return <>{renderElement()}</>;
 
@@ -25,20 +24,16 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
             router.push('/');
             return null;
         }
-        const message = `welcome to dashboard page ${user.username}, and thank you to use the validate hook`;
+        const message = `welcome to dashboard page ${username}, and thank you to use the validate hook`;
 
         return (
             <div className="o-dashboard-page">
                 <div>{message}</div>
                 <div>
-                    <PerfilImageForm handleUserProps={handleUserProps} />
-                    <PerfilImage handleUserProps={handleUserProps} />
-                    <ChangePasswordForm handleUserProps={handleUserProps} />
-                    <ChangeUsernameForm
-                        ownProps={{
-                            handleUserProps: handleUserProps,
-                        }}
-                    />
+                    <PerfilImageForm />
+                    <PerfilImage />
+                    <ChangePasswordForm />
+                    <ChangeUsernameForm />
                     {adminCheck && (
                         <button onClick={onDeleteAccount}>
                             Delete Account
@@ -68,7 +63,7 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
         }
 
         async function onDeleteAccount() {
-            const body = user.username;
+            const body = username;
             const response = await fetch(HANDLE_DB_API, {
                 body: body,
                 method: 'POST',
@@ -79,7 +74,7 @@ export default function DashBoardPage({ handleUserProps }: DashBoardPageProps) {
         }
         async function signOutUser() {
             await fetch(SIGN_IN_API, { method: 'DELETE' });
-            setUser({ username: '' });
+            setUsername('');
             setHasUser(false);
             if (!hasUser) {
                 window.location.assign('/');

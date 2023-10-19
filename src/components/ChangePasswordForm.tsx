@@ -3,21 +3,15 @@ import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
 import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
 import { useState } from 'react';
+import { useUser } from '../context/UserContext';
 
 const API = 'api/changePassword';
 
-type ChangePasswordFormPropsTypes = {
-    handleUserProps: HandleUserPropsType;
-};
-
 type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 
-export default function ChangePasswordForm({
-    handleUserProps,
-}: ChangePasswordFormPropsTypes) {
+export default function ChangePasswordForm() {
     const router = useRouter();
-    const { user } = handleUserProps;
-    const [showMessage, onShowMessage] = useState<boolean>(false);
+    const { user } = useUser();
     const { uniqueValidation, manyValidation } = useValidate();
     const { omitFields, onHighlightManyInputs } = useInputHandler();
     const [isButtonClickable, setClickableButton] = useState(true);
@@ -46,7 +40,7 @@ export default function ChangePasswordForm({
             validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
-                    message: 'Password incorrect',
+                    message: 'Incorrect Password',
                 },
             ],
             required: true,
@@ -63,12 +57,14 @@ export default function ChangePasswordForm({
                     coditional: currentInputValue === inputs?.password.value,
                     message:
                         'This field have to be different than the password',
+                    crossfield: 'password',
                 },
                 {
                     coditional:
                         currentInputValue !== inputs?.confirmNewPassword.value,
                     message:
                         'This field has to be equal to the confirm new password',
+                    crossfield: 'confirmNewPassword',
                 },
             ],
             required: true,
@@ -81,6 +77,7 @@ export default function ChangePasswordForm({
                     coditional:
                         currentInputValue !== hookInputs?.newPassword.value,
                     message: 'This field has to be equal to the new password',
+                    crossfield: 'newPassword',
                 },
             ],
             required: true,
@@ -173,7 +170,7 @@ export default function ChangePasswordForm({
         }));
         setInputs((prev) => ({
             ...prev,
-            [key]: uniqueValidation({ ...prev[key] }),
+            [key]: uniqueValidation({ ...prev[key] }, prev),
         }));
     }
 
@@ -199,14 +196,12 @@ export default function ChangePasswordForm({
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (manyValidation(inputs)) {
             if (!isButtonClickable) return;
             setClickableButton(false);
             await onSubmitInputs();
         }
-        onHighlightManyInputs(inputState, true, 2);
-        onShowMessage(true);
+        onHighlightManyInputs(inputState, true, 3);
         setClickableButton(true);
     }
 
@@ -223,8 +218,7 @@ export default function ChangePasswordForm({
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) return;
-        onHighlightManyInputs(inputState, true, 2);
-        onShowMessage(false);
+        onHighlightManyInputs(inputState, true, 3);
         router.reload();
     }
 }

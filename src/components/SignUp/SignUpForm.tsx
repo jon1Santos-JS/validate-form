@@ -4,6 +4,7 @@ import { onOmitProps } from '@/lib/lodashAdapter';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
 import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
+import { useUser } from '../../context/UserContext';
 
 const API = 'api/signUp';
 const INPUTS_TO_OMIT = ['confirmPassword'] as InputsType[];
@@ -11,7 +12,6 @@ const REQUIRED_MESSAGE = 'This field is required';
 
 interface SignUpFormPropsType {
     ownProps: PropsType;
-    handleUserProps: HandleUserPropsType;
 }
 
 interface PropsType {
@@ -20,12 +20,11 @@ interface PropsType {
 
 type InputsType = 'confirmPassword' | 'password' | 'username';
 
-export default function SignUpForm({
-    ownProps,
-    handleUserProps,
-}: SignUpFormPropsType) {
+export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const { setModalState } = ownProps;
-    const { hasUser } = handleUserProps;
+    const {
+        userState: { hasUser },
+    } = useUser();
     const { uniqueValidation, manyValidation } = useValidate();
     const { omitFields, onHighlightManyInputs, onSetTimeOut } =
         useInputHandler();
@@ -208,7 +207,7 @@ export default function SignUpForm({
             setClickableButton(false);
             await onSubmitInputs();
         }
-        onHighlightManyInputs(inputState, true, 2);
+        onHighlightManyInputs(inputState, true, 3);
         setClickableButton(true);
     }
 
@@ -230,7 +229,7 @@ export default function SignUpForm({
             setModalState(true);
             return;
         }
-        onHighlightManyInputs(inputState, false, 2);
+        onHighlightManyInputs(inputState, false, 3);
         window.location.assign('/dashboard-page');
     }
 }

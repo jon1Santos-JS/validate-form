@@ -1,12 +1,11 @@
 import SignUpContent from '@/components/SignUp/SignUpContent';
+import { useUser } from '@/context/UserContext';
 import { useRouter } from 'next/router';
 
-type SignUpPageProps = {
-    handleUserProps: HandleUserPropsType;
-};
-
-export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
-    const { hasUser, isUserStateLoading } = handleUserProps;
+export default function SignUpPage() {
+    const {
+        userState: { hasUser, isUserStateLoading },
+    } = useUser();
     const router = useRouter();
 
     return <>{renderContent()}</>;
@@ -18,6 +17,6 @@ export default function SignUpPage({ handleUserProps }: SignUpPageProps) {
             return null;
         }
 
-        return <SignUpContent handleUserProps={handleUserProps} />;
+        return <SignUpContent />;
     }
 }

@@ -3,25 +3,16 @@ import Input from './Input';
 import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
 import useInputHandler from '@/hooks/useInputHandler';
+import { useUser } from '../context/UserContext';
 const API = 'api/changeUsername';
 
 const DEFAULT_MESSAGE = 'Invalid username';
 
-type OwnPropsType = {
-    ownProps: ChangeUsernameFormPropsTypes;
-};
-
-type ChangeUsernameFormPropsTypes = {
-    handleUserProps: HandleUserPropsType;
-};
-
 type InputsType = 'newUsername';
 
-export default function ChangeUsernameForm({
-    ownProps: { handleUserProps },
-}: OwnPropsType) {
+export default function ChangeUsernameForm() {
     const router = useRouter();
-    const { user, setUser } = handleUserProps;
+    const { user } = useUser();
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const { uniqueValidation, manyValidation } = useValidate();
     const { onHighlightManyInputs } = useInputHandler();
@@ -142,7 +133,7 @@ export default function ChangeUsernameForm({
             setClickableButton(false);
             return;
         }
-        onHighlightManyInputs(inputState, true, 2);
+        onHighlightManyInputs(inputState, true, 3);
         onShowMessage(true);
         setClickableButton(true);
     }
@@ -166,7 +157,7 @@ export default function ChangeUsernameForm({
         onShowMessage(false);
         router.reload();
         window.addEventListener('load', function () {
-            setUser({ username: parsedResponse.body as string });
+            user.setUsername(parsedResponse.body as string);
             window.removeEventListener('load', () => this);
         });
     }
