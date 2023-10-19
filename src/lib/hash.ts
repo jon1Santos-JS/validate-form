@@ -20,10 +20,7 @@ export function createHash<T>(value: T) {
 export async function returnUserByHash(
     browserHash: string | undefined,
     users: UserFromDataBaseType[],
-): Promise<{
-    serverResponse: boolean;
-    body: string | UserType;
-}> {
+) {
     if (!browserHash) {
         return {
             serverResponse: false,
@@ -32,7 +29,7 @@ export async function returnUserByHash(
     }
     const validation = {
         isValid: false,
-        user: { username: '' } as UserType,
+        user: { username: '', userImage: '' },
         message: USER_HASH_ERROR,
     };
 
