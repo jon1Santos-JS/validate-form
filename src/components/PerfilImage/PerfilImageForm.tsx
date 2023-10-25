@@ -92,7 +92,10 @@ export default function PerfilImageForm() {
             ...prev,
             [key]: validateSingle({ ...prev[key] }),
         }));
-        inputState.imageInput.onHighlightInput(false, 'imageInput');
+        setInputState((prev) => ({
+            ...prev,
+            imageInput: { ...prev.imageInput, highlightInput: false },
+        }));
     }
 
     function onShowInputMessage(value: boolean, key: InputsType) {
@@ -133,6 +136,7 @@ export default function PerfilImageForm() {
         handleButtonClick(true);
     }
 
+    // IMAGE THIRTY PARTY API
     async function onSubmitInputs() {
         if (!inputs.imageInput.files) return;
         const file = inputs.imageInput.files[0];
@@ -143,14 +147,12 @@ export default function PerfilImageForm() {
             method: 'POST',
             body: formData,
         };
-        // IMAGE THIRTY PARTY API
         const imgApiResponse = await fetch(
             process.env.NEXT_PUBLIC_IMGBB_API_LINK as string,
             fetchOptions,
         );
         if (!imgApiResponse.ok) return;
-        const image = await imgApiResponse.json();
-        // IMAGE LOCAL API
+        const image: ImgBBResponseType = await imgApiResponse.json();
         await onUpdateUserImageDB(image.data.url);
         setInputState((prev) => ({
             ...prev,
@@ -158,7 +160,7 @@ export default function PerfilImageForm() {
         }));
         return image.data.url;
     }
-
+    // IMAGE LOCAL API
     async function onUpdateUserImageDB(img: string) {
         const handledUser = {
             userName: username,

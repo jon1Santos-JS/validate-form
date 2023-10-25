@@ -10,3 +10,13 @@ declare interface ServerResponse {
     serverResponse: boolean;
     body: string | UserType;
 }
+
+// IMGBB API RESPONSE: https://api.imgbb.com
+
+declare type ImgBBResponseType = {
+    [key: string]: DataType;
+};
+
+declare type DataType = {
+    url: string;
+} & string;
