@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Input from './Input';
 import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
 import Link from 'next/link';
@@ -15,26 +15,23 @@ export default function SignInForm() {
         user,
         userState: { setHasUser, hasUser, setUserStateLoading },
     } = useUser();
-    const { uniqueValidation, manyValidation } = useValidate();
-    const { omitFields, onHighlightManyInputs } = useInputHandler();
+    const { validateSingle, validateMany } = useValidate();
+    const { omitFields, onSetTimeOut, inputsFactory, inputStateFactory } =
+        useInputHandler();
     const [showMessage, onShowMessage] = useState<boolean>(false);
-    const [isButtonClickable, setClickableButton] = useState(true);
+    const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        username: {
-            showInputMessage: false,
-            highlightInput: false,
-            onShowInputMessage: onShowInputMessage,
-            onHighlightInput: onHighlightInput,
-        },
-        password: {
-            showInputMessage: false,
-            highlightInput: false,
-            onShowInputMessage: onShowInputMessage,
-            onHighlightInput: onHighlightInput,
-        },
+        username: inputStateFactory({
+            onShowInputMessage,
+            onHighlightInput,
+        }),
+        password: inputStateFactory({
+            onShowInputMessage,
+            onHighlightInput,
+        }),
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
-        username: {
+        username: inputsFactory({
             validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue,
@@ -50,10 +47,8 @@ export default function SignInForm() {
                 },
             ],
             required: true,
-            value: '',
-            errors: [],
-        },
-        password: {
+        }),
+        password: inputsFactory({
             validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue,
@@ -65,26 +60,8 @@ export default function SignInForm() {
                 },
             ],
             required: true,
-            value: '',
-            errors: [],
-        },
+        }),
     });
-
-    useEffect(() => {
-        const timerDownMessage = setTimeout(() => {
-            onHighlightManyInputs(inputState, false, 2);
-        }, 2750);
-
-        return () => clearTimeout(timerDownMessage);
-    }, [inputState, onHighlightManyInputs]);
-
-    useEffect(() => {
-        const timerDownMessage = setTimeout(() => {
-            onShowMessage(false);
-        }, 2750);
-
-        return () => clearTimeout(timerDownMessage);
-    }, [showMessage]);
 
     return (
         <form className="o-sign-in-form">
@@ -103,9 +80,6 @@ export default function SignInForm() {
                             input: inputs.username,
                             inputState: inputState.username,
                         }}
-                        formProps={{
-                            hasError: true,
-                        }}
                     />
                     <Input
                         ownProps={{
@@ -116,9 +90,6 @@ export default function SignInForm() {
                         inputStateProps={{
                             input: inputs.password,
                             inputState: inputState.password,
-                        }}
-                        formProps={{
-                            hasError: true,
                         }}
                     />
                 </div>
@@ -151,7 +122,7 @@ export default function SignInForm() {
         }));
         setInputs((prev) => ({
             ...prev,
-            [name]: uniqueValidation({ ...prev[name] }),
+            [name]: validateSingle({ ...prev[name] }),
         }));
     }
 
@@ -183,14 +154,20 @@ export default function SignInForm() {
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (showMessage) return;
-        if (manyValidation(inputs)) {
-            if (!isButtonClickable) return;
-            setClickableButton(false);
-            await onSubmitInputs();
+        if (!isClickable) return;
+        if (!validateMany(inputs)) {
+            onShowMessage(true);
+            onHilightInputs(true);
+            onSetTimeOut(() => {
+                onShowMessage(false);
+                onHilightInputs(false);
+            }, 2750);
+            onShowInputsMessages(true);
+            return;
         }
-        onShowMessage(true);
-        onHighlightManyInputs(inputState, true, 3);
-        setClickableButton(true);
+        handleButtonClick(false);
+        await onSubmitInputs();
+        handleButtonClick(true);
     }
 
     async function onSubmitInputs() {
@@ -205,11 +182,41 @@ export default function SignInForm() {
         setHasUser(parsedResponse.serverResponse);
         if (!parsedResponse.serverResponse) {
             onShowMessage(true);
-            onHighlightManyInputs(inputState, true, 2);
+            onHilightInputs(true);
+            onSetTimeOut(() => {
+                onShowMessage(false);
+                onHilightInputs(false);
+            }, 2750);
             return;
         }
-        onHighlightManyInputs(inputState, false, 3);
-        onShowMessage(false);
         user.setUsername(parsedResponse.body as string);
+    }
+
+    function onHilightInputs(value: boolean) {
+        setInputState((prev) => ({
+            ...prev,
+            username: {
+                ...prev.username,
+                highlightInput: value,
+            },
+            password: {
+                ...prev.password,
+                highlightInput: value,
+            },
+        }));
+    }
+
+    function onShowInputsMessages(value: boolean) {
+        setInputState((prev) => ({
+            ...prev,
+            username: {
+                ...prev.username,
+                showInputMessage: value,
+            },
+            password: {
+                ...prev.password,
+                showInputMessage: value,
+            },
+        }));
     }
 }

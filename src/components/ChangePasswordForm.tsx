@@ -12,31 +12,25 @@ type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 export default function ChangePasswordForm() {
     const router = useRouter();
     const { user } = useUser();
-    const { uniqueValidation, manyValidation } = useValidate();
-    const { omitFields, onHighlightManyInputs } = useInputHandler();
-    const [isButtonClickable, setClickableButton] = useState(true);
+    const { validateSingle, validateMany } = useValidate();
+    const { omitFields, inputsFactory, inputStateFactory } = useInputHandler();
+    const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        password: {
-            showInputMessage: false,
-            highlightInput: false,
+        password: inputStateFactory({
             onShowInputMessage: onShowInputMessage,
             onHighlightInput: onHighlightInput,
-        },
-        newPassword: {
-            showInputMessage: false,
-            highlightInput: false,
+        }),
+        newPassword: inputStateFactory({
             onShowInputMessage: onShowInputMessage,
             onHighlightInput: onHighlightInput,
-        },
-        confirmNewPassword: {
-            showInputMessage: false,
-            highlightInput: false,
+        }),
+        confirmNewPassword: inputStateFactory({
             onShowInputMessage: onShowInputMessage,
             onHighlightInput: onHighlightInput,
-        },
+        }),
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
-        password: {
+        password: inputsFactory({
             validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
@@ -44,10 +38,8 @@ export default function ChangePasswordForm() {
                 },
             ],
             required: true,
-            value: '',
-            errors: [],
-        },
-        newPassword: {
+        }),
+        newPassword: inputsFactory({
             validations: (currentInputValue, inputs) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
@@ -68,10 +60,8 @@ export default function ChangePasswordForm() {
                 },
             ],
             required: true,
-            value: '',
-            errors: [],
-        },
-        confirmNewPassword: {
+        }),
+        confirmNewPassword: inputsFactory({
             validations: (currentInputValue, hookInputs) => [
                 {
                     coditional:
@@ -81,9 +71,7 @@ export default function ChangePasswordForm() {
                 },
             ],
             required: true,
-            value: '',
-            errors: [],
-        },
+        }),
     });
 
     return <>{renderContent()}</>;
@@ -112,9 +100,6 @@ export default function ChangePasswordForm() {
                                 input: inputs.password,
                                 inputState: inputState.password,
                             }}
-                            formProps={{
-                                hasError: false,
-                            }}
                         />
                         <Input
                             ownProps={{
@@ -125,9 +110,6 @@ export default function ChangePasswordForm() {
                             inputStateProps={{
                                 input: inputs.newPassword,
                                 inputState: inputState.newPassword,
-                            }}
-                            formProps={{
-                                hasError: false,
                             }}
                         />
                         <Input
@@ -140,9 +122,6 @@ export default function ChangePasswordForm() {
                             inputStateProps={{
                                 input: inputs.confirmNewPassword,
                                 inputState: inputState.confirmNewPassword,
-                            }}
-                            formProps={{
-                                hasError: false,
                             }}
                         />
                     </div>
@@ -160,17 +139,14 @@ export default function ChangePasswordForm() {
         );
     }
 
-    function onChange(
-        e: React.ChangeEvent<HTMLInputElement>,
-        key: keyof typeof inputs,
-    ) {
+    function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], value: e.target.value },
         }));
         setInputs((prev) => ({
             ...prev,
-            [key]: uniqueValidation({ ...prev[key] }, prev),
+            [key]: validateSingle({ ...prev[key] }, prev),
         }));
     }
 
@@ -196,13 +172,15 @@ export default function ChangePasswordForm() {
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (manyValidation(inputs)) {
-            if (!isButtonClickable) return;
-            setClickableButton(false);
-            await onSubmitInputs();
+        if (!isClickable) return;
+        if (validateMany(inputs)) {
+            onHilightInputs(true);
+            onShowInputsMessages(true);
+            return;
         }
-        onHighlightManyInputs(inputState, true, 3);
-        setClickableButton(true);
+        handleButtonClick(true);
+        await onSubmitInputs();
+        handleButtonClick(false);
     }
 
     async function onSubmitInputs() {
@@ -218,7 +196,44 @@ export default function ChangePasswordForm() {
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         if (!parsedResponse.serverResponse) return;
-        onHighlightManyInputs(inputState, true, 3);
+        onHilightInputs(true);
+        onShowInputsMessages(true);
         router.reload();
+    }
+
+    function onHilightInputs(value: boolean) {
+        setInputState((prev) => ({
+            ...prev,
+            password: {
+                ...prev.password,
+                highlightInput: value,
+            },
+            newPassword: {
+                ...prev.password,
+                highlightInput: value,
+            },
+            confirmNewPassword: {
+                ...prev.confirmNewPassword,
+                highlightInput: value,
+            },
+        }));
+    }
+
+    function onShowInputsMessages(value: boolean) {
+        setInputState((prev) => ({
+            ...prev,
+            password: {
+                ...prev.password,
+                showInputMessage: value,
+            },
+            newPassword: {
+                ...prev.newPassword,
+                showInputMessage: value,
+            },
+            confirmNewPassword: {
+                ...prev.confirmNewPassword,
+                showInputMessage: value,
+            },
+        }));
     }
 }

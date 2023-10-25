@@ -7,20 +7,22 @@ declare type InputsToValidateType<T extends string> = {
 };
 
 declare interface ValidateInputType<T extends string> {
-    validations?: (
-        currentInputValue: string,
-        conditionalInputValue?: InputsToValidateType<T>,
-    ) => Validation<T>[];
+    validations?: ValidateFunctionType<T>;
     errors: string[];
     value: string;
+    crossfield?: T;
     files?: FileList | null;
     required?: string | boolean;
 }
 
-declare interface Validation<T extends string> {
+declare type ValidateFunctionType<T extends string> = (
+    currentInputValue: string,
+    conditionalInputValue?: InputsToValidateType<T>,
+) => Validation[];
+
+declare interface Validation {
     coditional: boolean | RegExpMatchArray | null;
     message: string;
-    crossfield?: T;
 }
 
 declare type InputState<T extends string> = {

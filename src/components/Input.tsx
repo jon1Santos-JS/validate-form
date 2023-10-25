@@ -1,9 +1,8 @@
-import React, { useId } from 'react';
+import React from 'react';
 
 type InputPropsTypes<T extends string> = {
     ownProps: PropsType;
     inputStateProps: inputStatePropsType<T>;
-    formProps: FormProps;
 };
 
 type inputStatePropsType<T extends string> = {
@@ -18,33 +17,25 @@ type PropsType = {
     inputAccept?: string;
 };
 
-type FormProps = {
-    hasError?: boolean;
-    error?: string;
-};
-
 export default function Input<T extends string>({
     ownProps,
     inputStateProps,
-    formProps,
 }: InputPropsTypes<T>) {
-    const { hasError } = formProps;
     const { label, inputType, onChange, inputAccept } = ownProps;
     const { input, inputState } = inputStateProps;
     const { value, errors } = input;
     const { showInputMessage, highlightInput } = inputState;
-    const id = useId();
-    const highlightConditional = errors.length > 0 || hasError;
+    const highlightConditional = errors.length > 0;
 
     return (
         <div className="field">
             {label ? (
-                <label htmlFor={id + label} className="label">
+                <label htmlFor={label} className="label">
                     {label}
                 </label>
             ) : null}
             <input
-                id={id + label}
+                id={label}
                 className={`input ${
                     highlightConditional && highlightInput && 'has-error'
                 }`}

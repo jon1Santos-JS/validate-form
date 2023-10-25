@@ -25,32 +25,26 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const {
         userState: { hasUser },
     } = useUser();
-    const { uniqueValidation, manyValidation } = useValidate();
-    const { omitFields, onHighlightManyInputs, onSetTimeOut } =
+    const { validateSingle, validateMany } = useValidate();
+    const { omitFields, onSetTimeOut, inputsFactory, inputStateFactory } =
         useInputHandler();
-    const [isButtonClickable, setClickableButton] = useState(true);
+    const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        username: {
-            showInputMessage: false,
-            highlightInput: false,
+        username: inputStateFactory({
             onShowInputMessage: onShowInputMessage,
             onHighlightInput: onHighlightInput,
-        },
-        password: {
-            showInputMessage: false,
-            highlightInput: false,
+        }),
+        password: inputStateFactory({
             onShowInputMessage: onShowInputMessage,
             onHighlightInput: onHighlightInput,
-        },
-        confirmPassword: {
-            showInputMessage: false,
-            highlightInput: false,
+        }),
+        confirmPassword: inputStateFactory({
             onShowInputMessage: onShowInputMessage,
             onHighlightInput: onHighlightInput,
-        },
+        }),
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
-        username: {
+        username: inputsFactory({
             validations: (currentInputValue) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
@@ -62,10 +56,8 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 },
             ],
             required: REQUIRED_MESSAGE,
-            value: '',
-            errors: [],
-        },
-        password: {
+        }),
+        password: inputsFactory({
             validations: (currentInputValue, inputs) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
@@ -76,25 +68,21 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         currentInputValue !== inputs?.confirmPassword.value,
                     message:
                         'This field has to be equal to the confirm password',
-                    crossfield: 'confirmPassword',
                 },
             ],
             required: REQUIRED_MESSAGE,
-            value: '',
-            errors: [],
-        },
-        confirmPassword: {
+            crossfield: 'confirmPassword',
+        }),
+        confirmPassword: inputsFactory({
             validations: (currentInputValue, inputs) => [
                 {
                     coditional: currentInputValue !== inputs?.password.value,
                     message: 'This field has to be equal to the password',
-                    crossfield: 'password',
                 },
             ],
             required: REQUIRED_MESSAGE,
-            value: '',
-            errors: [],
-        },
+            crossfield: 'password',
+        }),
     });
 
     return (
@@ -114,9 +102,6 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                             input: inputs.username,
                             inputState: inputState.username,
                         }}
-                        formProps={{
-                            hasError: false,
-                        }}
                     />
                     <Input
                         ownProps={{
@@ -128,9 +113,6 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                             input: inputs.password,
                             inputState: inputState.password,
                         }}
-                        formProps={{
-                            hasError: false,
-                        }}
                     />
                     <Input
                         ownProps={{
@@ -141,9 +123,6 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         inputStateProps={{
                             input: inputs.confirmPassword,
                             inputState: inputState.confirmPassword,
-                        }}
-                        formProps={{
-                            hasError: false,
                         }}
                     />
                 </div>
@@ -173,11 +152,17 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
-                [key]: uniqueValidation({ ...prev[key] }, prev),
+                [key]: validateSingle({ ...prev[key] }, prev),
             }));
         }, 950);
-        inputState[key].onHighlightInput(true, key);
-        inputState[key].onShowInputMessage(true, key);
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                showInputMessage: true,
+                highlightInput: true,
+            },
+        }));
     }
 
     function onShowInputMessage(value: boolean, key: InputsType) {
@@ -202,13 +187,15 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (manyValidation(inputs)) {
-            if (!isButtonClickable) return;
-            setClickableButton(false);
-            await onSubmitInputs();
+        if (!isClickable) return;
+        if (!validateMany(inputs)) {
+            onHilightInputs(true);
+            onShowInputsMessages(true);
+            return;
         }
-        onHighlightManyInputs(inputState, true, 3);
-        setClickableButton(true);
+        handleButtonClick(false);
+        await onSubmitInputs();
+        handleButtonClick(true);
     }
 
     async function onSubmitInputs() {
@@ -229,7 +216,42 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             setModalState(true);
             return;
         }
-        onHighlightManyInputs(inputState, false, 3);
         window.location.assign('/dashboard-page');
+    }
+
+    function onHilightInputs(value: boolean) {
+        setInputState((prev) => ({
+            ...prev,
+            username: {
+                ...prev.username,
+                highlightInput: value,
+            },
+            password: {
+                ...prev.password,
+                highlightInput: value,
+            },
+            confirmPassword: {
+                ...prev.confirmPassword,
+                highlightInput: value,
+            },
+        }));
+    }
+
+    function onShowInputsMessages(value: boolean) {
+        setInputState((prev) => ({
+            ...prev,
+            username: {
+                ...prev.username,
+                showInputMessage: value,
+            },
+            password: {
+                ...prev.password,
+                showInputMessage: value,
+            },
+            confirmPassword: {
+                ...prev.confirmPassword,
+                showInputMessage: value,
+            },
+        }));
     }
 }

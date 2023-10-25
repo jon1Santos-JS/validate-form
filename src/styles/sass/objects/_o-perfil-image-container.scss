@@ -3,4 +3,11 @@
     min-height: var(--app-base-image);
     min-width: var(--app-base-image);
     place-items: center;
+
+    .perfil-image {
+        height: auto;
+        max-height: 200px;
+        max-width: 200px;
+        width: auto;
+    }
 }

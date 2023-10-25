@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Input from './Input';
 import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
-import useInputHandler from '@/hooks/useInputHandler';
 import { useUser } from '../context/UserContext';
+import useInputHandler from '@/hooks/useInputHandler';
 const API = 'api/changeUsername';
 
 const DEFAULT_MESSAGE = 'Invalid username';
@@ -13,30 +13,31 @@ type InputsType = 'newUsername';
 export default function ChangeUsernameForm() {
     const router = useRouter();
     const { user } = useUser();
+    const { validateSingle, validateMany } = useValidate();
+    const { onSetTimeOut, inputsFactory, inputStateFactory } =
+        useInputHandler();
     const [showMessage, onShowMessage] = useState<boolean>(false);
-    const { uniqueValidation, manyValidation } = useValidate();
-    const { onHighlightManyInputs } = useInputHandler();
-    const [isButtonClickable, setClickableButton] = useState(true);
+    const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        newUsername: {
-            showInputMessage: false,
-            highlightInput: false,
-            onShowInputMessage: onShowInputMessage,
-            onHighlightInput: onHighlightInput,
-        },
+        newUsername: inputStateFactory({
+            onShowInputMessage,
+            onHighlightInput,
+        }),
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
-        newUsername: {
+        newUsername: inputsFactory({
             validations: (currentInputValue: string) => [
                 {
                     coditional: !currentInputValue.match(/.{6,}/),
                     message: '',
                 },
+                {
+                    coditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
+                    message: '',
+                },
             ],
             required: true,
-            value: '',
-            errors: [],
-        },
+        }),
     });
 
     return <>{renderContent()}</>;
@@ -65,9 +66,6 @@ export default function ChangeUsernameForm() {
                                 input: inputs.newUsername,
                                 inputState: inputState.newUsername,
                             }}
-                            formProps={{
-                                hasError: false,
-                            }}
                         />
                     </div>
                     {renderError()}
@@ -95,7 +93,7 @@ export default function ChangeUsernameForm() {
         }));
         setInputs((prev) => ({
             ...prev,
-            [name]: uniqueValidation({ ...prev[name] }),
+            [name]: validateSingle({ ...prev[name] }),
         }));
     }
 
@@ -127,15 +125,23 @@ export default function ChangeUsernameForm() {
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
-        if (manyValidation(inputs)) {
-            if (!isButtonClickable) return;
-            await onSubmitInputs();
-            setClickableButton(false);
+        if (!isClickable) return;
+        if (!validateMany(inputs)) {
+            setInputState((prev) => ({
+                ...prev,
+                newUsername: {
+                    ...prev.newUsername,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
+            }));
+            onShowMessage(true);
+            onSetTimeOut(() => onShowMessage(false), 2750);
             return;
         }
-        onHighlightManyInputs(inputState, true, 3);
-        onShowMessage(true);
-        setClickableButton(true);
+        handleButtonClick(true);
+        await onSubmitInputs();
+        handleButtonClick(false);
     }
 
     async function onSubmitInputs() {
@@ -153,12 +159,12 @@ export default function ChangeUsernameForm() {
         if (!parsedResponse.serverResponse) {
             return parsedResponse.body as string;
         }
-        inputState.newUsername.onShowInputMessage(true, 'newUsername');
+
+        setInputState((prev) => ({
+            ...prev,
+            newUsername: { ...prev.newUsername, showInputMessage: true },
+        }));
         onShowMessage(false);
         router.reload();
-        window.addEventListener('load', function () {
-            user.setUsername(parsedResponse.body as string);
-            window.removeEventListener('load', () => this);
-        });
     }
 }

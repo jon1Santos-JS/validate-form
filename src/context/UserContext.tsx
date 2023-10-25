@@ -11,14 +11,14 @@ const API = 'api/signIn';
 type UserContextType = {
     user: UserType;
     userState: UserStateType;
+    isUserImageLoading: boolean;
+    onLoadUserImage: (value: boolean) => void;
 };
 
-const UserContext = createContext<UserContextType>({
+export const UserContext = createContext<UserContextType>({
     user: {
         username: '',
         userImage: '',
-        isUserImageLoading: true,
-        setUserImageLoading: () => null,
         setUsername: () => null,
         setUserimage: () => null,
     },
@@ -28,6 +28,8 @@ const UserContext = createContext<UserContextType>({
         setHasUser: () => null,
         setUserStateLoading: () => null,
     },
+    isUserImageLoading: false,
+    onLoadUserImage: () => null,
 });
 
 type UserProps = {
@@ -35,15 +37,10 @@ type UserProps = {
 };
 
 export function UserProvider({ children }: UserProps) {
+    const [isUserImageLoading, onLoadUserImage] = useState(false);
     const [user, setUser] = useState({
         username: '',
         userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
-        isUserImageLoading: false,
-        setUserImageLoading: (value: boolean) =>
-            setUser((prev) => ({
-                ...prev,
-                isUserStateLoading: value,
-            })),
         setUsername: (value: string) =>
             setUser((prev) => ({ ...prev, username: value })),
         setUserimage: (value: string) =>
@@ -55,7 +52,7 @@ export function UserProvider({ children }: UserProps) {
         setHasUser: (value: boolean) =>
             setUserState((prev) => ({ ...prev, hasUser: value })),
         setUserStateLoading: (value: boolean) =>
-            setUserState((prev) => ({ ...prev, isUserImageLoading: value })),
+            setUserState((prev) => ({ ...prev, isUserStateLoading: value })),
     });
 
     const onCheckUserState = useCallback(async () => {
@@ -82,7 +79,9 @@ export function UserProvider({ children }: UserProps) {
     }, [onCheckUserState]);
 
     return (
-        <UserContext.Provider value={{ user, userState }}>
+        <UserContext.Provider
+            value={{ user, userState, isUserImageLoading, onLoadUserImage }}
+        >
             {children}
         </UserContext.Provider>
     );

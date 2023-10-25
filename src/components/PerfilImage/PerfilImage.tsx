@@ -3,8 +3,10 @@ import { useUser } from '../../context/UserContext';
 
 export default function PerfilImage() {
     const {
-        user: { userImage, isUserImageLoading, setUserImageLoading },
+        user: { userImage },
         userState: { isUserStateLoading },
+        isUserImageLoading,
+        onLoadUserImage,
     } = useUser();
 
     return <>{renderImage()}</>;
@@ -13,31 +15,36 @@ export default function PerfilImage() {
         if (isUserStateLoading) return null;
         return (
             <div className="o-perfil-image-container">
-                {!isUserImageLoading ? (
-                    <Image
-                        src={userImage}
-                        alt="test image"
-                        width={200}
-                        height={200}
-                        onLoad={onLoadingImage}
-                        priority
-                        style={{
-                            width: 'auto',
-                            height: 'auto',
-                            maxWidth: '200px',
-                            maxHeight: '200px',
-                        }}
-                    />
-                ) : (
-                    <div className="o-spinner-container">
-                        <div className="spinner-element"></div>
+                <div
+                    className={`${
+                        isUserImageLoading ? 'o-spinner-container' : ''
+                    }`}
+                >
+                    <div
+                        className={`${
+                            isUserImageLoading ? 'spinner-element' : ''
+                        }`}
+                    >
+                        <Image
+                            src={userImage}
+                            alt="test image"
+                            priority
+                            onLoad={onLoadingImage}
+                            width={200}
+                            height={200}
+                            className={`${
+                                isUserImageLoading
+                                    ? 'is-image-not-display'
+                                    : 'perfil-image'
+                            }`}
+                        />
                     </div>
-                )}
+                </div>
             </div>
         );
     }
 
     function onLoadingImage() {
-        setUserImageLoading(false);
+        onLoadUserImage(false);
     }
 }

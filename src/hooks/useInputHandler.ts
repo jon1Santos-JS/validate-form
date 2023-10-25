@@ -5,6 +5,7 @@ export const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
     'errors',
     'validations',
     'required',
+    'crossfield',
 ];
 
 export default function useInputHandler() {
@@ -38,38 +39,46 @@ export default function useInputHandler() {
         return handleInputs;
     }
 
-    function onHighlightManyInputs<T extends string>(
-        inputs: { [key in T]: InputState<T> },
-        value: boolean,
-        highLightLevel: 1 | 2 | 3,
-    ) {
-        if (highLightLevel === 1) {
-            for (const i in inputs) {
-                const typedIndex = i as T;
-                inputs[typedIndex].onShowInputMessage(value, typedIndex);
-            }
-            return;
-        }
-        if (highLightLevel === 2) {
-            for (const i in inputs) {
-                const typedIndex = i as T;
-                inputs[typedIndex].onHighlightInput(value, typedIndex);
-            }
-            return;
-        }
-        if (highLightLevel === 3) {
-            for (const i in inputs) {
-                const typedIndex = i as T;
-                inputs[typedIndex].onShowInputMessage(value, typedIndex);
-                inputs[typedIndex].onHighlightInput(value, typedIndex);
-            }
-            return;
-        }
+    function inputsFactory<T extends string, G extends T>({
+        validations,
+        required,
+        crossfield,
+        files,
+    }: {
+        validations?: ValidateFunctionType<T>;
+        required?: string | boolean;
+        crossfield?: G;
+        files?: FileList | null;
+    }): ValidateInputType<T> {
+        return {
+            validations,
+            value: '',
+            errors: [],
+            required,
+            crossfield,
+            files,
+        };
+    }
+
+    function inputStateFactory<T extends string>({
+        onShowInputMessage,
+        onHighlightInput,
+    }: {
+        onShowInputMessage: (value: boolean, key: T) => void;
+        onHighlightInput: (value: boolean, key: T) => void;
+    }) {
+        return {
+            showInputMessage: false,
+            highlightInput: false,
+            onShowInputMessage,
+            onHighlightInput,
+        };
     }
 
     return {
         omitFields,
-        onHighlightManyInputs,
         onSetTimeOut,
+        inputsFactory,
+        inputStateFactory,
     };
 }
