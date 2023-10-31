@@ -29,7 +29,7 @@ export default function PerfilImageForm() {
         imageInput: inputsFactory({
             validations: (currentInputValue: string) => [
                 {
-                    coditional: !onCheckExtensions(
+                    conditional: !onCheckExtensions(
                         ALLOWED_EXTENSIONS,
                         currentInputValue,
                     ),
@@ -135,7 +135,6 @@ export default function PerfilImageForm() {
         }));
         handleButtonClick(true);
     }
-
     // IMAGE THIRTY PARTY API
     async function onSubmitInputs() {
         if (!inputs.imageInput.files) return;

@@ -34,6 +34,16 @@ export async function signUpController(userAccount: UserFromClientType) {
     return { serverResponse: true, body: 'Account has been created' };
 }
 
+export async function checkUsernameController(username: string) {
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.checkUsername(username);
+    if (!response) {
+        console.log('controller error to check username: ', response);
+        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
+    }
+    return { serverResponse: true, body: response };
+}
+
 export async function changePasswordController(
     userAccount: ChangePasswordFromClientType,
 ) {

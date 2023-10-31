@@ -1,12 +1,13 @@
 import { onOmitProps } from '@/lib/lodashAdapter';
 import { useEffect, useState } from 'react';
 
-export const FIELDS_TO_OMIT: (keyof ValidateInputType<string>)[] = [
-    'errors',
-    'validations',
-    'required',
-    'crossfield',
-];
+export const FIELDS_TO_OMIT: (
+    | 'errors'
+    | 'validations'
+    | 'asyncValidations'
+    | 'required'
+    | 'crossfield'
+)[] = ['errors', 'asyncValidations', 'validations', 'required', 'crossfield'];
 
 export default function useInputHandler() {
     const [timeoutToClear, onSetTimeoutToClear] =
@@ -40,17 +41,20 @@ export default function useInputHandler() {
     }
 
     function inputsFactory<T extends string, G extends T>({
+        asyncValidations,
         validations,
         required,
         crossfield,
         files,
     }: {
+        asyncValidations?: AsyncValidateFunctionType<T>;
         validations?: ValidateFunctionType<T>;
         required?: string | boolean;
         crossfield?: G;
         files?: FileList | null;
     }): ValidateInputType<T> {
         return {
+            asyncValidations,
             validations,
             value: '',
             errors: [],

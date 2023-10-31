@@ -45,6 +45,14 @@ export default class MiniDBAccountHandler {
         return SERVER_ERROR_RESPONSE;
     }
 
+    async checkUsername(username: string) {
+        if (await this.#onInitDB('check username'))
+            return SERVER_ERROR_RESPONSE;
+        const hasUsername = this.#authUsername(username);
+        if (!hasUsername) SERVER_ERROR_RESPONSE;
+        return hasUsername?.username.value;
+    }
+
     async updateUsername(user: ChangeUsernameFromClientType) {
         if (await this.#onInitDB('update username'))
             return SERVER_ERROR_RESPONSE;

@@ -66,7 +66,7 @@ export function UserProvider({ children }: UserProps) {
             isUserStateLoading: false,
         }));
         if (typeof parsedResponse.body !== 'string') {
-            const DBUser = parsedResponse.body as UserType;
+            const DBUser: UserType = parsedResponse.body;
             setUser((prev) => ({
                 ...prev,
                 ...DBUser,

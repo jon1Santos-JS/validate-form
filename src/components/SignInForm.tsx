@@ -34,15 +34,15 @@ export default function SignInForm() {
         username: inputsFactory({
             validations: (currentInputValue) => [
                 {
-                    coditional: !currentInputValue,
+                    conditional: !currentInputValue,
                     message: '',
                 },
                 {
-                    coditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !currentInputValue.match(/.{6,}/),
                     message: '',
                 },
                 {
-                    coditional: !currentInputValue.match(/^[A-Za-z]+$/),
+                    conditional: !currentInputValue.match(/^[A-Za-z]+$/),
                     message: '',
                 },
             ],
@@ -51,11 +51,11 @@ export default function SignInForm() {
         password: inputsFactory({
             validations: (currentInputValue) => [
                 {
-                    coditional: !currentInputValue,
+                    conditional: !currentInputValue,
                     message: '',
                 },
                 {
-                    coditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !currentInputValue.match(/.{6,}/),
                     message: '',
                 },
             ],

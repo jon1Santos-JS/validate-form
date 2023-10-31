@@ -33,7 +33,7 @@ export default function ChangePasswordForm() {
         password: inputsFactory({
             validations: (currentInputValue) => [
                 {
-                    coditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !currentInputValue.match(/.{6,}/),
                     message: 'Incorrect Password',
                 },
             ],
@@ -42,17 +42,17 @@ export default function ChangePasswordForm() {
         newPassword: inputsFactory({
             validations: (currentInputValue, inputs) => [
                 {
-                    coditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !currentInputValue.match(/.{6,}/),
                     message: 'Password must has 6 characters at least',
                 },
                 {
-                    coditional: currentInputValue === inputs?.password.value,
+                    conditional: currentInputValue === inputs?.password.value,
                     message:
                         'This field have to be different than the password',
                     crossfield: 'password',
                 },
                 {
-                    coditional:
+                    conditional:
                         currentInputValue !== inputs?.confirmNewPassword.value,
                     message:
                         'This field has to be equal to the confirm new password',
@@ -64,7 +64,7 @@ export default function ChangePasswordForm() {
         confirmNewPassword: inputsFactory({
             validations: (currentInputValue, hookInputs) => [
                 {
-                    coditional:
+                    conditional:
                         currentInputValue !== hookInputs?.newPassword.value,
                     message: 'This field has to be equal to the new password',
                     crossfield: 'newPassword',

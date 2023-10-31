@@ -7,6 +7,7 @@ declare type InputsToValidateType<T extends string> = {
 };
 
 declare interface ValidateInputType<T extends string> {
+    asyncValidations?: AsyncValidateFunctionType<T>;
     validations?: ValidateFunctionType<T>;
     errors: string[];
     value: string;
@@ -20,14 +21,19 @@ declare type ValidateFunctionType<T extends string> = (
     conditionalInputValue?: InputsToValidateType<T>,
 ) => Validation[];
 
+declare type AsyncValidateFunctionType<T extends string> = (
+    currentInputValue: string,
+    conditionalInputValue?: InputsToValidateType<T>,
+) => Promise<Validation[]>;
+
 declare interface Validation {
-    coditional: boolean | RegExpMatchArray | null;
+    conditional: boolean | RegExpMatchArray | null | Promise<boolean | string>;
     message: string;
 }
 
 declare type InputState<T extends string> = {
     showInputMessage: boolean;
     highlightInput: boolean;
-    onShowInputMessage: (value: boolean, key: T) => void;
-    onHighlightInput: (value: boolean, key: T) => void;
+    onShowInputMessage?: (value: boolean, key: T) => void;
+    onHighlightInput?: (value: boolean, key: T) => void;
 };

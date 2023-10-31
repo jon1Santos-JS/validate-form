@@ -1,11 +1,12 @@
 import { omit, deburr } from 'lodash';
 
-export function onOmitProps<T extends object, U extends keyof T>(
-    obj: T,
-    propsToOmit: U[],
-) {
+export function onOmitProps<
+    O extends object,
+    U extends keyof O,
+    T extends keyof O & string,
+>(obj: O, propsToOmit: U[]) {
     const handledObj: unknown = omit(obj, propsToOmit);
-    return handledObj as Omit<T, U>;
+    return handledObj as InputsToValidateType<Exclude<T, U>>;
 }
 
 export function onConverToBasicLatinLetters(word: string) {

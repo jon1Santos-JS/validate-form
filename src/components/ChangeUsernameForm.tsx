@@ -28,11 +28,11 @@ export default function ChangeUsernameForm() {
         newUsername: inputsFactory({
             validations: (currentInputValue: string) => [
                 {
-                    coditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !currentInputValue.match(/.{6,}/),
                     message: '',
                 },
                 {
-                    coditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
+                    conditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
                     message: '',
                 },
             ],

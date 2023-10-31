@@ -9,13 +9,13 @@ export default function useValidate() {
         return isValid;
     }
 
-    function validateSingle<T extends string>(
+    async function validateSingle<T extends string>(
         input: ValidateInputType<T>,
         inputs?: InputsToValidateType<T>,
     ) {
         validate(input, inputs);
-        if (!input.crossfield || !inputs) return input;
-        crossfieldValidate(inputs[input.crossfield], inputs);
+        crossfieldValidate(input, inputs);
+        await asyncValidate(input, inputs);
         return input;
     }
 
@@ -28,43 +28,47 @@ export default function useValidate() {
 
         if (required && !value) {
             onCheckRequired(input);
-            return input;
+            return;
         }
-        if (!validations) return input;
+        if (!validations) return;
         validations(value, inputs && inputs).forEach(
-            ({ coditional, message }) => {
-                if (coditional) {
-                    newErrors.push(message);
-                }
+            ({ conditional, message }) => {
+                if (conditional) newErrors.push(message);
             },
         );
         input.errors = [...newErrors];
-        return input;
+    }
+
+    async function asyncValidate<T extends string>(
+        input: ValidateInputType<T>,
+        inputs?: InputsToValidateType<T>,
+    ) {
+        if (input.errors.length > 0) return;
+        await asyncronizedValidate(input, inputs);
     }
 
     function crossfieldValidate<T extends string>(
         input: ValidateInputType<T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        const { value, validations, required } = input;
+        if (!input.crossfield || !inputs) return;
+        if (!inputs[input.crossfield].value) return;
+        validate(inputs[input.crossfield], inputs);
+    }
+
+    async function asyncronizedValidate<T extends string>(
+        input: ValidateInputType<T>,
+        inputs?: InputsToValidateType<T>,
+    ) {
+        const { value, asyncValidations } = input;
         const newErrors: string[] = [];
-
-        if (!value) return input;
-
-        if (required && !value) {
-            onCheckRequired(input);
-            return input;
-        }
-        if (!validations) return input;
-        validations(value, inputs && inputs).forEach(
-            ({ coditional, message }) => {
-                if (coditional) {
-                    newErrors.push(message);
-                }
+        if (!asyncValidations) return;
+        (await asyncValidations(value, inputs && inputs)).forEach(
+            ({ conditional, message }) => {
+                if (conditional) newErrors.push(message);
             },
         );
         input.errors = [...newErrors];
-        return input;
     }
 
     function onCheckRequired<T extends string>(input: ValidateInputType<T>) {

@@ -5,7 +5,6 @@ import { UserProvider } from '@/context/UserContext';
 
 export default function App({ Component, pageProps }: AppProps) {
     if (pageProps.statusCode === 404) return <Component {...pageProps} />;
-
     return (
         <>
             <div className="o-app">
