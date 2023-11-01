@@ -9,13 +9,22 @@ export default function useValidate() {
         return isValid;
     }
 
-    async function validateSingle<T extends string>(
+    async function asyncValidateSingle<T extends string>(
         input: ValidateInputType<T>,
         inputs?: InputsToValidateType<T>,
     ) {
         validate(input, inputs);
         crossfieldValidate(input, inputs);
         await asyncValidate(input, inputs);
+        return input;
+    }
+
+    function validateSingle<T extends string>(
+        input: ValidateInputType<T>,
+        inputs?: InputsToValidateType<T>,
+    ) {
+        validate(input, inputs);
+        crossfieldValidate(input, inputs);
         return input;
     }
 
@@ -39,21 +48,24 @@ export default function useValidate() {
         input.errors = [...newErrors];
     }
 
+    function crossfieldValidate<T extends string>(
+        input: ValidateInputType<T>,
+        inputs?: InputsToValidateType<T>,
+    ) {
+        if (!input.crossfields || !inputs) return;
+        if (input.crossfields.length === 0) return;
+        input.crossfields.forEach((crossInput) => {
+            if (!inputs[crossInput].value) return;
+            validate(inputs[crossInput], inputs);
+        });
+    }
+
     async function asyncValidate<T extends string>(
         input: ValidateInputType<T>,
         inputs?: InputsToValidateType<T>,
     ) {
         if (input.errors.length > 0) return;
         await asyncronizedValidate(input, inputs);
-    }
-
-    function crossfieldValidate<T extends string>(
-        input: ValidateInputType<T>,
-        inputs?: InputsToValidateType<T>,
-    ) {
-        if (!input.crossfield || !inputs) return;
-        if (!inputs[input.crossfield].value) return;
-        validate(inputs[input.crossfield], inputs);
     }
 
     async function asyncronizedValidate<T extends string>(
@@ -77,5 +89,5 @@ export default function useValidate() {
         input.errors.push(conditional);
     }
 
-    return { validateSingle, validateMany };
+    return { validateSingle, asyncValidateSingle, validateMany };
 }

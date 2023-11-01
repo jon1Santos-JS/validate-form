@@ -6,26 +6,25 @@ import { useUser } from '../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
 const API = 'api/changeUsername';
 
-const DEFAULT_MESSAGE = 'Invalid username';
-
 type InputsType = 'newUsername';
 
 export default function ChangeUsernameForm() {
     const router = useRouter();
     const { user } = useUser();
-    const { validateSingle, validateMany } = useValidate();
-    const { onSetTimeOut, inputsFactory, inputStateFactory } =
-        useInputHandler();
-    const [showMessage, onShowMessage] = useState<boolean>(false);
+    const { asyncValidateSingle, validateMany } = useValidate();
+    const { onSetTimeOut, inputsFactory, onCheckUsername } = useInputHandler();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        newUsername: inputStateFactory({
-            onShowInputMessage,
-            onHighlightInput,
-        }),
+        newUsername: { showInputMessage: false, highlightInput: false },
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         newUsername: inputsFactory({
+            asyncValidations: async (currentInputValue: string) => [
+                {
+                    conditional: await onCheckUsername(currentInputValue),
+                    message: 'This username already exist',
+                },
+            ],
             validations: (currentInputValue: string) => [
                 {
                     conditional: !currentInputValue.match(/.{6,}/),
@@ -68,7 +67,6 @@ export default function ChangeUsernameForm() {
                             }}
                         />
                     </div>
-                    {renderError()}
                     <div>
                         <button
                             key={'submitButton'}
@@ -83,48 +81,24 @@ export default function ChangeUsernameForm() {
         );
     }
 
-    function onChange(
-        e: React.ChangeEvent<HTMLInputElement>,
-        name: keyof typeof inputs,
-    ) {
+    function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
+        handleButtonClick(false);
         setInputs((prev) => ({
             ...prev,
-            [name]: { ...prev[name], value: e.target.value },
+            [key]: { ...prev[key], value: e.target.value },
         }));
-        setInputs((prev) => ({
-            ...prev,
-            [name]: validateSingle({ ...prev[name] }),
-        }));
-    }
-
-    function onShowInputMessage(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                showInputMessage: value,
-            },
-        }));
-    }
-
-    function onHighlightInput(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                highlightInput: value,
-            },
-        }));
-    }
-
-    function renderError() {
-        if (!showMessage) return <div className="form-error-message"></div>;
-        return <div className="form-error-message">{DEFAULT_MESSAGE}</div>;
+        onSetTimeOut(async () => {
+            const validatedInput = await asyncValidateSingle({
+                ...inputs[key],
+                value: e.target.value,
+            });
+            setInputs((prev) => ({ ...prev, [key]: validatedInput }));
+            handleButtonClick(true);
+        }, 950);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (showMessage) return; // WAITING THE MESSAGE GOES DOWN TO REQUEST
         if (!isClickable) return;
         if (!validateMany(inputs)) {
             setInputState((prev) => ({
@@ -135,13 +109,20 @@ export default function ChangeUsernameForm() {
                     showInputMessage: true,
                 },
             }));
-            onShowMessage(true);
-            onSetTimeOut(() => onShowMessage(false), 2750);
             return;
         }
-        handleButtonClick(true);
-        await onSubmitInputs();
         handleButtonClick(false);
+        onHandleResponse(await onSubmitInputs());
+        handleButtonClick(true);
+    }
+
+    function onHandleResponse(response: ServerResponse) {
+        if (!response.serverResponse) return;
+        setInputState((prev) => ({
+            ...prev,
+            newUsername: { ...prev.newUsername, showInputMessage: true },
+        }));
+        router.reload();
     }
 
     async function onSubmitInputs() {
@@ -156,15 +137,6 @@ export default function ChangeUsernameForm() {
         };
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
-        if (!parsedResponse.serverResponse) {
-            return parsedResponse.body as string;
-        }
-
-        setInputState((prev) => ({
-            ...prev,
-            newUsername: { ...prev.newUsername, showInputMessage: true },
-        }));
-        onShowMessage(false);
-        router.reload();
+        return parsedResponse;
     }
 }

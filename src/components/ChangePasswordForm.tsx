@@ -13,21 +13,12 @@ export default function ChangePasswordForm() {
     const router = useRouter();
     const { user } = useUser();
     const { validateSingle, validateMany } = useValidate();
-    const { omitFields, inputsFactory, inputStateFactory } = useInputHandler();
+    const { omitFields, inputsFactory, onSetTimeOut } = useInputHandler();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        password: inputStateFactory({
-            onShowInputMessage: onShowInputMessage,
-            onHighlightInput: onHighlightInput,
-        }),
-        newPassword: inputStateFactory({
-            onShowInputMessage: onShowInputMessage,
-            onHighlightInput: onHighlightInput,
-        }),
-        confirmNewPassword: inputStateFactory({
-            onShowInputMessage: onShowInputMessage,
-            onHighlightInput: onHighlightInput,
-        }),
+        password: { showInputMessage: false, highlightInput: false },
+        newPassword: { showInputMessage: false, highlightInput: false },
+        confirmNewPassword: { showInputMessage: false, highlightInput: false },
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         password: inputsFactory({
@@ -49,16 +40,15 @@ export default function ChangePasswordForm() {
                     conditional: currentInputValue === inputs?.password.value,
                     message:
                         'This field have to be different than the password',
-                    crossfield: 'password',
                 },
                 {
                     conditional:
                         currentInputValue !== inputs?.confirmNewPassword.value,
                     message:
                         'This field has to be equal to the confirm new password',
-                    crossfield: 'confirmNewPassword',
                 },
             ],
+            crossfields: ['password', 'confirmNewPassword'],
             required: true,
         }),
         confirmNewPassword: inputsFactory({
@@ -67,9 +57,9 @@ export default function ChangePasswordForm() {
                     conditional:
                         currentInputValue !== hookInputs?.newPassword.value,
                     message: 'This field has to be equal to the new password',
-                    crossfield: 'newPassword',
                 },
             ],
+            crossfields: ['newPassword'],
             required: true,
         }),
     });
@@ -144,43 +134,32 @@ export default function ChangePasswordForm() {
             ...prev,
             [key]: { ...prev[key], value: e.target.value },
         }));
-        setInputs((prev) => ({
-            ...prev,
-            [key]: validateSingle({ ...prev[key] }, prev),
-        }));
-    }
-
-    function onShowInputMessage(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                showInputMessage: value,
-            },
-        }));
-    }
-
-    function onHighlightInput(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                highlightInput: value,
-            },
-        }));
+        onSetTimeOut(() => {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: validateSingle({ ...prev[key] }, prev),
+            }));
+        }, 950);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (!isClickable) return;
-        if (validateMany(inputs)) {
+        if (!validateMany(inputs)) {
             onHilightInputs(true);
             onShowInputsMessages(true);
             return;
         }
-        handleButtonClick(true);
-        await onSubmitInputs();
         handleButtonClick(false);
+        onHandleResponse(await onSubmitInputs());
+        handleButtonClick(true);
+    }
+
+    function onHandleResponse(response: ServerResponse) {
+        if (!response.serverResponse) return;
+        onHilightInputs(true);
+        onShowInputsMessages(true);
+        router.reload();
     }
 
     async function onSubmitInputs() {
@@ -195,10 +174,7 @@ export default function ChangePasswordForm() {
         };
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
-        if (!parsedResponse.serverResponse) return;
-        onHilightInputs(true);
-        onShowInputsMessages(true);
-        router.reload();
+        return parsedResponse;
     }
 
     function onHilightInputs(value: boolean) {

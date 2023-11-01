@@ -23,8 +23,9 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const {
         userState: { hasUser },
     } = useUser();
-    const { validateSingle, validateMany } = useValidate();
-    const { omitFields, onSetTimeOut, inputsFactory } = useInputHandler();
+    const { validateSingle, asyncValidateSingle, validateMany } = useValidate();
+    const { omitFields, onSetTimeOut, inputsFactory, onCheckUsername } =
+        useInputHandler();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
@@ -65,7 +66,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 },
             ],
             required: REQUIRED_MESSAGE,
-            crossfield: 'confirmPassword',
+            crossfields: ['confirmPassword'],
         }),
         confirmPassword: inputsFactory({
             validations: (currentInputValue, inputs) => [
@@ -75,7 +76,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 },
             ],
             required: REQUIRED_MESSAGE,
-            crossfield: 'password',
+            crossfields: ['password'],
         }),
     });
 
@@ -90,7 +91,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         ownProps={{
                             label: 'Username',
                             inputType: 'text',
-                            onChange: (e) => onChange(e, 'username'),
+                            onChange: (e) => onChangeUsernameInput(e),
                         }}
                         inputStateProps={{
                             input: inputs.username,
@@ -146,15 +147,6 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             ...prev,
             [key]: { ...prev[key], value: e.target.value },
         }));
-        onSetTimeOut(async () => {
-            const input = { ...inputs[key], value: e.target.value };
-            const currentInputs = {
-                ...inputs,
-                [key]: input,
-            };
-            const validateInput = await validateSingle(input, currentInputs);
-            setInputs((prev) => ({ ...prev, [key]: validateInput }));
-        }, 950);
         setInputState((prev) => ({
             ...prev,
             [key]: {
@@ -163,6 +155,43 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 highlightInput: true,
             },
         }));
+        onSetTimeOut(() => {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: validateSingle(prev[key], prev),
+            }));
+        }, 950);
+    }
+
+    async function onChangeUsernameInput(
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) {
+        handleButtonClick(false);
+        setInputs((prev) => ({
+            ...prev,
+            username: { ...prev.username, value: e.target.value },
+        }));
+        setInputState((prev) => ({
+            ...prev,
+            username: {
+                ...prev.username,
+                showInputMessage: true,
+                highlightInput: true,
+            },
+        }));
+        onSetTimeOut(async () => {
+            const input = { ...inputs.username, value: e.target.value };
+            const currentInputs = {
+                ...inputs,
+                username: input,
+            };
+            const validateInput = await asyncValidateSingle(
+                input,
+                currentInputs,
+            );
+            setInputs((prev) => ({ ...prev, username: validateInput }));
+            handleButtonClick(true);
+        }, 950);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -205,13 +234,6 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             return;
         }
         window.location.assign('/dashboard-page');
-    }
-
-    async function onCheckUsername(username: string) {
-        const options = { method: 'POST', body: username };
-        const response = await fetch('api/checkUsername', options);
-        const parsedResponse: ServerResponse = await response.json();
-        return parsedResponse.serverResponse;
     }
 
     function onHilightInputs(value: boolean) {

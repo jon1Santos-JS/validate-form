@@ -6,7 +6,7 @@ export default function PerfilImage() {
         user: { userImage },
         userState: { isUserStateLoading },
         isUserImageLoading,
-        onLoadUserImage,
+        setUserImageLoader,
     } = useUser();
 
     return <>{renderImage()}</>;
@@ -45,6 +45,6 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        onLoadUserImage(false);
+        setUserImageLoader(false);
     }
 }

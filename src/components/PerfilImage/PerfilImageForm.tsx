@@ -13,18 +13,16 @@ type InputsType = 'imageInput';
 export default function PerfilImageForm() {
     const {
         user: { username, setUserimage },
-        onLoadUserImage,
+        setUserImageLoader,
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
     const { handledName, onCheckExtensions } = useString();
-    const { inputsFactory, inputStateFactory } = useInputHandler();
+    const { inputsFactory } = useInputHandler();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        imageInput: inputStateFactory({
-            onShowInputMessage,
-            onHighlightInput,
-        }),
+        imageInput: { showInputMessage: false, highlightInput: false },
     });
+
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         imageInput: inputsFactory({
             validations: (currentInputValue: string) => [
@@ -76,44 +74,18 @@ export default function PerfilImageForm() {
         </>
     );
 
-    function onChange(
+    async function onChange(
         e: React.ChangeEvent<HTMLInputElement>,
-        key: keyof typeof inputs,
+        key: InputsType,
     ) {
+        const input = { ...inputs[key], value: e.target.value };
+        const currentInputs = { ...inputs, [key]: input };
+        const validateInput = validateSingle(input, currentInputs);
         setInputs((prev) => ({
             ...prev,
             [key]: {
-                ...prev[key],
-                value: e.target.value,
+                ...validateInput,
                 files: e.target.files,
-            },
-        }));
-        setInputs((prev) => ({
-            ...prev,
-            [key]: validateSingle({ ...prev[key] }),
-        }));
-        setInputState((prev) => ({
-            ...prev,
-            imageInput: { ...prev.imageInput, highlightInput: false },
-        }));
-    }
-
-    function onShowInputMessage(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                showInputMessage: value,
-            },
-        }));
-    }
-
-    function onHighlightInput(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                highlightInput: value,
             },
         }));
     }
@@ -122,23 +94,47 @@ export default function PerfilImageForm() {
         e.preventDefault();
         if (!isClickable) return;
         if (!validateMany(inputs)) {
-            inputState.imageInput.onShowInputMessage(true, 'imageInput');
+            setInputState((prev) => ({
+                ...prev,
+                imageInput: { ...prev.imageInput, showInputMessage: true },
+            }));
             return;
         }
         handleButtonClick(false);
-        onLoadUserImage(true);
-        const response = await onSubmitInputs();
-        if (response) setUserimage(response);
+        setUserImageLoader(true);
+        await onHandleApiResponses();
+        handleButtonClick(true);
+    }
+
+    async function onHandleApiResponses() {
+        const files = inputs.imageInput.files;
+        const APIResponse = await onSubmitImageToImageBB(files);
+        if (!APIResponse) {
+            setInputState((prev) => ({
+                ...prev,
+                imageInput: { ...prev.imageInput, showInputMessage: true },
+            }));
+            return;
+        }
+        const imgUrl = APIResponse.data.url;
+        const DBResponse = await onSubmitImageToDB(username, imgUrl);
+        if (!DBResponse) {
+            setInputState((prev) => ({
+                ...prev,
+                imageInput: { ...prev.imageInput, showInputMessage: true },
+            }));
+            return;
+        }
+        setUserimage(imgUrl);
         setInputs((prev) => ({
             ...prev,
             imageInput: { ...prev.imageInput, files: null, value: '' },
         }));
-        handleButtonClick(true);
     }
-    // IMAGE THIRTY PARTY API
-    async function onSubmitInputs() {
-        if (!inputs.imageInput.files) return;
-        const file = inputs.imageInput.files[0];
+
+    async function onSubmitImageToImageBB(files: FileList | undefined | null) {
+        if (!files) return;
+        const file = files[0];
         const fileName = handledName(file.name);
         const formData = new FormData(); // multipart/form-data format to send to API;
         formData.append('image', file, fileName);
@@ -146,23 +142,17 @@ export default function PerfilImageForm() {
             method: 'POST',
             body: formData,
         };
-        const imgApiResponse = await fetch(
+        const response = await fetch(
             process.env.NEXT_PUBLIC_IMGBB_API_LINK as string,
             fetchOptions,
         );
-        if (!imgApiResponse.ok) return;
-        const image: ImgBBResponseType = await imgApiResponse.json();
-        await onUpdateUserImageDB(image.data.url);
-        setInputState((prev) => ({
-            ...prev,
-            imageInput: { ...prev.imageInput, showInputMessage: true },
-        }));
-        return image.data.url;
+        const parsedResponse: ImgBBResponseType = await response.json();
+        return parsedResponse;
     }
-    // IMAGE LOCAL API
-    async function onUpdateUserImageDB(img: string) {
+
+    async function onSubmitImageToDB(name: string, img: string) {
         const handledUser = {
-            userName: username,
+            userName: name,
             userImg: img,
         };
         const options: FetchOptionsType = {
@@ -170,6 +160,8 @@ export default function PerfilImageForm() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledUser),
         };
-        await fetch(API, options);
+        const response = await fetch(API, options);
+        const parsedResponse: ServerResponse = await response.json();
+        return parsedResponse.serverResponse;
     }
 }

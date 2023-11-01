@@ -16,19 +16,12 @@ export default function SignInForm() {
         userState: { setHasUser, hasUser, setUserStateLoading },
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
-    const { omitFields, onSetTimeOut, inputsFactory, inputStateFactory } =
-        useInputHandler();
+    const { omitFields, onSetTimeOut, inputsFactory } = useInputHandler();
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
-        username: inputStateFactory({
-            onShowInputMessage,
-            onHighlightInput,
-        }),
-        password: inputStateFactory({
-            onShowInputMessage,
-            onHighlightInput,
-        }),
+        username: { showInputMessage: false, highlightInput: false },
+        password: { showInputMessage: false, highlightInput: false },
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: inputsFactory({
@@ -126,26 +119,6 @@ export default function SignInForm() {
         }));
     }
 
-    function onShowInputMessage(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                showInputMessage: value,
-            },
-        }));
-    }
-
-    function onHighlightInput(value: boolean, key: InputsType) {
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                highlightInput: value,
-            },
-        }));
-    }
-
     function renderError() {
         if (!showMessage) return <div className="form-error-message"></div>;
         return <div className="form-error-message">{DEFAULT_MESSAGE}</div>;
@@ -166,8 +139,23 @@ export default function SignInForm() {
             return;
         }
         handleButtonClick(false);
-        await onSubmitInputs();
+        onHandledResponse(await onSubmitInputs());
         handleButtonClick(true);
+    }
+
+    function onHandledResponse(response: ServerResponse) {
+        setUserStateLoading(false);
+        setHasUser(response.serverResponse);
+        if (!response.serverResponse) {
+            onShowMessage(true);
+            onHilightInputs(true);
+            onSetTimeOut(() => {
+                onShowMessage(false);
+                onHilightInputs(false);
+            }, 2750);
+            return;
+        }
+        user.setUsername(response.body as string);
     }
 
     async function onSubmitInputs() {
@@ -178,18 +166,7 @@ export default function SignInForm() {
         };
         const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
-        setUserStateLoading(false);
-        setHasUser(parsedResponse.serverResponse);
-        if (!parsedResponse.serverResponse) {
-            onShowMessage(true);
-            onHilightInputs(true);
-            onSetTimeOut(() => {
-                onShowMessage(false);
-                onHilightInputs(false);
-            }, 2750);
-            return;
-        }
-        user.setUsername(parsedResponse.body as string);
+        return parsedResponse;
     }
 
     function onHilightInputs(value: boolean) {

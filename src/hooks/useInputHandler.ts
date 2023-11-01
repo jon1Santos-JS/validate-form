@@ -6,8 +6,8 @@ export const FIELDS_TO_OMIT: (
     | 'validations'
     | 'asyncValidations'
     | 'required'
-    | 'crossfield'
-)[] = ['errors', 'asyncValidations', 'validations', 'required', 'crossfield'];
+    | 'crossfields'
+)[] = ['errors', 'asyncValidations', 'validations', 'required', 'crossfields'];
 
 export default function useInputHandler() {
     const [timeoutToClear, onSetTimeoutToClear] =
@@ -40,17 +40,24 @@ export default function useInputHandler() {
         return handleInputs;
     }
 
+    async function onCheckUsername(username: string) {
+        const options = { method: 'POST', body: username };
+        const response = await fetch('api/checkUsername', options);
+        const parsedResponse: ServerResponse = await response.json();
+        return parsedResponse.serverResponse;
+    }
+
     function inputsFactory<T extends string, G extends T>({
         asyncValidations,
         validations,
         required,
-        crossfield,
+        crossfields,
         files,
     }: {
         asyncValidations?: AsyncValidateFunctionType<T>;
         validations?: ValidateFunctionType<T>;
         required?: string | boolean;
-        crossfield?: G;
+        crossfields?: G[];
         files?: FileList | null;
     }): ValidateInputType<T> {
         return {
@@ -59,23 +66,8 @@ export default function useInputHandler() {
             value: '',
             errors: [],
             required,
-            crossfield,
+            crossfields,
             files,
-        };
-    }
-
-    function inputStateFactory<T extends string>({
-        onShowInputMessage,
-        onHighlightInput,
-    }: {
-        onShowInputMessage: (value: boolean, key: T) => void;
-        onHighlightInput: (value: boolean, key: T) => void;
-    }) {
-        return {
-            showInputMessage: false,
-            highlightInput: false,
-            onShowInputMessage,
-            onHighlightInput,
         };
     }
 
@@ -83,6 +75,6 @@ export default function useInputHandler() {
         omitFields,
         onSetTimeOut,
         inputsFactory,
-        inputStateFactory,
+        onCheckUsername,
     };
 }

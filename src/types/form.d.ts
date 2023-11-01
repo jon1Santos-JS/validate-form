@@ -11,7 +11,7 @@ declare interface ValidateInputType<T extends string> {
     validations?: ValidateFunctionType<T>;
     errors: string[];
     value: string;
-    crossfield?: T;
+    crossfields?: T[];
     files?: FileList | null;
     required?: string | boolean;
 }
