@@ -26,7 +26,6 @@ export default function Input<T extends string>({
     const { value, errors } = input;
     const { showInputMessage, highlightInput } = inputState;
     const highlightConditional = errors.length > 0;
-
     return (
         <div className="field">
             {label ? (

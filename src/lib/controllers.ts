@@ -44,18 +44,6 @@ export async function checkUsernameController(username: string) {
     return { serverResponse: true, body: response };
 }
 
-export async function changePasswordController(
-    userAccount: ChangePasswordFromClientType,
-) {
-    const accountHandler = new MiniDBAccountHandler();
-    const response = await accountHandler.updatePassword(userAccount);
-    if (typeof response === 'string') {
-        console.log('controller error to change user password: ', response);
-        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
-    }
-    return { serverResponse: true, body: 'Account has been changed' };
-}
-
 export async function changeUsernameController(
     user: ChangeUsernameFromClientType,
 ) {
@@ -68,24 +56,39 @@ export async function changeUsernameController(
     return { serverResponse: true, body: response };
 }
 
+export async function changePasswordController(
+    userAccount: ChangePasswordFromClientType,
+) {
+    const accountHandler = new MiniDBAccountHandler();
+    const response = await accountHandler.updatePassword(userAccount);
+    if (typeof response === 'string') {
+        console.log('controller error to change user password: ', response);
+        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
+    }
+    return { serverResponse: true, body: 'Account has been changed' };
+}
+
 export async function changeUserImgController(user: UserWithImgType) {
     const accountHandler = new MiniDBAccountHandler();
     const response = await accountHandler.updateUserImage(user);
     if (typeof response === 'string') {
         console.log('controller error to change user image: ', response);
         return {
-            serverResponse: false,
-            body: 'Error when try to update the image',
-        };
+            success: false,
+            data: response,
+        } as ImageUpdateServerResponse;
     }
-    return { serverResponse: true, body: 'User image has been updated' };
+    return {
+        success: true,
+        data: response,
+    } as ImageUpdateServerResponse;
 }
 
 export async function deleteAccountController(username: string) {
     const accountHandler = new MiniDBAccountHandler();
     const response = await accountHandler.excludeUserAccount(username);
     if (typeof response === 'string') {
-        console.log('controller error to exclude user account: ', response);
+        console.log('controller error to delete user account: ', response);
         return {
             serverResponse: false,
             body: 'Error when try to delete user account',
@@ -106,7 +109,7 @@ export async function resetDBController(username: string) {
         console.log('controller error to reset Database: ', response);
         return {
             serverResponse: false,
-            body: SERVER_ERROR_RESPONSE,
+            body: response,
         };
     }
     return { serverResponse: true, body: 'Database has been reseted' };

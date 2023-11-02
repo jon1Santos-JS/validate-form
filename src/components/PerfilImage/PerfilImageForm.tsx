@@ -100,39 +100,14 @@ export default function PerfilImageForm() {
             }));
             return;
         }
-        handleButtonClick(false);
         setUserImageLoader(true);
-        await onHandleApiResponses();
+        handleButtonClick(false);
+        const APIResponse = await onSubmitImageToAPI(inputs.imageInput.files);
+        await onHandleAPIResponse(APIResponse);
         handleButtonClick(true);
     }
 
-    async function onHandleApiResponses() {
-        const files = inputs.imageInput.files;
-        const APIResponse = await onSubmitImageToImageBB(files);
-        if (!APIResponse) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
-            return;
-        }
-        const imgUrl = APIResponse.data.url;
-        const DBResponse = await onSubmitImageToDB(username, imgUrl);
-        if (!DBResponse) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
-            return;
-        }
-        setUserimage(imgUrl);
-        setInputs((prev) => ({
-            ...prev,
-            imageInput: { ...prev.imageInput, files: null, value: '' },
-        }));
-    }
-
-    async function onSubmitImageToImageBB(files: FileList | undefined | null) {
+    async function onSubmitImageToAPI(files: FileList | undefined | null) {
         if (!files) return;
         const file = files[0];
         const fileName = handledName(file.name);
@@ -146,14 +121,26 @@ export default function PerfilImageForm() {
             process.env.NEXT_PUBLIC_IMGBB_API_LINK as string,
             fetchOptions,
         );
-        const parsedResponse: ImgBBResponseType = await response.json();
+        const parsedResponse: ImgBBResponse = await response.json();
         return parsedResponse;
     }
 
-    async function onSubmitImageToDB(name: string, img: string) {
+    async function onHandleAPIResponse(response: ImgBBResponse | undefined) {
+        if (!response || !response.success) {
+            setInputState((prev) => ({
+                ...prev,
+                imageInput: { ...prev.imageInput, showInputMessage: true },
+            }));
+            return;
+        }
+        const DBResponse = await onSubmitImageToDB(username, response);
+        onHandleDBResponse(DBResponse);
+    }
+
+    async function onSubmitImageToDB(name: string, APIResponse: ImgBBResponse) {
         const handledUser = {
             userName: name,
-            userImg: img,
+            userImg: APIResponse.data.url,
         };
         const options: FetchOptionsType = {
             method: 'POST',
@@ -161,7 +148,24 @@ export default function PerfilImageForm() {
             body: JSON.stringify(handledUser),
         };
         const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
-        return parsedResponse.serverResponse;
+        const parsedResponse: ImageUpdateServerResponse = await response.json();
+        return parsedResponse;
+    }
+
+    function onHandleDBResponse(
+        response: ImageUpdateServerResponse | undefined,
+    ) {
+        if (!response || !response.success) {
+            setInputState((prev) => ({
+                ...prev,
+                imageInput: { ...prev.imageInput, showInputMessage: true },
+            }));
+            return;
+        }
+        setUserimage(response.data.userImg);
+        setInputs((prev) => ({
+            ...prev,
+            imageInput: { ...prev.imageInput, files: null, value: '' },
+        }));
     }
 }

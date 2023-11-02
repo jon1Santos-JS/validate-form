@@ -25,7 +25,7 @@ export default async function handler(
                 usersFromDB,
             );
             if (!hashResponse.serverResponse)
-                return res.status(500).json(hashResponse);
+                return res.status(401).json(hashResponse);
             return res.status(200).json(hashResponse);
         }
         case 'POST': {

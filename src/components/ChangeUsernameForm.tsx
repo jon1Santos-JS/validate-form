@@ -27,6 +27,10 @@ export default function ChangeUsernameForm() {
             ],
             validations: (currentInputValue: string) => [
                 {
+                    conditional: currentInputValue === user.username,
+                    message: 'This is your currently username',
+                },
+                {
                     conditional: !currentInputValue.match(/.{6,}/),
                     message: '',
                 },
