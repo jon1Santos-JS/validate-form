@@ -13,7 +13,7 @@ export default async function handler(
             cookies.set(USER_HASH_NAME);
             const user: UserFromClient = req.body;
             const controllerResponse = await signUpController(user);
-            if (!controllerResponse.serverResponse)
+            if (!controllerResponse.success)
                 return res.status(500).json(controllerResponse);
             return res.status(200).json(controllerResponse);
         }

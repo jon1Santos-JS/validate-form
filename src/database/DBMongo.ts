@@ -14,13 +14,13 @@ export class MongoDB {
         try {
             await MONGODB.connect();
             console.log('Connected to MongoDB by:', caller);
-            return { success: true } as DBResponse;
+            return { success: true } as DBDefaultResponse;
         } catch {
             console.log('Failed to connect to MongoDB by:', caller);
             return {
                 success: false,
                 data: DEFAULT_ERROR,
-            } as DBResponse;
+            } as DBDefaultResponse;
         }
     }
     async accessState(caller: string) {
@@ -37,7 +37,7 @@ export class MongoDB {
             DATABASE.state = DBState;
             console.log('MongoDB state has been accessed by:', caller);
             await MONGODB.close();
-            return { success: true } as DBResponse;
+            return { success: true } as DBDefaultResponse;
         } catch {
             console.log('Failed to access MongoDB state by:', caller);
             return this.createState('access mongoDB state');
@@ -55,10 +55,10 @@ export class MongoDB {
             };
             await collection.updateOne({}, update);
             console.log('MongoDB state has been refreshed by:', caller);
-            return { success: true } as DBResponse;
+            return { success: true } as DBDefaultResponse;
         } catch {
             console.log('failed to refresh MongoDB state by:', caller);
-            return { success: false, data: DEFAULT_ERROR } as DBResponse;
+            return { success: false, data: DEFAULT_ERROR } as DBDefaultResponse;
         } finally {
             await MONGODB.close();
         }
@@ -72,10 +72,10 @@ export class MongoDB {
             };
             await collection.insertMany([initialState]);
             console.log('MongoDB state has been created by:', caller);
-            return { success: true } as DBResponse;
+            return { success: true } as DBDefaultResponse;
         } catch {
             console.log('failed to create MongoDB state by:', caller);
-            return { success: false, data: DEFAULT_ERROR } as DBResponse;
+            return { success: false, data: DEFAULT_ERROR } as DBDefaultResponse;
         } finally {
             await MONGODB.close();
         }

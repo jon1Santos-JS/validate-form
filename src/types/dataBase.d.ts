@@ -24,13 +24,22 @@ declare type HandleDBCommand =
     | 'checkDBState'
     | 'refreshDB';
 
-declare type DBResponse =
-    | {
-          success: false;
-          data: string;
-      }
+declare type DBFailedResponse = {
+    success: false;
+    data: string;
+};
+
+declare type DBDefaultResponse =
+    | DBFailedResponse
     | {
           success: true;
+      };
+
+declare type DBAuthResponse =
+    | DBFailedResponse
+    | {
+          success: true;
+          data: UserFromDataBase;
       };
 
 // DATA FROM CLIENT

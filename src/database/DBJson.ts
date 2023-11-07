@@ -9,7 +9,7 @@ export class JsonDB {
             const data = await readFileSync(MINI_DB_FILE_PATH_NAME, 'utf8');
             DATABASE.state = JSON.parse(data);
             console.log('Json Database has been accessed by:', caller);
-            return { success: true } as DBResponse;
+            return { success: true } as DBDefaultResponse;
         } catch {
             DATABASE.state = INITIAL_STATE;
             return await this.createState(caller);
@@ -20,13 +20,13 @@ export class JsonDB {
         try {
             await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
             console.log('Json DB has been refreshed by:', caller);
-            return { success: true } as DBResponse;
+            return { success: true } as DBDefaultResponse;
         } catch {
             console.log('failed to refresh Json DB by:', caller);
             return {
                 success: false,
                 data: DEFAULT_ERROR,
-            } as DBResponse;
+            } as DBDefaultResponse;
         }
     }
 
@@ -35,13 +35,13 @@ export class JsonDB {
         try {
             await writeFileSync(MINI_DB_FILE_PATH_NAME, json);
             console.log('Json DB has been created by:', caller);
-            return { success: true } as DBResponse;
+            return { success: true } as DBDefaultResponse;
         } catch {
             console.log('failed to create Json DB by:', caller);
             return {
                 success: false,
                 data: DEFAULT_ERROR,
-            } as DBResponse;
+            } as DBDefaultResponse;
         }
     }
 }

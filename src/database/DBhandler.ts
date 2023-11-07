@@ -11,7 +11,7 @@ export default class DBHandler {
         console.log('Database has been refreshed by:', caller);
         return {
             success: true,
-        } as DBResponse;
+        } as DBDefaultResponse;
     }
 
     async #checkDBState(caller: string) {
@@ -25,11 +25,11 @@ export default class DBHandler {
             return {
                 success: false,
                 data: 'Database limit account reached',
-            } as DBResponse;
+            } as DBDefaultResponse;
         }
         return {
             success: true,
-        } as DBResponse;
+        } as DBDefaultResponse;
     }
 
     async #resetDB(caller: string) {
@@ -39,7 +39,7 @@ export default class DBHandler {
         console.log('Database has been reset by:', caller);
         return {
             success: true,
-        } as DBResponse;
+        } as DBDefaultResponse;
     }
 
     async #getUsers(caller: string) {
@@ -49,7 +49,7 @@ export default class DBHandler {
         return {
             success: true,
             data: DATABASE.state.accounts,
-        } as DBResponse;
+        } as DBDefaultResponse;
     }
 
     async handleDB<T extends HandleDBCommand>(command: T, caller: string) {
@@ -70,7 +70,7 @@ export default class DBHandler {
                 return {
                     success: false,
                     data: DEFAULT_ERROR,
-                } as DBResponse;
+                } as DBDefaultResponse;
             }
         }
     }

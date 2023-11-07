@@ -20,37 +20,23 @@ export async function returnUserByHash(
     browserHash: string | undefined,
     users: UserFromDataBase[],
 ) {
+    const response = {
+        success: false,
+        data: HASH_DEFAULT_ERROR,
+    } as HashResponse;
     if (!browserHash) {
-        return {
-            serverResponse: false,
-            body: HASH_DEFAULT_ERROR,
-        };
+        return response;
     }
-    const validation = {
-        isValid: false,
-        user: { username: '', userImage: '' },
-        message: USER_HASH_ERROR,
-    };
-
     users.forEach((user) => {
         const userToCompare = {
             username: user.username,
             password: user.password,
         };
         if (compareSync(JSON.stringify(userToCompare), browserHash)) {
-            validation.user = {
-                username: user.username.value,
-                userImage: user.userImage,
-            };
-            validation.isValid = true;
+            response.success = true;
+            response.data = user;
         }
     });
-
-    const conditional = validation.isValid
-        ? validation.user
-        : validation.message;
-    return {
-        serverResponse: validation.isValid,
-        body: conditional,
-    };
+    if (!response.success) return { ...response, data: USER_HASH_ERROR };
+    return response;
 }
