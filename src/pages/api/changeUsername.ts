@@ -9,7 +9,7 @@ export default async function handler(
 ) {
     switch (req.method) {
         case 'POST': {
-            const userFromClient: ChangeUsernameFromClientType = req.body;
+            const userFromClient: ChangeUsernameFromClient = req.body;
             const controllerResponse = await changeUsernameController(
                 userFromClient,
             );

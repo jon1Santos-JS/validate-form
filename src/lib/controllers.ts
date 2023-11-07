@@ -1,65 +1,61 @@
-import MiniDBAccountHandler from '@/database/accountHandler';
-import { SERVER_ERROR_RESPONSE } from '@/database/miniDB';
-import MiniDBHandler from '@/database/miniDBHandler';
+import DBAccountHandler from '@/database/accountHandler';
+import { DEFAULT_ERROR } from '@/database/DB';
+import DBHandler from '@/database/DBhandler';
 
 export async function getUserStateController() {
-    const jsonDB = new MiniDBHandler();
-    const response = await jsonDB.handleDB('getUsers')(
-        'getUsersState controller',
-    );
+    const DB = new DBHandler();
+    const response = await DB.handleDB('getUsers')('getUsersState controller');
     if (typeof response === 'string') {
         console.log('controller error to get users: ', response);
-        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
+        return { serverResponse: false, body: DEFAULT_ERROR };
     }
     return { serverResponse: true, body: response };
 }
 
-export async function signInController(userAccount: UserFromClientType) {
-    const accountHandler = new MiniDBAccountHandler();
+export async function signInController(userAccount: UserFromClient) {
+    const accountHandler = new DBAccountHandler();
     const response = await accountHandler.signIn(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to sign in user: ', response);
-        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
+        return { serverResponse: false, body: DEFAULT_ERROR };
     }
     return { serverResponse: true, body: userAccount.username.value };
 }
 
-export async function signUpController(userAccount: UserFromClientType) {
-    const accountHandler = new MiniDBAccountHandler();
+export async function signUpController(userAccount: UserFromClient) {
+    const accountHandler = new DBAccountHandler();
     const response = await accountHandler.signUp(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to sign up user: ', response);
-        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
+        return { serverResponse: false, body: DEFAULT_ERROR };
     }
     return { serverResponse: true, body: 'Account has been created' };
 }
 
 export async function checkUsernameController(username: string) {
-    const accountHandler = new MiniDBAccountHandler();
+    const accountHandler = new DBAccountHandler();
     const response = await accountHandler.checkUsername(username);
     if (!response) {
         console.log('controller error to check username: ', response);
-        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
+        return { serverResponse: false, body: DEFAULT_ERROR };
     }
     return { serverResponse: true, body: response };
 }
 
 export async function changePasswordController(
-    userAccount: ChangePasswordFromClientType,
+    userAccount: ChangePasswordFromClient,
 ) {
-    const accountHandler = new MiniDBAccountHandler();
+    const accountHandler = new DBAccountHandler();
     const response = await accountHandler.updatePassword(userAccount);
     if (typeof response === 'string') {
         console.log('controller error to change user password: ', response);
-        return { serverResponse: false, body: SERVER_ERROR_RESPONSE };
+        return { serverResponse: false, body: DEFAULT_ERROR };
     }
     return { serverResponse: true, body: 'Account has been changed' };
 }
 
-export async function changeUsernameController(
-    user: ChangeUsernameFromClientType,
-) {
-    const accountHandler = new MiniDBAccountHandler();
+export async function changeUsernameController(user: ChangeUsernameFromClient) {
+    const accountHandler = new DBAccountHandler();
     const response = await accountHandler.updateUsername(user);
     if (typeof response === 'string') {
         console.log('controller error to change username: ', response);
@@ -68,8 +64,8 @@ export async function changeUsernameController(
     return { serverResponse: true, body: response };
 }
 
-export async function changeUserImgController(user: UserWithImgType) {
-    const accountHandler = new MiniDBAccountHandler();
+export async function changeUserImgController(user: UserWithImg) {
+    const accountHandler = new DBAccountHandler();
     const response = await accountHandler.updateUserImage(user);
     if (typeof response === 'string') {
         console.log('controller error to change user image: ', response);
@@ -82,7 +78,7 @@ export async function changeUserImgController(user: UserWithImgType) {
 }
 
 export async function deleteAccountController(username: string) {
-    const accountHandler = new MiniDBAccountHandler();
+    const accountHandler = new DBAccountHandler();
     const response = await accountHandler.excludeUserAccount(username);
     if (typeof response === 'string') {
         console.log('controller error to exclude user account: ', response);
@@ -100,13 +96,13 @@ export async function resetDBController(username: string) {
             serverResponse: false,
             body: 'Permission denied',
         };
-    const DBHandler = new MiniDBHandler();
-    const response = await DBHandler.handleDB('resetDB')('resetDB controller');
+    const DB = new DBHandler();
+    const response = await DB.handleDB('resetDB')('resetDB controller');
     if (typeof response === 'string') {
         console.log('controller error to reset Database: ', response);
         return {
             serverResponse: false,
-            body: SERVER_ERROR_RESPONSE,
+            body: DEFAULT_ERROR,
         };
     }
     return { serverResponse: true, body: 'Database has been reseted' };

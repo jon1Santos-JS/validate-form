@@ -8,7 +8,7 @@ export default async function handler(
     switch (req.method) {
         case 'POST': {
             const response = await changeUserImgController(
-                req.body as UserWithImgType,
+                req.body as UserWithImg,
             );
             if (!response.serverResponse) return res.status(500).json(response);
             return res.status(200).json(response);

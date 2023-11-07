@@ -1,18 +1,24 @@
-import MiniDBAccountHandler from '@/database/accountHandler';
+import DBAccountHandler from '@/database/accountHandler';
+// import { MONGO_HANDLER } from './mongoAccess.test';
 
 const AMOUNT_OF_ACCOUNTS = 9;
 
-test('check signUp function', async () => {
+// beforeAll(async () => {
+//     await MONGO_HANDLER.connect('test');
+//     await MONGO_HANDLER.accessState('test');
+// });
+
+test('sign up', async () => {
     await testLoop(AMOUNT_OF_ACCOUNTS);
 });
 
-async function testLoop(limit: number) {
-    const DBAccountHandler = new MiniDBAccountHandler();
+export async function testLoop(limit: number) {
+    const DBAccountHandler = new DBAccountHandler();
     const account = {
         username: { value: randomString() },
         password: { value: randomString() },
     };
-    await expect(DBAccountHandler.signUp(account)).resolves.toBe(undefined);
+    await expect(DBAccountHandler.signUp(account)).resolve.toBe(undefined);
     limit--;
     if (limit === 0) return;
     testLoop(limit);

@@ -1,49 +1,53 @@
-declare interface MiniDBType<T> {
+declare type MiniDBType<T> = {
     state: MiniDBState<T>;
-}
+};
 
-declare interface MiniDBState<T> {
+declare type MiniDBState<T> = {
     _id: T;
-    accounts: UserFromDataBaseType[];
+    accounts: UserFromDataBase[];
     limit: number;
-}
+};
 
-declare interface UserFromDataBaseType {
+declare type UserFromDataBase = {
     ID: string;
-    constraint: ConstraintsType;
+    constraint: Constraints;
     username: { value: string };
     password: { value: string };
     userImage: string;
-}
+};
 
-declare type ConstraintsType = 'user' | 'admin';
+declare type Constraints = 'user' | 'admin';
 
-declare interface UserFromClientType {
-    username: { value: string };
-}
-
-declare interface UserFromClientType {
-    username: { value: string };
-    password: { value: string };
-}
-
-declare interface ChangeUsernameFromClientType {
-    username: { value: string };
-    newUsername: { value: string };
-}
-
-declare interface ChangePasswordFromClientType extends UserFromClientType {
-    newPassword: { value: string };
-}
-
-declare interface UserWithImgType {
-    userName: string;
-    userImg: string;
-}
-
-declare type HandleDBCommandTypes =
+declare type HandleDBCommand =
     | 'resetDB'
-    | 'createAndRefreshDB'
     | 'getUsers'
     | 'checkDBState'
-    | 'accessDB';
+    | 'refreshDB';
+
+declare type DBResponse =
+    | {
+          success: false;
+          data: string;
+      }
+    | {
+          success: true;
+      };
+
+// DATA FROM CLIENT
+
+declare type UserFromClient = {
+    username: { value: string };
+    password: { value: string };
+};
+
+declare type NewUsernameFromClient = {
+    value: string;
+};
+
+declare type NewPasswordFromClient = {
+    value: string;
+};
+
+declare type NewUserImage = {
+    value: string;
+};

@@ -1,7 +1,6 @@
-import { compareSync, genSaltSync, hashSync } from 'bcrypt-ts';
+import { hashSync, genSaltSync, compareSync } from 'bcrypt-ts';
 
 // Hash time stamp
-
 const HOUR = 1000 * 60 * 60;
 export const COOKIES_EXPIRES = new Date(Date.now() + HOUR * 2);
 
@@ -19,7 +18,7 @@ export function createHash<T>(value: T) {
 
 export async function returnUserByHash(
     browserHash: string | undefined,
-    users: UserFromDataBaseType[],
+    users: UserFromDataBase[],
 ) {
     if (!browserHash) {
         return {

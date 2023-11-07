@@ -29,7 +29,7 @@ export default async function handler(
             return res.status(200).json(hashResponse);
         }
         case 'POST': {
-            const user: UserFromClientType = req.body;
+            const user: UserFromClient = req.body;
             const controllerResponse = await signInController(user); //
             if (!controllerResponse.serverResponse)
                 return res.status(500).json(controllerResponse);

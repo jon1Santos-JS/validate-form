@@ -9,7 +9,7 @@ export default async function handler(
 ) {
     switch (req.method) {
         case 'POST': {
-            const user: ChangePasswordFromClientType = req.body;
+            const user: ChangePasswordFromClient = req.body;
             const controllerResponse = await changePasswordController(user);
             if (!controllerResponse.serverResponse) {
                 return res.status(500).json(controllerResponse);
