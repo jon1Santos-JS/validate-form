@@ -1,6 +1,8 @@
 import { onOmitProps } from '@/lib/lodashAdapter';
 import { useEffect, useState } from 'react';
 
+const API = 'api/checkUsername';
+
 export const FIELDS_TO_OMIT: (
     | 'errors'
     | 'validations'
@@ -42,7 +44,7 @@ export default function useInputHandler() {
 
     async function onCheckUsername(username: string) {
         const options = { method: 'POST', body: username };
-        const response = await fetch('api/checkUsername', options);
+        const response = await fetch(API, options);
         const parsedResponse: ServerResponse = await response.json();
         return parsedResponse.serverResponse;
     }

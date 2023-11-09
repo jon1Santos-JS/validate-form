@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
 import { useUser } from '../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
-const API = 'api/changeUsername';
+const API = 'api/updateUsername';
 
 type InputsType = 'newUsername';
 

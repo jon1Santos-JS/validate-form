@@ -1,4 +1,4 @@
-import { DATABASE } from '../DBState';
+import { DATABASE } from '../DBHandler/DBState';
 
 export default class UserAuthHandler {
     async authAccount(userAccount: UserFromClient) {
@@ -13,30 +13,28 @@ export default class UserAuthHandler {
             return {
                 success: false,
                 data: 'Account does not exist',
-            } as DBAuthResponse;
+            } as DBDefaultResponse;
         }
         return {
             success: true,
-            data: account,
-        } as DBAuthResponse;
+            data: 'Account does not exist',
+        } as DBDefaultResponse;
     }
 
-    async authUsername(userAccount: UserFromClient) {
+    async authUsername(username: string) {
         const account = DATABASE.state.accounts.find((DBAccount) =>
-            DBAccount.username.value === userAccount.username.value
-                ? DBAccount
-                : undefined,
+            DBAccount.username.value === username ? DBAccount : undefined,
         );
         if (!account) {
             console.log('Account does not exist');
             return {
                 success: false,
                 data: 'Account does not exist',
-            } as DBAuthResponse;
+            } as DBDefaultResponse;
         }
         return {
             success: true,
-            data: account,
-        } as DBAuthResponse;
+            data: 'Account does not exist',
+        } as DBDefaultResponse;
     }
 }

@@ -63,10 +63,8 @@ export default function DashBoardPage() {
         }
 
         async function onDeleteAccount() {
-            const body = username;
             const response = await fetch(HANDLE_DB_API, {
-                body: body,
-                method: 'POST',
+                method: 'GET',
             });
             const parsedResponse = await response.json();
             if (typeof parsedResponse === 'string') return;

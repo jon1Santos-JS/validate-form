@@ -1,24 +1,23 @@
-import type { NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import Cookies from 'cookies';
-import { signUpController } from '@/controllers/RegisterUserController';
-import { IncomingMessage } from 'http';
+import { deleteAccountController } from '@/controllers/DeleteUserController';
 import { USER_HASH_NAME } from '@/lib/cookies';
 
-interface NextApiRequest<T> extends IncomingMessage {
-    body: T;
-}
-
 export default async function handler(
-    req: NextApiRequest<UserFromClient>,
+    req: NextApiRequest,
     res: NextApiResponse,
 ) {
     const cookies = new Cookies(req, res);
     switch (req.method) {
-        case 'POST': {
-            cookies.set(USER_HASH_NAME);
-            const controllerResponse = await signUpController(req.body);
+        case 'GET': {
+            const browserHash = cookies.get(USER_HASH_NAME);
+            const controllerResponse = await deleteAccountController(
+                browserHash,
+            );
             if (!controllerResponse.success)
                 return res.status(500).json(controllerResponse);
+            cookies.set(USER_HASH_NAME);
             return res.status(200).json(controllerResponse);
         }
         default: {
@@ -28,11 +27,3 @@ export default async function handler(
         }
     }
 }
-
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '1mb',
-        },
-    },
-};

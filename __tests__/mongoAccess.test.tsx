@@ -1,4 +1,4 @@
-import { MONGO_HANDLER } from '@/database/DBhandler';
+import { MONGO_HANDLER } from '@/database/DBHandler/DBhandler';
 
 test('mongo connection', async () => {
     expect(await MONGO_HANDLER.connect('test')).toStrictEqual({

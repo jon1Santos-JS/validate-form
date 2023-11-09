@@ -1,5 +1,10 @@
-import { checkUsernameController } from '@/lib/controllers';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { checkUsernameController } from '@/controllers/AuthUserController';
+import { IncomingMessage } from 'http';
+import { NextApiResponse } from 'next';
+
+interface NextApiRequest extends IncomingMessage {
+    body: string;
+}
 
 export default async function handle(
     req: NextApiRequest,
@@ -7,12 +12,21 @@ export default async function handle(
 ) {
     switch (req.method) {
         case 'POST': {
-            const username = req.body;
-            const controllerResponse = await checkUsernameController(username);
+            const controllerResponse = await checkUsernameController(req.body);
             return res.status(200).json(controllerResponse);
         }
         default: {
-            return res.status(403).json({ message: 'Method Not Allowed' });
+            return res
+                .status(405)
+                .json({ success: false, data: 'Method Not Allowed' });
         }
     }
 }
+
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '1mb',
+        },
+    },
+};

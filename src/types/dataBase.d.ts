@@ -35,27 +35,36 @@ declare type DBDefaultResponse =
           success: true;
       };
 
-declare type DBAuthResponse =
+declare type DBGetUsersResponse =
+    | DBFailedResponse
+    | {
+          success: true;
+          data: UserFromDataBase[];
+      };
+
+declare type DBHashResponse =
     | DBFailedResponse
     | {
           success: true;
           data: UserFromDataBase;
       };
 
-// DATA FROM CLIENT
-
-declare type UserFromClient = {
+declare interface UserFromClient {
     username: { value: string };
     password: { value: string };
-};
+}
 
-declare type NewUsernameFromClient = {
-    value: string;
-};
+declare interface UserWithNewPassword extends UserFromClient {
+    newPassword: { value: string };
+}
 
-declare type NewPasswordFromClient = {
-    value: string;
-};
+declare interface UserWithNewUsername extends UserFromClient {
+    newUsername: { value: string };
+}
+
+declare interface UserWithImage extends UserFromClient {
+    newImage: { value: string };
+}
 
 declare type NewUserImage = {
     value: string;

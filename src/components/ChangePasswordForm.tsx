@@ -5,7 +5,7 @@ import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
 import { useState } from 'react';
 import { useUser } from '../context/UserContext';
 
-const API = 'api/changePassword';
+const API = 'api/updatePassword';
 
 type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 

@@ -1,11 +1,15 @@
 import { JsonDB } from './DBJson';
 import { MongoDB } from './DBMongo';
-import { DATABASE, DEFAULT_ERROR, INITIAL_STATE } from './DBState';
+import { DATABASE, INITIAL_STATE } from './DBState';
+import { compareSyncBcrypt } from '@/lib/bcryptAdapter';
+
+const HASH_DEFAULT_ERROR = 'invalid hash';
+const USER_HASH_ERROR = 'User was not found by hash';
 
 export default class DBHandler {
     #DB = process.env.IS_LOCALHOST === 'true' ? new JsonDB() : new MongoDB();
 
-    async #refreshDB(caller: string) {
+    async refreshDB(caller: string) {
         const response = await this.#DB.refreshState('check database state');
         if (!response.success) return response;
         console.log('Database has been refreshed by:', caller);
@@ -13,8 +17,7 @@ export default class DBHandler {
             success: true,
         } as DBDefaultResponse;
     }
-
-    async #checkDBState(caller: string) {
+    async checkDBState(caller: string) {
         const response = await this.#DB.accessState('check database state');
         if (!response.success) return response;
         if (DATABASE.state.accounts.length >= DATABASE.state.limit) {
@@ -31,8 +34,12 @@ export default class DBHandler {
             success: true,
         } as DBDefaultResponse;
     }
-
-    async #resetDB(caller: string) {
+    async resetDB(constraint: Constraints, caller: string) {
+        if (constraint !== 'admin')
+            return {
+                success: false,
+                data: 'permission denied',
+            };
         DATABASE.state = INITIAL_STATE;
         const response = await this.#DB.refreshState('reset database');
         if (!response.success) return response;
@@ -42,6 +49,31 @@ export default class DBHandler {
         } as DBDefaultResponse;
     }
 
+    async getUserByHash(browserHash: string | undefined) {
+        const response = {
+            success: false,
+            data: HASH_DEFAULT_ERROR,
+        } as DBHashResponse;
+        if (!browserHash) {
+            return response;
+        }
+        const getUsersReponse = await this.#getUsers('get user hash');
+        if (!getUsersReponse.success) return getUsersReponse;
+        const users = getUsersReponse.data;
+        users.forEach((user) => {
+            const userToCompare = {
+                username: user.username,
+                password: user.password,
+            };
+            if (compareSyncBcrypt(JSON.stringify(userToCompare), browserHash)) {
+                response.success = true;
+                response.data = user;
+            }
+        });
+        if (!response.success) return { ...response, data: USER_HASH_ERROR };
+        return response;
+    }
+
     async #getUsers(caller: string) {
         const response = await this.#DB.accessState('get users state');
         if (!response.success) return response;
@@ -49,29 +81,6 @@ export default class DBHandler {
         return {
             success: true,
             data: DATABASE.state.accounts,
-        } as DBDefaultResponse;
-    }
-
-    async handleDB<T extends HandleDBCommand>(command: T, caller: string) {
-        switch (command) {
-            case 'getUsers': {
-                return await this.#getUsers(caller);
-            }
-            case 'resetDB': {
-                return await this.#resetDB(caller);
-            }
-            case 'checkDBState': {
-                return await this.#checkDBState(caller);
-            }
-            case 'refreshDB': {
-                return await this.#refreshDB(caller);
-            }
-            default: {
-                return {
-                    success: false,
-                    data: DEFAULT_ERROR,
-                } as DBDefaultResponse;
-            }
-        }
+        } as DBGetUsersResponse;
     }
 }

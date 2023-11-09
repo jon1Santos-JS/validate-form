@@ -59,7 +59,7 @@ export function UserProvider({ children }: UserProps) {
         const response = await fetch(API, {
             method: 'GET',
         });
-        const parsedResponse: ServerResponse = await response.json();
+        const parsedResponse = await response.json();
         setUserState((prev) => ({
             ...prev,
             hasUser: parsedResponse.serverResponse,

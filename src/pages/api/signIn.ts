@@ -1,39 +1,35 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import {
-    COOKIES_EXPIRES,
-    USER_HASH_NAME,
-    createHash,
-    returnUserByHash,
-} from '@/lib/hash';
-import { getUserStateController, signInController } from '@/lib/controllers';
+import type { NextApiResponse } from 'next';
+import { createHash } from '@/lib/bcryptAdapter';
 import Cookies from 'cookies';
+import { getUserStateController } from '@/controllers/DBController';
+import { signInController } from '@/controllers/AuthUserController';
+import { COOKIES_EXPIRES, USER_HASH_NAME } from '@/lib/cookies';
+import { IncomingMessage } from 'http';
+
+interface NextApiRequest<T> extends IncomingMessage {
+    body: T;
+}
 
 export default async function handler(
-    req: NextApiRequest,
+    req: NextApiRequest<UserFromClient>,
     res: NextApiResponse,
 ) {
     const cookies = new Cookies(req, res);
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const controllerResponse = await getUserStateController();
-            if (typeof controllerResponse.body === 'string')
-                return res.status(500).json(controllerResponse);
-            const usersFromDB = controllerResponse.body;
-            const hashResponse = await returnUserByHash(
+            const controllerResponse = await getUserStateController(
                 browserHash,
-                usersFromDB,
             );
-            if (!hashResponse.serverResponse)
-                return res.status(500).json(hashResponse);
-            return res.status(200).json(hashResponse);
+            if (!controllerResponse.success)
+                return res.status(500).json(controllerResponse);
+            return res.status(200).json(controllerResponse);
         }
         case 'POST': {
-            const user: UserFromClient = req.body;
-            const controllerResponse = await signInController(user); //
-            if (!controllerResponse.serverResponse)
+            const controllerResponse = await signInController(req.body); //
+            if (!controllerResponse.success)
                 return res.status(500).json(controllerResponse);
-            const hash = createHash(user);
+            const hash = createHash(req.body);
             cookies.set(USER_HASH_NAME, hash, {
                 expires: COOKIES_EXPIRES,
                 sameSite: 'lax',
@@ -42,13 +38,13 @@ export default async function handler(
         }
         case 'DELETE': {
             cookies.set(USER_HASH_NAME);
-            const response = { serverResponse: true, body: 'User logged out' };
+            const response = { success: true, data: 'User logged out' };
             return res.status(200).json(response);
         }
         default: {
             return res
                 .status(405)
-                .json({ serverResponse: 'Method Not Allowed' });
+                .json({ success: false, data: 'Method Not Allowed' });
         }
     }
 }

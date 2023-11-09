@@ -5,14 +5,14 @@ import useString from '@/hooks/useString';
 import { useUser } from '../../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
 
-const API = 'api/changeUserImg';
+const API = 'api/updateUserImage';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
 type InputsType = 'imageInput';
 
 export default function PerfilImageForm() {
     const {
-        user: { username, setUserimage },
+        user: { setUserimage },
         setUserImageLoader,
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
@@ -100,16 +100,16 @@ export default function PerfilImageForm() {
             }));
             return;
         }
+        if (!inputs.imageInput.files) return;
         handleButtonClick(false);
         setUserImageLoader(true);
-        await onHandleApiResponses();
+        await onHandleApiResponses(inputs.imageInput.files);
         handleButtonClick(true);
     }
 
-    async function onHandleApiResponses() {
-        const files = inputs.imageInput.files;
+    async function onHandleApiResponses(files: FileList) {
         const APIResponse = await onSubmitImageToImageBB(files);
-        if (!APIResponse) {
+        if (!APIResponse.success) {
             setInputState((prev) => ({
                 ...prev,
                 imageInput: { ...prev.imageInput, showInputMessage: true },
@@ -117,8 +117,8 @@ export default function PerfilImageForm() {
             return;
         }
         const imgUrl = APIResponse.data.url;
-        const DBResponse = await onSubmitImageToDB(username, imgUrl);
-        if (!DBResponse) {
+        const DBResponse = await onSubmitImageToDB(imgUrl);
+        if (!DBResponse.success) {
             setInputState((prev) => ({
                 ...prev,
                 imageInput: { ...prev.imageInput, showInputMessage: true },
@@ -132,8 +132,7 @@ export default function PerfilImageForm() {
         }));
     }
 
-    async function onSubmitImageToImageBB(files: FileList | undefined | null) {
-        if (!files) return;
+    async function onSubmitImageToImageBB(files: FileList) {
         const file = files[0];
         const fileName = handledName(file.name);
         const formData = new FormData(); // multipart/form-data format to send to API;
@@ -150,18 +149,14 @@ export default function PerfilImageForm() {
         return parsedResponse;
     }
 
-    async function onSubmitImageToDB(name: string, img: string) {
-        const handledUser = {
-            userName: name,
-            userImg: img,
-        };
+    async function onSubmitImageToDB(img: string) {
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(handledUser),
+            body: JSON.stringify({ value: img }),
         };
         const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
-        return parsedResponse.serverResponse;
+        const parsedResponse: DBDefaultResponse = await response.json();
+        return parsedResponse;
     }
 }
