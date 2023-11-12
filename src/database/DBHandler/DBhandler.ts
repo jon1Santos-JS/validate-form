@@ -10,15 +10,15 @@ export default class DBHandler {
     #DB = process.env.IS_LOCALHOST === 'true' ? new JsonDB() : new MongoDB();
 
     async refreshDB(caller: string) {
-        const response = await this.#DB.refreshState('check database state');
+        const response = await this.#DB.refreshState(caller);
         if (!response.success) return response;
         console.log('Database has been refreshed by:', caller);
         return {
             success: true,
         } as DBDefaultResponse;
     }
-    async checkDBState(caller: string) {
-        const response = await this.#DB.accessState('check database state');
+    async checkDB(caller: string) {
+        const response = await this.#DB.accessState(caller);
         if (!response.success) return response;
         if (DATABASE.state.accounts.length >= DATABASE.state.limit) {
             console.log(
@@ -41,7 +41,7 @@ export default class DBHandler {
                 data: 'permission denied',
             };
         DATABASE.state = INITIAL_STATE;
-        const response = await this.#DB.refreshState('reset database');
+        const response = await this.#DB.refreshState(caller);
         if (!response.success) return response;
         console.log('Database has been reset by:', caller);
         return {
@@ -50,6 +50,8 @@ export default class DBHandler {
     }
 
     async getUserByHash(browserHash: string | undefined) {
+        const getUsersReponse = await this.#getUsers('get user hash');
+        if (!getUsersReponse.success) return getUsersReponse;
         const response = {
             success: false,
             data: HASH_DEFAULT_ERROR,
@@ -57,8 +59,6 @@ export default class DBHandler {
         if (!browserHash) {
             return response;
         }
-        const getUsersReponse = await this.#getUsers('get user hash');
-        if (!getUsersReponse.success) return getUsersReponse;
         const users = getUsersReponse.data;
         users.forEach((user) => {
             const userToCompare = {

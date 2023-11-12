@@ -22,22 +22,26 @@ export default function PerfilImageForm() {
     const [inputState, setInputState] = useState({
         imageInput: { showInputMessage: false, highlightInput: false },
     });
-
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         imageInput: inputsFactory({
-            validations: (currentInputValue: string) => [
+            validations: (inputAttributes) => [
                 {
                     conditional: !onCheckExtensions(
                         ALLOWED_EXTENSIONS,
-                        currentInputValue,
+                        inputAttributes.value,
                     ),
                     message: `Supported extensions: ${ALLOWED_EXTENSIONS.join(
                         ', ',
                     )}`,
                 },
+                {
+                    conditional: !inputAttributes.files,
+                    message: `Image is required`,
+                },
             ],
             required: 'No image uploaded',
-            files: null,
+            attributes: { value: '', files: null },
+            errors: [],
         }),
     });
 
@@ -78,15 +82,13 @@ export default function PerfilImageForm() {
         e: React.ChangeEvent<HTMLInputElement>,
         key: InputsType,
     ) {
-        const input = { ...inputs[key], value: e.target.value };
+        const { value, files } = e.target;
+        const input = { ...inputs[key], attribute: { value: value, files } };
         const currentInputs = { ...inputs, [key]: input };
         const validateInput = validateSingle(input, currentInputs);
         setInputs((prev) => ({
             ...prev,
-            [key]: {
-                ...validateInput,
-                files: e.target.files,
-            },
+            [key]: validateInput,
         }));
     }
 
@@ -100,10 +102,10 @@ export default function PerfilImageForm() {
             }));
             return;
         }
-        if (!inputs.imageInput.files) return;
+        const inputAttributes = inputs.imageInput.attributes;
         handleButtonClick(false);
         setUserImageLoader(true);
-        await onHandleApiResponses(inputs.imageInput.files);
+        await onHandleApiResponses(inputAttributes.files as FileList);
         handleButtonClick(true);
     }
 

@@ -8,9 +8,3 @@ export async function resetDBController(browserHash: string | undefined) {
     const response = await DB.resetDB(userFromDB.constraint, 'resetDB');
     return response;
 }
-
-export async function getUserStateController(browserHash: string | undefined) {
-    const DB = new DBHandler();
-    const response = await DB.getUserByHash(browserHash);
-    return response;
-}

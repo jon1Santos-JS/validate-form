@@ -17,7 +17,6 @@ export default class UserAuthHandler {
         }
         return {
             success: true,
-            data: 'Account does not exist',
         } as DBDefaultResponse;
     }
 
@@ -26,15 +25,15 @@ export default class UserAuthHandler {
             DBAccount.username.value === username ? DBAccount : undefined,
         );
         if (!account) {
-            console.log('Account does not exist');
+            console.log('Username does not exist');
             return {
                 success: false,
-                data: 'Account does not exist',
+                data: 'Username does not exist',
             } as DBDefaultResponse;
         }
         return {
             success: true,
-            data: 'Account does not exist',
+            data: 'Username already exist',
         } as DBDefaultResponse;
     }
 }

@@ -2,8 +2,7 @@ import { hashSync, genSaltSync, compareSync } from 'bcrypt-ts';
 
 export function createHash(user: UserFromClient) {
     const salt = genSaltSync(10);
-    const rawUSer = { username: user.username, password: user.password };
-    const stringifiedValue = JSON.stringify(rawUSer);
+    const stringifiedValue = JSON.stringify(user);
     const hash = hashSync(stringifiedValue, salt);
     return hash;
 }

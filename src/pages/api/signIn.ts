@@ -1,8 +1,10 @@
 import type { NextApiResponse } from 'next';
 import { createHash } from '@/lib/bcryptAdapter';
 import Cookies from 'cookies';
-import { getUserStateController } from '@/controllers/DBController';
-import { signInController } from '@/controllers/AuthUserController';
+import {
+    authUserControler,
+    signInController,
+} from '@/controllers/AuthUserController';
 import { COOKIES_EXPIRES, USER_HASH_NAME } from '@/lib/cookies';
 import { IncomingMessage } from 'http';
 
@@ -18,15 +20,13 @@ export default async function handler(
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const controllerResponse = await getUserStateController(
-                browserHash,
-            );
+            const controllerResponse = await authUserControler(browserHash);
             if (!controllerResponse.success)
                 return res.status(500).json(controllerResponse);
             return res.status(200).json(controllerResponse);
         }
         case 'POST': {
-            const controllerResponse = await signInController(req.body); //
+            const controllerResponse = await signInController(req.body);
             if (!controllerResponse.success)
                 return res.status(500).json(controllerResponse);
             const hash = createHash(req.body);

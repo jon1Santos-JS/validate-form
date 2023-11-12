@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 type InputPropsTypes<T extends string> = {
     ownProps: PropsType;
@@ -6,7 +6,7 @@ type InputPropsTypes<T extends string> = {
 };
 
 type inputStatePropsType<T extends string> = {
-    input: ValidateInputType<T>;
+    input: ValidateInputType<T, T>;
     inputState: InputState<T>;
 };
 
@@ -23,9 +23,10 @@ export default function Input<T extends string>({
 }: InputPropsTypes<T>) {
     const { label, inputType, onChange, inputAccept } = ownProps;
     const { input, inputState } = inputStateProps;
-    const { value, errors } = input;
+    const { attributes, errors } = input;
     const { showInputMessage, highlightInput } = inputState;
     const highlightConditional = errors.length > 0;
+    const inputID = useId();
 
     return (
         <div className="field">
@@ -35,14 +36,14 @@ export default function Input<T extends string>({
                 </label>
             ) : null}
             <input
-                id={label}
+                id={inputID + label}
                 className={`input ${
                     highlightConditional && highlightInput && 'has-error'
                 }`}
                 placeholder={label}
                 accept={inputAccept && inputAccept}
                 onChange={onChange}
-                value={value}
+                value={attributes.value}
                 type={inputType}
             />
             {renderErrors()}

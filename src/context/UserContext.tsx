@@ -59,14 +59,14 @@ export function UserProvider({ children }: UserProps) {
         const response = await fetch(API, {
             method: 'GET',
         });
-        const parsedResponse = await response.json();
+        const parsedResponse: AuthUserResponse = await response.json();
         setUserState((prev) => ({
             ...prev,
-            hasUser: parsedResponse.serverResponse,
+            hasUser: parsedResponse.success,
             isUserStateLoading: false,
         }));
-        if (typeof parsedResponse.body !== 'string') {
-            const DBUser: UserType = parsedResponse.body;
+        if (parsedResponse.success) {
+            const DBUser = parsedResponse.data;
             setUser((prev) => ({
                 ...prev,
                 ...DBUser,

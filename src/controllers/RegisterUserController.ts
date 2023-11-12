@@ -4,7 +4,7 @@ import DBHandler from '@/database/DBHandler/DBhandler';
 export async function signUpController(userAccount: UserFromClient) {
     const register = new UserRegisterHandler();
     const db = new DBHandler();
-    const checkDBResponse = await db.checkDBState('signup controller');
+    const checkDBResponse = await db.checkDB('signup controller');
     if (!checkDBResponse.success) return checkDBResponse;
     const registerResponse = await register.signUp(userAccount);
     if (!registerResponse.success) return registerResponse;

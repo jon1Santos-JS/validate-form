@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Input from './Input';
-import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
+import useInputHandler from '@/hooks/useInputHandler';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
 import { useUser } from '../context/UserContext';
@@ -12,11 +12,10 @@ type InputsType = 'username' | 'password';
 
 export default function SignInForm() {
     const {
-        user,
         userState: { setHasUser, hasUser, setUserStateLoading },
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
-    const { omitFields, onSetTimeOut, inputsFactory } = useInputHandler();
+    const { onSetTimeOut, inputsFactory } = useInputHandler();
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
@@ -25,34 +24,38 @@ export default function SignInForm() {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: inputsFactory({
-            validations: (currentInputValue) => [
+            validations: ({ value }) => [
                 {
-                    conditional: !currentInputValue,
+                    conditional: !value,
                     message: '',
                 },
                 {
-                    conditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !value.match(/.{6,}/),
                     message: '',
                 },
                 {
-                    conditional: !currentInputValue.match(/^[A-Za-z]+$/),
+                    conditional: !value.match(/^[A-Za-z]+$/),
                     message: '',
                 },
             ],
             required: true,
+            attributes: { value: '' },
+            errors: [],
         }),
         password: inputsFactory({
-            validations: (currentInputValue) => [
+            validations: ({ value }) => [
                 {
-                    conditional: !currentInputValue,
+                    conditional: !value,
                     message: '',
                 },
                 {
-                    conditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !value.match(/.{6,}/),
                     message: '',
                 },
             ],
             required: true,
+            attributes: { value: '' },
+            errors: [],
         }),
     });
 
@@ -111,7 +114,7 @@ export default function SignInForm() {
     ) {
         setInputs((prev) => ({
             ...prev,
-            [name]: { ...prev[name], value: e.target.value },
+            [name]: { ...prev[name], attributes: { value: e.target.value } },
         }));
         setInputs((prev) => ({
             ...prev,
@@ -138,15 +141,28 @@ export default function SignInForm() {
             onShowInputsMessages(true);
             return;
         }
+        const username = { value: inputs.username.attributes.value };
+        const password = { value: inputs.password.attributes.value };
         handleButtonClick(false);
-        onHandledResponse(await onSubmitInputs());
+        onHandledResponse(await onSubmitInputs({ username, password }));
         handleButtonClick(true);
     }
 
-    function onHandledResponse(response: ServerResponse) {
+    async function onSubmitInputs(handledInput: UserFromClient) {
+        const options: FetchOptionsType = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(handledInput),
+        };
+        const response = await fetch(API, options);
+        const parsedResponse: DBDefaultResponse = await response.json();
+        return parsedResponse;
+    }
+
+    function onHandledResponse(response: DBDefaultResponse) {
         setUserStateLoading(false);
-        setHasUser(response.serverResponse);
-        if (!response.serverResponse) {
+        setHasUser(response.success);
+        if (!response.success) {
             onShowMessage(true);
             onHilightInputs(true);
             onSetTimeOut(() => {
@@ -155,18 +171,6 @@ export default function SignInForm() {
             }, 2750);
             return;
         }
-        user.setUsername(response.body as string);
-    }
-
-    async function onSubmitInputs() {
-        const options: FetchOptionsType = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(omitFields(inputs, FIELDS_TO_OMIT)),
-        };
-        const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
-        return parsedResponse;
     }
 
     function onHilightInputs(value: boolean) {
