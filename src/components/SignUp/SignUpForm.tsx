@@ -4,6 +4,7 @@ import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
 import useInputHandler from '@/hooks/useInputHandler';
 import { useUser } from '../../context/UserContext';
+import useUtils from '@/hooks/useUtils';
 
 const API = 'api/signUp';
 const REQUIRED_MESSAGE = 'This field is required';
@@ -22,8 +23,8 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         userState: { hasUser },
     } = useUser();
     const { validateSingle, asyncValidateSingle, validateMany } = useValidate();
-    const { onSetTimeOut, onSetAsyncTimeOut, inputsFactory, onCheckUsername } =
-        useInputHandler();
+    const { inputsFactory, onCheckUsername } = useInputHandler();
+    const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
@@ -215,14 +216,20 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             return;
         }
         handleButtonClick(false);
-        const username = { value: inputs.username.attributes.value };
-        const password = { value: inputs.password.attributes.value };
-        const submitResponse = await onSubmitInputs({
-            username,
-            password,
+        const handledInputs = onHandleInputs(inputs);
+        const submitResponse = await onSubmitInputs(handledInputs);
+        handleButtonClick(() => {
+            onHandleResponse(submitResponse);
+            return true;
         });
-        handleButtonClick(true);
-        onHandleResponse(submitResponse);
+    }
+
+    function onHandleInputs(inputsToHandle: InputsToValidateType<InputsType>) {
+        const { username, password } = inputsToHandle;
+        return {
+            username: { value: username.attributes.value },
+            password: { value: password.attributes.value },
+        };
     }
 
     async function onSubmitInputs(handledInputs: UserFromClient) {

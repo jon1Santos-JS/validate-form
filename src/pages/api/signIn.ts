@@ -4,8 +4,9 @@ import {
     authUserController,
     signInController,
 } from '@/controllers/AuthUserController';
-import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
+import CookiesAdapter from '@/lib/cookiesAdapter';
 import { IncomingMessage } from 'http';
+import { USER_HASH_NAME } from '@/database/DBHandler/DBState';
 
 interface NextApiRequest<T> extends IncomingMessage {
     body: T;

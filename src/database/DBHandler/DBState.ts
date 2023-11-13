@@ -15,3 +15,4 @@ export const INITIAL_STATE: MiniDBState<null> = {
 export const DATABASE: MiniDBType<null> = { state: INITIAL_STATE };
 
 export const DEFAULT_ERROR = 'internal server error';
+export const USER_HASH_NAME = 'user-hash';

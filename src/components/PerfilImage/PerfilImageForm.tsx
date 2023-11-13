@@ -4,6 +4,7 @@ import useValidate from '@/hooks/useValidate';
 import useString from '@/hooks/useString';
 import { useUser } from '../../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
+import useUtils from '@/hooks/useUtils';
 
 const API = 'api/updateUserImage';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
@@ -17,6 +18,7 @@ export default function PerfilImageForm() {
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
     const { handledName, onCheckExtensions } = useString();
+    const { onSetTimeOut } = useUtils();
     const { inputsFactory } = useInputHandler();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
@@ -99,17 +101,23 @@ export default function PerfilImageForm() {
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (!(await isClickable)) return;
+        if (!isClickable) return;
         if (!validateMany(inputs)) {
             setInputState((prev) => ({
                 ...prev,
                 imageInput: { ...prev.imageInput, showInputMessage: true },
             }));
+            onSetTimeOut(() => {
+                setInputState((prev) => ({
+                    ...prev,
+                    imageInput: { ...prev.imageInput, showInputMessage: false },
+                }));
+            }, 2750);
             return;
         }
-        const inputAttributes = inputs.imageInput.attributes;
+        const { attributes } = inputs.imageInput.attributes;
         handleButtonClick(false);
-        await onHandleApiResponses(inputAttributes.files as FileList);
+        await onHandleApiResponses(attributes.files as FileList);
         setUserImageLoader(true);
         setInputs((prev) => {
             prev.imageInput.attributes.files = null;

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
 import { useUser } from '../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
+import useUtils from '@/hooks/useUtils';
 const API = 'api/updateUsername';
 
 type InputsType = 'newUsername' | 'password';
@@ -12,8 +13,8 @@ export default function ChangeUsernameForm() {
     const router = useRouter();
     const { user } = useUser();
     const { asyncValidateSingle, validateMany, validateSingle } = useValidate();
-    const { onSetTimeOut, onSetAsyncTimeOut, inputsFactory, onCheckUsername } =
-        useInputHandler();
+    const { inputsFactory, onCheckUsername } = useInputHandler();
+    const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
         newUsername: { showInputMessage: false, highlightInput: false },
@@ -124,6 +125,7 @@ export default function ChangeUsernameForm() {
     }
 
     function onChangePassword(e: React.ChangeEvent<HTMLInputElement>) {
+        handleButtonClick(false);
         setInputs((prev) => ({
             ...prev,
             password: {
@@ -139,6 +141,7 @@ export default function ChangeUsernameForm() {
                     attributes: { value: e.target.value },
                 }),
             }));
+            handleButtonClick(true);
         }, 950);
     }
 
@@ -162,13 +165,24 @@ export default function ChangeUsernameForm() {
             return;
         }
         handleButtonClick(false);
-        const username = { value: user.username };
-        const newUsername = { value: inputs.newUsername.attributes.value };
-        const password = { value: inputs.password.attributes.value };
-        onHandleResponse(
-            await onSubmitInputs({ username, newUsername, password }),
-        );
-        handleButtonClick(true);
+        const handledInputs = onHandleInputs(inputs, user.username);
+        const response = await onSubmitInputs(handledInputs);
+        handleButtonClick(() => {
+            onHandleResponse(response);
+            return true;
+        });
+    }
+
+    function onHandleInputs(
+        inputsToHandle: InputsToValidateType<InputsType>,
+        username: string,
+    ) {
+        const { newUsername, password } = inputsToHandle;
+        return {
+            username: { value: username },
+            newUsername: { value: newUsername.attributes.value },
+            password: { value: password.attributes.value },
+        };
     }
 
     async function onSubmitInputs(handledInputs: UserWithNewUsername) {
@@ -178,12 +192,12 @@ export default function ChangeUsernameForm() {
             body: JSON.stringify(handledInputs),
         };
         const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
+        const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
     }
 
-    function onHandleResponse(response: ServerResponse) {
-        if (!response.serverResponse) return;
+    function onHandleResponse(response: DBDefaultResponse) {
+        if (!response.success) return;
         setInputState((prev) => ({
             ...prev,
             newUsername: { ...prev.newUsername, showInputMessage: true },

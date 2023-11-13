@@ -42,16 +42,18 @@ export async function updateUserImageController(
     const update = new UserUpdateHandler();
     const auth = new UserAuthHandler();
     const db = new DBHandler();
-    const DBResponse1 = await db.getUserByHash(
+    const checkResponse = await db.checkDB('update image controller');
+    if (!checkResponse.success) return checkResponse;
+    const getUserResponse = await db.getUserByHash(
         browserHash,
         'update image controller',
     );
-    if (!DBResponse1.success) return DBResponse1;
-    const user = DBResponse1.data;
+    if (!getUserResponse.success) return getUserResponse;
+    const user = getUserResponse.data;
     const authResponse = await auth.authUsername(user.username.value);
     if (!authResponse) return authResponse;
     const updateResponse = await update.updateUserImage(user, newUserImage);
-    const DBResponse2 = await db.refreshDB('update image controller');
-    if (!DBResponse2.success) return DBResponse2;
+    const refreshResponse = await db.refreshDB('update image controller');
+    if (!refreshResponse.success) return refreshResponse;
     return updateResponse;
 }

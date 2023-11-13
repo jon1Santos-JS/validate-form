@@ -4,6 +4,7 @@ import useValidate from '@/hooks/useValidate';
 import useInputHandler from '@/hooks/useInputHandler';
 import { useState } from 'react';
 import { useUser } from '../context/UserContext';
+import useUtils from '@/hooks/useUtils';
 
 const API = 'api/updatePassword';
 
@@ -13,7 +14,8 @@ export default function ChangePasswordForm() {
     const router = useRouter();
     const { user } = useUser();
     const { validateSingle, validateMany } = useValidate();
-    const { inputsFactory, onSetTimeOut } = useInputHandler();
+    const { inputsFactory } = useInputHandler();
+    const { onSetTimeOut } = useUtils();
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
         password: { showInputMessage: false, highlightInput: false },
@@ -138,6 +140,7 @@ export default function ChangePasswordForm() {
     }
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
+        handleButtonClick(false);
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
@@ -147,6 +150,7 @@ export default function ChangePasswordForm() {
                 ...prev,
                 [key]: validateSingle({ ...prev[key] }, prev),
             }));
+            handleButtonClick(true);
         }, 950);
     }
 
@@ -158,18 +162,25 @@ export default function ChangePasswordForm() {
             onShowInputsMessages(true);
             return;
         }
-        const username = { value: user.username };
-        const password = { value: inputs.password.attributes.value };
-        const newPassword = { value: inputs.newPassword.attributes.value };
-        const requestBody = {
-            username,
-            password,
-            newPassword,
-        };
+        const handledInputs = onHandleInputs(inputs, user.username);
         handleButtonClick(false);
-        const response = await onSubmitInputs(requestBody);
-        onHandleResponse(response);
-        handleButtonClick(true);
+        const response = await onSubmitInputs(handledInputs);
+        handleButtonClick(() => {
+            onHandleResponse(response);
+            return true;
+        });
+    }
+
+    function onHandleInputs(
+        inputsToHandle: InputsToValidateType<InputsType>,
+        username: string,
+    ) {
+        const { password, newPassword } = inputsToHandle;
+        return {
+            username: { value: username },
+            password: { value: password.attributes.value },
+            newPassword: { value: newPassword.attributes.value },
+        };
     }
 
     function onHandleResponse(response: DBDefaultResponse) {

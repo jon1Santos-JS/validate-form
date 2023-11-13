@@ -2,7 +2,8 @@ import type { NextApiResponse } from 'next';
 import { createHash } from '@/lib/bcryptAdapter';
 import { updateUsernameController } from '@/controllers/UpdateUserController';
 import { IncomingMessage } from 'http';
-import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
+import CookiesAdapter from '@/lib/cookiesAdapter';
+import { USER_HASH_NAME } from '@/database/DBHandler/DBState';
 
 interface NextApiRequest<T> extends IncomingMessage {
     body: T;

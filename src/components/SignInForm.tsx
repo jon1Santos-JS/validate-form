@@ -4,6 +4,7 @@ import useInputHandler from '@/hooks/useInputHandler';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
 import { useUser } from '../context/UserContext';
+import useUtils from '@/hooks/useUtils';
 
 const API = 'api/signIn';
 const DEFAULT_MESSAGE = 'Incorrect username or password';
@@ -15,7 +16,8 @@ export default function SignInForm() {
         userState: { setHasUser, hasUser, setUserStateLoading },
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
-    const { onSetTimeOut, inputsFactory } = useInputHandler();
+    const { inputsFactory } = useInputHandler();
+    const { onSetTimeOut } = useUtils();
     const [showMessage, onShowMessage] = useState<boolean>(false);
     const [isClickable, handleButtonClick] = useState(true);
     const [inputState, setInputState] = useState({
@@ -141,11 +143,18 @@ export default function SignInForm() {
             onShowInputsMessages(true);
             return;
         }
-        const username = { value: inputs.username.attributes.value };
-        const password = { value: inputs.password.attributes.value };
+        const handledInputs = onHandleInputs(inputs);
         handleButtonClick(false);
-        onHandledResponse(await onSubmitInputs({ username, password }));
+        onHandledResponse(await onSubmitInputs(handledInputs));
         handleButtonClick(true);
+    }
+
+    function onHandleInputs(inputsTohandle: InputsToValidateType<InputsType>) {
+        const { username, password } = inputsTohandle;
+        return {
+            username: { value: username.attributes.value },
+            password: { value: password.attributes.value },
+        };
     }
 
     async function onSubmitInputs(handledInput: UserFromClient) {

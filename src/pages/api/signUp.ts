@@ -1,7 +1,8 @@
 import type { NextApiResponse } from 'next';
 import { signUpController } from '@/controllers/RegisterUserController';
 import { IncomingMessage } from 'http';
-import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
+import CookiesAdapter from '@/lib/cookiesAdapter';
+import { USER_HASH_NAME } from '@/database/DBHandler/DBState';
 
 interface NextApiRequest<T> extends IncomingMessage {
     body: T;

@@ -1,5 +1,6 @@
 import { updateUserImageController } from '@/controllers/UpdateUserController';
-import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
+import { USER_HASH_NAME } from '@/database/DBHandler/DBState';
+import CookiesAdapter from '@/lib/cookiesAdapter';
 import { IncomingMessage } from 'http';
 import { NextApiResponse } from 'next';
 

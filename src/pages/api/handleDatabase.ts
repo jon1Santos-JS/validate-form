@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { resetDBController } from '@/controllers/DBController';
-import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
+import CookiesAdapter from '@/lib/cookiesAdapter';
+import { USER_HASH_NAME } from '@/database/DBHandler/DBState';
 
 export default async function handler(
     req: NextApiRequest,
