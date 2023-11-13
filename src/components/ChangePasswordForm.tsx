@@ -161,17 +161,23 @@ export default function ChangePasswordForm() {
         const username = { value: user.username };
         const password = { value: inputs.password.attributes.value };
         const newPassword = { value: inputs.newPassword.attributes.value };
+        const requestBody = {
+            username,
+            password,
+            newPassword,
+        };
         handleButtonClick(false);
-        onHandleResponse(
-            await onSubmitInputs({ username, password, newPassword }),
-        );
+        const response = await onSubmitInputs(requestBody);
+        onHandleResponse(response);
         handleButtonClick(true);
     }
 
-    function onHandleResponse(response: ServerResponse) {
-        if (!response.serverResponse) return;
-        onHilightInputs(true);
-        onShowInputsMessages(true);
+    function onHandleResponse(response: DBDefaultResponse) {
+        if (!response.success) {
+            onHilightInputs(true);
+            onShowInputsMessages(true);
+            return;
+        }
         router.reload();
     }
 
@@ -182,7 +188,7 @@ export default function ChangePasswordForm() {
             body: JSON.stringify(handledInputs),
         };
         const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
+        const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
     }
 

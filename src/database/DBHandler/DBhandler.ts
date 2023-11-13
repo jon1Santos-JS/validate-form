@@ -12,7 +12,6 @@ export default class DBHandler {
     async refreshDB(caller: string) {
         const response = await this.#DB.refreshState(caller);
         if (!response.success) return response;
-        console.log('Database has been refreshed by:', caller);
         return {
             success: true,
         } as DBDefaultResponse;
@@ -49,8 +48,8 @@ export default class DBHandler {
         } as DBDefaultResponse;
     }
 
-    async getUserByHash(browserHash: string | undefined) {
-        const getUsersReponse = await this.#getUsers('get user hash');
+    async getUserByHash(browserHash: string | undefined, caller: string) {
+        const getUsersReponse = await this.#getUsers(caller);
         if (!getUsersReponse.success) return getUsersReponse;
         const response = {
             success: false,
@@ -75,7 +74,7 @@ export default class DBHandler {
     }
 
     async #getUsers(caller: string) {
-        const response = await this.#DB.accessState('get users state');
+        const response = await this.#DB.accessState(caller);
         if (!response.success) return response;
         console.log('Users have been gotten by:', caller);
         return {

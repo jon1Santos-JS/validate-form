@@ -1,6 +1,5 @@
 import { updateUserImageController } from '@/controllers/UpdateUserController';
-import { USER_HASH_NAME } from '@/lib/cookies';
-import Cookies from 'cookies';
+import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
 import { IncomingMessage } from 'http';
 import { NextApiResponse } from 'next';
 
@@ -12,9 +11,9 @@ export default async function handler(
     req: NextApiRequest<NewUserImage>,
     res: NextApiResponse,
 ) {
+    const cookies = new CookiesAdapter(req, res);
     switch (req.method) {
         case 'POST': {
-            const cookies = new Cookies(req, res);
             const browserHash = cookies.get(USER_HASH_NAME);
             const response = await updateUserImageController(
                 browserHash,

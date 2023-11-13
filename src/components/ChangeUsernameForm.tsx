@@ -124,7 +124,6 @@ export default function ChangeUsernameForm() {
     }
 
     function onChangePassword(e: React.ChangeEvent<HTMLInputElement>) {
-        handleButtonClick(false);
         setInputs((prev) => ({
             ...prev,
             password: {
@@ -133,12 +132,13 @@ export default function ChangeUsernameForm() {
             },
         }));
         onSetTimeOut(() => {
-            const validatedInput = validateSingle({
-                ...inputs.password,
-                attributes: { value: e.target.value },
-            });
-            setInputs((prev) => ({ ...prev, password: validatedInput }));
-            handleButtonClick(true);
+            setInputs((prev) => ({
+                ...prev,
+                password: validateSingle({
+                    ...prev.password,
+                    attributes: { value: e.target.value },
+                }),
+            }));
         }, 950);
     }
 
@@ -149,6 +149,11 @@ export default function ChangeUsernameForm() {
             setInputState((prev) => ({
                 ...prev,
                 newUsername: {
+                    ...prev.newUsername,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
+                password: {
                     ...prev.newUsername,
                     highlightInput: true,
                     showInputMessage: true,

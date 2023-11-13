@@ -1,9 +1,8 @@
 import type { NextApiResponse } from 'next';
-import Cookies from 'cookies';
 import { createHash } from '@/lib/bcryptAdapter';
 import { updateUsernameController } from '@/controllers/UpdateUserController';
 import { IncomingMessage } from 'http';
-import { COOKIES_EXPIRES, USER_HASH_NAME } from '@/lib/cookies';
+import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
 
 interface NextApiRequest<T> extends IncomingMessage {
     body: T;
@@ -13,6 +12,7 @@ export default async function handler(
     req: NextApiRequest<UserWithNewUsername>,
     res: NextApiResponse,
 ) {
+    const cookies = new CookiesAdapter(req, res);
     switch (req.method) {
         case 'POST': {
             const controllerResponse = await updateUsernameController(req.body);
@@ -24,11 +24,7 @@ export default async function handler(
                 password: req.body.password,
             };
             const hash = createHash(newAccount);
-            const cookies = new Cookies(req, res);
-            cookies.set(USER_HASH_NAME, hash, {
-                expires: COOKIES_EXPIRES,
-                sameSite: 'lax',
-            });
+            cookies.set(USER_HASH_NAME, hash);
             return res.status(200).json({
                 serverResponse: true,
                 body: req.body.username.value,

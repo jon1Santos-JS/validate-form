@@ -34,10 +34,10 @@ export default function PerfilImageForm() {
                         ', ',
                     )}`,
                 },
-                {
-                    conditional: !inputAttributes.files,
-                    message: `Image is required`,
-                },
+                // {
+                //     conditional: !inputAttributes.files,
+                //     message: `Image is required`,
+                // },
             ],
             required: 'No image uploaded',
             attributes: { value: '', files: null },
@@ -82,19 +82,24 @@ export default function PerfilImageForm() {
         e: React.ChangeEvent<HTMLInputElement>,
         key: InputsType,
     ) {
-        const { value, files } = e.target;
-        const input = { ...inputs[key], attribute: { value: value, files } };
-        const currentInputs = { ...inputs, [key]: input };
-        const validateInput = validateSingle(input, currentInputs);
         setInputs((prev) => ({
             ...prev,
-            [key]: validateInput,
+            [key]: validateSingle(
+                {
+                    ...prev[key],
+                    attributes: {
+                        value: e.target.value,
+                        files: e.target.files,
+                    },
+                },
+                prev,
+            ),
         }));
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (!isClickable) return;
+        if (!(await isClickable)) return;
         if (!validateMany(inputs)) {
             setInputState((prev) => ({
                 ...prev,
@@ -104,9 +109,14 @@ export default function PerfilImageForm() {
         }
         const inputAttributes = inputs.imageInput.attributes;
         handleButtonClick(false);
-        setUserImageLoader(true);
         await onHandleApiResponses(inputAttributes.files as FileList);
-        handleButtonClick(true);
+        setUserImageLoader(true);
+        setInputs((prev) => {
+            prev.imageInput.attributes.files = null;
+            prev.imageInput.attributes.value = '';
+            handleButtonClick(true);
+            return prev;
+        });
     }
 
     async function onHandleApiResponses(files: FileList) {
@@ -128,10 +138,6 @@ export default function PerfilImageForm() {
             return;
         }
         setUserimage(imgUrl);
-        setInputs((prev) => ({
-            ...prev,
-            imageInput: { ...prev.imageInput, files: null, value: '' },
-        }));
     }
 
     async function onSubmitImageToImageBB(files: FileList) {

@@ -4,15 +4,18 @@ import DBHandler from '@/database/DBHandler/DBhandler';
 export async function signInController(userAccount: UserFromClient) {
     const db = new DBHandler();
     const accountHandler = new UserAuthHandler();
-    const DBResponse = await db.checkDB('signup controller');
+    const DBResponse = await db.checkDB('signin controller');
     if (!DBResponse.success) return DBResponse;
     const response = await accountHandler.authAccount(userAccount);
     return response;
 }
 
-export async function authUserControler(browserHash: string | undefined) {
+export async function authUserController(browserHash: string | undefined) {
     const DB = new DBHandler();
-    const response = await DB.getUserByHash(browserHash);
+    const response = await DB.getUserByHash(
+        browserHash,
+        'auth user controller',
+    );
     if (!response.success) return response;
     return {
         success: true,

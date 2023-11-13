@@ -1,14 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import Cookies from 'cookies';
 import { deleteAccountController } from '@/controllers/DeleteUserController';
-import { USER_HASH_NAME } from '@/lib/cookies';
+import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    const cookies = new Cookies(req, res);
+    const cookies = new CookiesAdapter(req, res);
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);

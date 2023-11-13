@@ -6,6 +6,7 @@ import { useUser } from '@/context/UserContext';
 import { useRouter } from 'next/router';
 
 const HANDLE_DB_API = 'api/handleDatabase';
+const DELETE_API = 'api/deleteUser';
 const SIGN_IN_API = 'api/signIn';
 
 export default function DashBoardPage() {
@@ -63,7 +64,7 @@ export default function DashBoardPage() {
         }
 
         async function onDeleteAccount() {
-            const response = await fetch(HANDLE_DB_API, {
+            const response = await fetch(DELETE_API, {
                 method: 'GET',
             });
             const parsedResponse = await response.json();

@@ -1,11 +1,10 @@
 import type { NextApiResponse } from 'next';
 import { createHash } from '@/lib/bcryptAdapter';
-import Cookies from 'cookies';
 import {
-    authUserControler,
+    authUserController,
     signInController,
 } from '@/controllers/AuthUserController';
-import { COOKIES_EXPIRES, USER_HASH_NAME } from '@/lib/cookies';
+import CookiesAdapter, { USER_HASH_NAME } from '@/lib/cookiesAdapter';
 import { IncomingMessage } from 'http';
 
 interface NextApiRequest<T> extends IncomingMessage {
@@ -16,11 +15,11 @@ export default async function handler(
     req: NextApiRequest<UserFromClient>,
     res: NextApiResponse,
 ) {
-    const cookies = new Cookies(req, res);
+    const cookies = new CookiesAdapter(req, res);
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const controllerResponse = await authUserControler(browserHash);
+            const controllerResponse = await authUserController(browserHash);
             if (!controllerResponse.success)
                 return res.status(500).json(controllerResponse);
             return res.status(200).json(controllerResponse);
@@ -30,10 +29,7 @@ export default async function handler(
             if (!controllerResponse.success)
                 return res.status(500).json(controllerResponse);
             const hash = createHash(req.body);
-            cookies.set(USER_HASH_NAME, hash, {
-                expires: COOKIES_EXPIRES,
-                sameSite: 'lax',
-            });
+            cookies.set(USER_HASH_NAME, hash);
             return res.status(200).json(controllerResponse);
         }
         case 'DELETE': {
