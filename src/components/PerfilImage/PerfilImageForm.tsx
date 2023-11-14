@@ -115,9 +115,9 @@ export default function PerfilImageForm() {
             }, 2750);
             return;
         }
-        const { attributes } = inputs.imageInput.attributes;
+        const inputAttributes = inputs.imageInput.attributes;
         handleButtonClick(false);
-        await onHandleApiResponses(attributes.files as FileList);
+        await onHandleApiResponses(inputAttributes.files as FileList);
         setUserImageLoader(true);
         setInputs((prev) => {
             prev.imageInput.attributes.files = null;
