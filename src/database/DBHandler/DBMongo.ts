@@ -44,7 +44,7 @@ export class MongoDB {
         }
     }
     async refreshState(caller: string) {
-        const connectionResponse = await this.connect('access state');
+        const connectionResponse = await this.connect(caller);
         if (!connectionResponse.success) return connectionResponse;
         try {
             const collection = MONGODB.db('accounts').collection('users');

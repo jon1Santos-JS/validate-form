@@ -14,7 +14,7 @@ type InputsType = 'imageInput';
 export default function PerfilImageForm() {
     const {
         user: { setUserimage },
-        setUserImageLoader,
+        userImageState,
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
     const { handledName, onCheckExtensions } = useString();
@@ -119,25 +119,25 @@ export default function PerfilImageForm() {
         const response = await onHandleApiResponses(
             inputs.imageInput.attributes.files as FileList,
         );
-        handleClickButton(() => {
-            if (!response.success) {
-                setInputState((prev) => ({
-                    ...prev,
-                    imageInput: { ...prev.imageInput, showInputMessage: true },
-                }));
-                return true;
-            }
-            setInputs((prev) => ({
+        if (!response.success) {
+            setInputState((prev) => ({
                 ...prev,
-                imageInput: {
-                    ...prev.imageInput,
-                    attributes: { value: '', files: null },
-                },
+                imageInput: { ...prev.imageInput, showInputMessage: true },
             }));
-            setUserImageLoader(true);
-            setUserimage(response.data.value);
-            return true;
-        });
+            handleClickButton(true);
+            return;
+        }
+        setInputs((prev) => ({
+            ...prev,
+            imageInput: {
+                ...prev.imageInput,
+                attributes: { value: '', files: null },
+            },
+        }));
+        userImageState.onLoadingUserImage(true);
+        // setUserImageLoader(true);
+        setUserimage(response.data.value);
+        handleClickButton(true);
     }
 
     async function onHandleApiResponses(files: FileList) {

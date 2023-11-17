@@ -15,7 +15,7 @@ export default function DashBoardPage() {
         userState: { hasUser, isUserStateLoading, setHasUser },
     } = useUser();
     const router = useRouter();
-    const adminCheck = username !== 'admins';
+    const adminCheck = username !== process.env.NEXT_PUBLIC_ADMINS_USERNAME;
 
     return <>{renderElement()}</>;
 
@@ -43,7 +43,6 @@ export default function DashBoardPage() {
                     {!adminCheck && (
                         <button onClick={onResetDB}>Reset Database</button>
                     )}
-
                     {hasUser && (
                         <button
                             className="c-button sign-out"

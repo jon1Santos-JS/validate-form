@@ -5,7 +5,8 @@ import { useUser } from '../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
 import useUtils from '@/hooks/useUtils';
 import { useRouter } from 'next/router';
-const API = 'api/updateUsername';
+const UPDATE_USERNAME_API = 'api/updateUsername';
+const CHECK_USERNAME_API = 'api/checkUsername';
 
 type InputsType = 'newUsername' | 'password';
 
@@ -24,18 +25,21 @@ export default function ChangeUsernameForm() {
         newUsername: inputsFactory({
             asyncValidations: async ({ value }) => [
                 {
-                    conditional: await onCheckUsername(value),
+                    conditional: await onCheckUsername(CHECK_USERNAME_API, {
+                        method: 'POST',
+                        body: value,
+                    }),
                     message: 'This username already exist',
                 },
             ],
             validations: ({ value }) => [
                 {
                     conditional: !value.match(/.{6,}/),
-                    message: '',
+                    message: 'Username must has 6 characters at least',
                 },
                 {
                     conditional: !value.match(/^[A-Za-zçÇ]+$/),
-                    message: '',
+                    message: 'Only characters',
                 },
             ],
             required: { value: true },
@@ -108,24 +112,39 @@ export default function ChangeUsernameForm() {
         );
     }
 
-    function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
-        handleClickButton(false);
+    async function onChange(
+        e: React.ChangeEvent<HTMLInputElement>,
+        key: InputsType,
+    ) {
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
-        onSetAsyncTimeOut(async () => {
+        handleClickButton(false);
+        await onSetAsyncTimeOut(async () => {
             const validatedInput = await asyncValidateSingle({
                 ...inputs[key],
                 attributes: { value: e.target.value },
             });
             setInputs((prev) => ({ ...prev, [key]: validatedInput }));
-            handleClickButton(true);
+            setInputState((prev) => ({
+                ...prev,
+                newUsername: {
+                    ...prev.newUsername,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
+                password: {
+                    ...prev.newUsername,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
+            }));
         }, 950);
+        handleClickButton(true);
     }
 
     function onChangePassword(e: React.ChangeEvent<HTMLInputElement>) {
-        handleClickButton(false);
         setInputs((prev) => ({
             ...prev,
             password: {
@@ -133,6 +152,7 @@ export default function ChangeUsernameForm() {
                 attributes: { value: e.target.value },
             },
         }));
+        handleClickButton(false);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
@@ -140,6 +160,19 @@ export default function ChangeUsernameForm() {
                     ...prev.password,
                     attributes: { value: e.target.value },
                 }),
+            }));
+            setInputState((prev) => ({
+                ...prev,
+                newUsername: {
+                    ...prev.newUsername,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
+                password: {
+                    ...prev.newUsername,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
             }));
             handleClickButton(true);
         }, 950);
@@ -167,20 +200,23 @@ export default function ChangeUsernameForm() {
         handleClickButton(false);
         const handledInputs = onHandleInputs(inputs, user.username);
         const response = await onSubmitInputs(handledInputs);
-        handleClickButton(() => {
-            if (!response.success) {
-                setInputState((prev) => ({
-                    ...prev,
-                    newUsername: {
-                        ...prev.newUsername,
-                        showInputMessage: true,
-                    },
-                }));
-                return true;
-            }
-            router.reload();
-            return false;
-        });
+        if (!response.success) {
+            setInputState((prev) => ({
+                ...prev,
+                newUsername: {
+                    ...prev.newUsername,
+                    showInputMessage: true,
+                },
+                password: {
+                    ...prev.password,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
+            }));
+            handleClickButton(true);
+            return;
+        }
+        router.reload();
     }
 
     function onHandleInputs(
@@ -201,7 +237,7 @@ export default function ChangeUsernameForm() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledInputs),
         };
-        const response = await fetch(API, options);
+        const response = await fetch(UPDATE_USERNAME_API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
     }

@@ -11,8 +11,8 @@ const API = 'api/signIn';
 type UserContextType = {
     user: UserType;
     userState: UserStateType;
-    isUserImageLoading: boolean;
-    setUserImageLoader: (value: boolean) => void;
+
+    userImageState: UserImageState;
 };
 
 export const UserContext = createContext<UserContextType>({
@@ -28,8 +28,10 @@ export const UserContext = createContext<UserContextType>({
         setHasUser: () => null,
         setUserStateLoading: () => null,
     },
-    isUserImageLoading: false,
-    setUserImageLoader: () => null,
+    userImageState: {
+        isUserImageLoading: false,
+        onLoadingUserImage: () => null,
+    },
 });
 
 type UserProps = {
@@ -37,7 +39,14 @@ type UserProps = {
 };
 
 export function UserProvider({ children }: UserProps) {
-    const [isUserImageLoading, setUserImageLoader] = useState(false);
+    const [userImageState, setUserImageState] = useState({
+        isUserImageLoading: false,
+        onLoadingUserImage: (value: boolean) =>
+            setUserImageState((prev) => ({
+                ...prev,
+                isUserImageLoading: value,
+            })),
+    });
     const [user, setUser] = useState({
         username: '',
         userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
@@ -80,7 +89,11 @@ export function UserProvider({ children }: UserProps) {
 
     return (
         <UserContext.Provider
-            value={{ user, userState, isUserImageLoading, setUserImageLoader }}
+            value={{
+                user,
+                userState,
+                userImageState,
+            }}
         >
             {children}
         </UserContext.Provider>

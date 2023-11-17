@@ -7,7 +7,8 @@ import { useUser } from '../../context/UserContext';
 import useUtils from '@/hooks/useUtils';
 import { useRouter } from 'next/router';
 
-const API = 'api/signUp';
+const SIGN_UP_API = 'api/signUp';
+const CHECK_USERNAME_API = 'api/checkUsername';
 const REQUIRED_MESSAGE = 'This field is required';
 
 interface SignUpFormPropsType {
@@ -37,7 +38,10 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         username: inputsFactory({
             asyncValidations: async ({ value }) => [
                 {
-                    conditional: await onCheckUsername(value),
+                    conditional: await onCheckUsername(CHECK_USERNAME_API, {
+                        method: 'POST',
+                        body: value,
+                    }),
                     message: 'This username already exist',
                 },
             ],
@@ -164,18 +168,19 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 highlightInput: true,
             },
         }));
+        handleClickButton(false);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
                 [key]: validateSingle(prev[key], prev),
             }));
+            handleClickButton(true);
         }, 950);
     }
 
     async function onChangeUsernameInput(
         e: React.ChangeEvent<HTMLInputElement>,
     ) {
-        handleClickButton(false);
         setInputs((prev) => ({
             ...prev,
             username: {
@@ -191,6 +196,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 highlightInput: true,
             },
         }));
+        handleClickButton(false);
         onSetAsyncTimeOut(async () => {
             const input = {
                 ...inputs.username,
@@ -206,7 +212,9 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             );
             setInputs((prev) => ({ ...prev, username: validateInput }));
             handleClickButton(true);
-        }, 960);
+        }, 960)
+            .then(() => handleClickButton(true))
+            .catch(() => handleClickButton(true));
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -220,14 +228,12 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         handleClickButton(false);
         const handledInputs = onHandleInputs(inputs);
         const response = await onSubmitInputs(handledInputs);
-        handleClickButton(() => {
-            if (!response.success) {
-                setModalState(true);
-                return true;
-            }
-            router.push('/dashboard-page');
-            return false;
-        });
+        if (!response.success) {
+            setModalState(true);
+            handleClickButton(true);
+            return;
+        }
+        router.push('/dashboard-page');
     }
 
     function onHandleInputs(inputsToHandle: InputsToValidateType<InputsType>) {
@@ -244,7 +250,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledInputs),
         };
-        const response = await fetch(API, options);
+        const response = await fetch(SIGN_UP_API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
     }

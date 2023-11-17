@@ -140,11 +140,11 @@ export default function ChangePasswordForm() {
     }
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
-        handleClickButton(false);
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
+        handleClickButton(false);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
@@ -165,15 +165,13 @@ export default function ChangePasswordForm() {
         const handledInputs = onHandleInputs(inputs, user.username);
         handleClickButton(false);
         const response = await onSubmitInputs(handledInputs);
-        handleClickButton(() => {
-            if (!response.success) {
-                onHilightInputs(true);
-                onShowInputsMessages(true);
-                return true;
-            }
-            router.reload();
-            return false;
-        });
+        if (!response.success) {
+            onHilightInputs(true);
+            onShowInputsMessages(true);
+            handleClickButton(true);
+            return;
+        }
+        router.reload();
     }
 
     function onHandleInputs(

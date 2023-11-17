@@ -13,8 +13,10 @@ export function middleware(req: NextRequest) {
                 return NextResponse.next();
             case 'https://validate-form-refactoring-7opgn27mm-gupa581333-gmailcom.vercel.app':
                 return NextResponse.next();
+            case 'http://localhost:3000':
+                return NextResponse.next();
             default:
-                return Response.json(
+                return NextResponse.json(
                     { success: false, data: 'authentication failed' },
                     { status: 401 },
                 );

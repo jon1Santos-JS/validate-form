@@ -1,11 +1,8 @@
-const API = 'api/checkUsername';
-
 export default function useInputHandler() {
-    async function onCheckUsername(username: string) {
-        const options = { method: 'POST', body: username };
-        const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
-        return parsedResponse.serverResponse;
+    async function onCheckUsername(url: string, options: FetchOptionsType) {
+        const response = await fetch(url, options);
+        const parsedResponse: DBDefaultResponse = await response.json();
+        return parsedResponse.success;
     }
 
     function inputsFactory<T extends string, G extends T>({

@@ -10,6 +10,11 @@ export async function updateUsernameController(
     const db = new DBHandler();
     const checkDBResponse = await db.checkDB('update username controller');
     if (!checkDBResponse.success) return checkDBResponse;
+    const accountResponse = await auth.authAccount({
+        username: userAccount.username,
+        password: userAccount.password,
+    });
+    if (!accountResponse.success) return accountResponse;
     const authResponse = await auth.authUsername(userAccount.newUsername.value);
     if (authResponse.success)
         return {
