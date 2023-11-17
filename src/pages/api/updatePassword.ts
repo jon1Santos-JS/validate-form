@@ -16,9 +16,9 @@ export default async function handler(
     const cookies = new CookiesAdapter(req, res);
     switch (req.method) {
         case 'POST': {
-            const controllerResponse = await updatePasswordController(req.body);
-            if (!controllerResponse.success) {
-                return res.status(500).json(controllerResponse);
+            const response = await updatePasswordController(req.body);
+            if (!response.success) {
+                return res.status(500).json(response);
             }
             const newAccount = {
                 username: req.body.username,
@@ -26,7 +26,7 @@ export default async function handler(
             };
             const hash = createHash(newAccount);
             cookies.set(USER_HASH_NAME, hash);
-            return res.status(200).json(controllerResponse);
+            return res.status(200).json(response);
         }
         default: {
             return res

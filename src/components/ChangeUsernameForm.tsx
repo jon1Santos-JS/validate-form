@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Input from './Input';
-import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
 import { useUser } from '../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
 import useUtils from '@/hooks/useUtils';
+import { useRouter } from 'next/router';
 const API = 'api/updateUsername';
 
 type InputsType = 'newUsername' | 'password';
@@ -15,7 +15,7 @@ export default function ChangeUsernameForm() {
     const { asyncValidateSingle, validateMany, validateSingle } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
-    const [isClickable, handleButtonClick] = useState(true);
+    const [isClickable, handleClickButton] = useState(true);
     const [inputState, setInputState] = useState({
         newUsername: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -38,7 +38,7 @@ export default function ChangeUsernameForm() {
                     message: '',
                 },
             ],
-            required: true,
+            required: { value: true },
             attributes: { value: '' },
             errors: [],
         }),
@@ -49,7 +49,7 @@ export default function ChangeUsernameForm() {
                     message: 'Incorrect Password',
                 },
             ],
-            required: true,
+            required: { value: true },
             attributes: { value: '' },
             errors: [],
         }),
@@ -109,7 +109,7 @@ export default function ChangeUsernameForm() {
     }
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
-        handleButtonClick(false);
+        handleClickButton(false);
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
@@ -120,12 +120,12 @@ export default function ChangeUsernameForm() {
                 attributes: { value: e.target.value },
             });
             setInputs((prev) => ({ ...prev, [key]: validatedInput }));
-            handleButtonClick(true);
+            handleClickButton(true);
         }, 950);
     }
 
     function onChangePassword(e: React.ChangeEvent<HTMLInputElement>) {
-        handleButtonClick(false);
+        handleClickButton(false);
         setInputs((prev) => ({
             ...prev,
             password: {
@@ -141,7 +141,7 @@ export default function ChangeUsernameForm() {
                     attributes: { value: e.target.value },
                 }),
             }));
-            handleButtonClick(true);
+            handleClickButton(true);
         }, 950);
     }
 
@@ -164,12 +164,22 @@ export default function ChangeUsernameForm() {
             }));
             return;
         }
-        handleButtonClick(false);
+        handleClickButton(false);
         const handledInputs = onHandleInputs(inputs, user.username);
         const response = await onSubmitInputs(handledInputs);
-        handleButtonClick(() => {
-            onHandleResponse(response);
-            return true;
+        handleClickButton(() => {
+            if (!response.success) {
+                setInputState((prev) => ({
+                    ...prev,
+                    newUsername: {
+                        ...prev.newUsername,
+                        showInputMessage: true,
+                    },
+                }));
+                return true;
+            }
+            router.reload();
+            return false;
         });
     }
 
@@ -194,14 +204,5 @@ export default function ChangeUsernameForm() {
         const response = await fetch(API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
-    }
-
-    function onHandleResponse(response: DBDefaultResponse) {
-        if (!response.success) return;
-        setInputState((prev) => ({
-            ...prev,
-            newUsername: { ...prev.newUsername, showInputMessage: true },
-        }));
-        router.reload();
     }
 }

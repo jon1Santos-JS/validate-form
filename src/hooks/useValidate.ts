@@ -2,8 +2,7 @@ export default function useValidate() {
     function validateMany<T extends string>(inputs: InputsToValidateType<T>) {
         let isValid = true;
         for (const i in inputs) {
-            if (inputs[i].required && !inputs[i].attributes.value)
-                onCheckRequired(inputs[i]);
+            onCheckRequired(inputs[i]);
             if (inputs[i].errors.length > 0) isValid = false;
         }
         return isValid;
@@ -32,13 +31,10 @@ export default function useValidate() {
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        const { attributes, validations, required } = input;
+        const { attributes, validations } = input;
         const newErrors: string[] = [];
 
-        if (required && !attributes.value) {
-            onCheckRequired(input);
-            return;
-        }
+        if (onCheckRequired(input)) return;
         if (!validations) return;
         validations(attributes, inputs && inputs).forEach(
             ({ conditional, message }) => {
@@ -84,9 +80,16 @@ export default function useValidate() {
     }
 
     function onCheckRequired<T extends string>(input: ValidateInputType<T, T>) {
-        const conditional =
-            typeof input.required === 'string' ? input.required : '';
-        input.errors.push(conditional);
+        const { attributes, required } = input;
+        if (!attributes.value && required?.value) {
+            if (!required.message) {
+                input.errors.push('');
+                return true;
+            }
+            input.errors.push(required.message);
+            return true;
+        }
+        return false;
     }
 
     return { validateSingle, asyncValidateSingle, validateMany };

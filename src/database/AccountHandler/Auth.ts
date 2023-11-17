@@ -29,11 +29,12 @@ export default class UserAuthHandler {
             return {
                 success: false,
                 data: 'Username does not exist',
-            } as DBDefaultResponse;
+            } as DBAuthUsernameResponse;
         }
+        console.log('Username already exist');
         return {
             success: true,
             data: 'Username already exist',
-        } as DBDefaultResponse;
+        } as DBAuthUsernameResponse;
     }
 }

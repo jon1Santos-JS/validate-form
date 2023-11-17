@@ -6,17 +6,14 @@ declare type FetchOptionsType = {
 
 declare type MethodTypes = 'GET' | 'DELETE' | 'POST';
 
-declare type ServerResponse = {
-    serverResponse: boolean;
-    body: string;
-};
-
 // IMGBB API RESPONSE: https://api.imgbb.com
 
-declare type ImgBBResponseType = {
-    data: DataType;
-    success: boolean;
-};
+declare type ImgBBResponseType =
+    | {
+          success: true;
+          data: DataType;
+      }
+    | { success: false; data: string };
 
 declare type DataType = {
     url: string;

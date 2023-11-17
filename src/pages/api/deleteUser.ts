@@ -11,13 +11,10 @@ export default async function handler(
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const controllerResponse = await deleteAccountController(
-                browserHash,
-            );
-            if (!controllerResponse.success)
-                return res.status(500).json(controllerResponse);
+            const response = await deleteAccountController(browserHash);
+            if (!response.success) return res.status(500).json(response);
             cookies.set(USER_HASH_NAME);
-            return res.status(200).json(controllerResponse);
+            return res.status(200).json(response);
         }
         default: {
             return res

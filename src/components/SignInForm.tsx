@@ -19,7 +19,7 @@ export default function SignInForm() {
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
     const [showMessage, onShowMessage] = useState<boolean>(false);
-    const [isClickable, handleButtonClick] = useState(true);
+    const [isClickable, handleClickButton] = useState(true);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -40,7 +40,7 @@ export default function SignInForm() {
                     message: '',
                 },
             ],
-            required: true,
+            required: { value: true },
             attributes: { value: '' },
             errors: [],
         }),
@@ -55,7 +55,7 @@ export default function SignInForm() {
                     message: '',
                 },
             ],
-            required: true,
+            required: { value: true },
             attributes: { value: '' },
             errors: [],
         }),
@@ -144,9 +144,22 @@ export default function SignInForm() {
             return;
         }
         const handledInputs = onHandleInputs(inputs);
-        handleButtonClick(false);
-        onHandledResponse(await onSubmitInputs(handledInputs));
-        handleButtonClick(true);
+        handleClickButton(false);
+        const response = await onSubmitInputs(handledInputs);
+        handleClickButton(() => {
+            setUserStateLoading(false);
+            setHasUser(response.success);
+            if (!response.success) {
+                onShowMessage(true);
+                onHilightInputs(true);
+                onSetTimeOut(() => {
+                    onShowMessage(false);
+                    onHilightInputs(false);
+                }, 2750);
+                return true;
+            }
+            return false;
+        });
     }
 
     function onHandleInputs(inputsTohandle: InputsToValidateType<InputsType>) {
@@ -166,20 +179,6 @@ export default function SignInForm() {
         const response = await fetch(API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
-    }
-
-    function onHandledResponse(response: DBDefaultResponse) {
-        setUserStateLoading(false);
-        setHasUser(response.success);
-        if (!response.success) {
-            onShowMessage(true);
-            onHilightInputs(true);
-            onSetTimeOut(() => {
-                onShowMessage(false);
-                onHilightInputs(false);
-            }, 2750);
-            return;
-        }
     }
 
     function onHilightInputs(value: boolean) {

@@ -11,7 +11,11 @@ export async function updateUsernameController(
     const checkDBResponse = await db.checkDB('update username controller');
     if (!checkDBResponse.success) return checkDBResponse;
     const authResponse = await auth.authUsername(userAccount.newUsername.value);
-    if (authResponse.success) return authResponse;
+    if (authResponse.success)
+        return {
+            success: false,
+            data: authResponse.data,
+        };
     const updateResponse = await update.updateUsername(userAccount);
     if (!updateResponse.success) return updateResponse;
     const DBResponse = await db.refreshDB('update username controller');
@@ -40,7 +44,6 @@ export async function updateUserImageController(
     newUserImage: NewUserImage,
 ) {
     const update = new UserUpdateHandler();
-    const auth = new UserAuthHandler();
     const db = new DBHandler();
     const checkResponse = await db.checkDB('update image controller');
     if (!checkResponse.success) return checkResponse;
@@ -50,8 +53,6 @@ export async function updateUserImageController(
     );
     if (!getUserResponse.success) return getUserResponse;
     const user = getUserResponse.data;
-    const authResponse = await auth.authUsername(user.username.value);
-    if (!authResponse) return authResponse;
     const updateResponse = await update.updateUserImage(user, newUserImage);
     const refreshResponse = await db.refreshDB('update image controller');
     if (!refreshResponse.success) return refreshResponse;

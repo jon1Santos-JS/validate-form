@@ -24,6 +24,8 @@ declare type HandleDBCommand =
     | 'checkDBState'
     | 'refreshDB';
 
+// DATABASE HANDLER RESPONSES
+
 declare type DBFailedResponse = {
     success: false;
     data: string;
@@ -48,6 +50,26 @@ declare type DBHashResponse =
           success: true;
           data: UserFromDataBase;
       };
+
+// AUTH HANDLER RESPONSES
+
+declare type DBAuthUsernameResponse =
+    | DBFailedResponse
+    | {
+          success: true;
+          data: string;
+      };
+
+// UPDATE RESPONSES
+
+declare type DBUpdateUserImageResponse =
+    | DBFailedResponse
+    | {
+          success: true;
+          data: { value: string };
+      };
+
+// CLIENT DATA
 
 declare interface UserFromClient {
     username: { value: string };

@@ -16,7 +16,7 @@ export default function ChangePasswordForm() {
     const { validateSingle, validateMany } = useValidate();
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
-    const [isClickable, handleButtonClick] = useState(true);
+    const [isClickable, handleClickButton] = useState(true);
     const [inputState, setInputState] = useState({
         password: { showInputMessage: false, highlightInput: false },
         newPassword: { showInputMessage: false, highlightInput: false },
@@ -30,7 +30,7 @@ export default function ChangePasswordForm() {
                     message: 'Incorrect Password',
                 },
             ],
-            required: true,
+            required: { value: true },
             attributes: { value: '' },
             errors: [],
         }),
@@ -55,7 +55,7 @@ export default function ChangePasswordForm() {
                 },
             ],
             crossfields: ['password', 'confirmNewPassword'],
-            required: true,
+            required: { value: true },
             attributes: { value: '' },
             errors: [],
         }),
@@ -68,7 +68,7 @@ export default function ChangePasswordForm() {
                 },
             ],
             crossfields: ['newPassword'],
-            required: true,
+            required: { value: true },
             attributes: { value: '' },
             errors: [],
         }),
@@ -140,7 +140,7 @@ export default function ChangePasswordForm() {
     }
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
-        handleButtonClick(false);
+        handleClickButton(false);
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
@@ -150,7 +150,7 @@ export default function ChangePasswordForm() {
                 ...prev,
                 [key]: validateSingle({ ...prev[key] }, prev),
             }));
-            handleButtonClick(true);
+            handleClickButton(true);
         }, 950);
     }
 
@@ -163,11 +163,16 @@ export default function ChangePasswordForm() {
             return;
         }
         const handledInputs = onHandleInputs(inputs, user.username);
-        handleButtonClick(false);
+        handleClickButton(false);
         const response = await onSubmitInputs(handledInputs);
-        handleButtonClick(() => {
-            onHandleResponse(response);
-            return true;
+        handleClickButton(() => {
+            if (!response.success) {
+                onHilightInputs(true);
+                onShowInputsMessages(true);
+                return true;
+            }
+            router.reload();
+            return false;
         });
     }
 
@@ -181,15 +186,6 @@ export default function ChangePasswordForm() {
             password: { value: password.attributes.value },
             newPassword: { value: newPassword.attributes.value },
         };
-    }
-
-    function onHandleResponse(response: DBDefaultResponse) {
-        if (!response.success) {
-            onHilightInputs(true);
-            onShowInputsMessages(true);
-            return;
-        }
-        router.reload();
     }
 
     async function onSubmitInputs(handledInputs: UserWithNewPassword) {

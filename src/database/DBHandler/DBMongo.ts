@@ -24,7 +24,7 @@ export class MongoDB {
         }
     }
     async accessState(caller: string) {
-        const connectionResponse = await this.connect('access state');
+        const connectionResponse = await this.connect(caller);
         if (!connectionResponse.success) return connectionResponse;
         try {
             const collection = MONGODB.db('accounts').collection('users');
@@ -38,9 +38,9 @@ export class MongoDB {
             console.log('MongoDB state has been accessed by:', caller);
             await MONGODB.close();
             return { success: true } as DBDefaultResponse;
-        } catch {
+        } catch (err: unknown) {
             console.log('Failed to access MongoDB state by:', caller);
-            return this.createState('access mongoDB state');
+            return this.createState(`${err}, state was created by: ${caller}`);
         }
     }
     async refreshState(caller: string) {

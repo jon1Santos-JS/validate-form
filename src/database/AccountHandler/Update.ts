@@ -47,7 +47,7 @@ export default class UserUpdateHandler {
         console.log('User image has been changed');
         return {
             success: true,
-            data: 'User image has been changed',
-        } as DBDefaultResponse;
+            data: newUserImage,
+        } as DBUpdateUserImageResponse;
     }
 }

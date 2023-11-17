@@ -12,8 +12,8 @@ export default async function handle(
 ) {
     switch (req.method) {
         case 'POST': {
-            const controllerResponse = await checkUsernameController(req.body);
-            return res.status(200).json(controllerResponse);
+            const response = await checkUsernameController(req.body);
+            return res.status(200).json(response);
         }
         default: {
             return res

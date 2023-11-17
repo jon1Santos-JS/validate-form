@@ -20,18 +20,16 @@ export default async function handler(
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const controllerResponse = await authUserController(browserHash);
-            if (!controllerResponse.success)
-                return res.status(500).json(controllerResponse);
-            return res.status(200).json(controllerResponse);
+            const response = await authUserController(browserHash);
+            if (!response.success) return res.status(500).json(response);
+            return res.status(200).json(response);
         }
         case 'POST': {
-            const controllerResponse = await signInController(req.body);
-            if (!controllerResponse.success)
-                return res.status(500).json(controllerResponse);
+            const response = await signInController(req.body);
+            if (!response.success) return res.status(500).json(response);
             const hash = createHash(req.body);
             cookies.set(USER_HASH_NAME, hash);
-            return res.status(200).json(controllerResponse);
+            return res.status(200).json(response);
         }
         case 'DELETE': {
             cookies.set(USER_HASH_NAME);

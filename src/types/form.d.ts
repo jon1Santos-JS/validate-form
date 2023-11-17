@@ -12,13 +12,13 @@ declare interface ValidateInputType<T extends string, U extends T> {
     errors: string[];
     crossfields?: U[];
     attributes: InputAttributes;
-    required?: string | boolean;
+    required?: { value: boolean; message?: string };
 }
 
-declare type InputAttributes = {
+declare interface InputAttributes {
     value: string;
     files?: FileList | null;
-};
+}
 
 declare type ValidateFunctionType<T extends string> = (
     inputAttributes: InputAttributes,

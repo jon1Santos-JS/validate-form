@@ -16,10 +16,9 @@ export default async function handler(
     switch (req.method) {
         case 'POST': {
             cookies.set(USER_HASH_NAME);
-            const controllerResponse = await signUpController(req.body);
-            if (!controllerResponse.success)
-                return res.status(500).json(controllerResponse);
-            return res.status(200).json(controllerResponse);
+            const response = await signUpController(req.body);
+            if (!response.success) return res.status(500).json(response);
+            return res.status(200).json(response);
         }
         default: {
             return res

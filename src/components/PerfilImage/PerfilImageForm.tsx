@@ -20,7 +20,7 @@ export default function PerfilImageForm() {
     const { handledName, onCheckExtensions } = useString();
     const { onSetTimeOut } = useUtils();
     const { inputsFactory } = useInputHandler();
-    const [isClickable, handleButtonClick] = useState(true);
+    const [isClickable, handleClickButton] = useState(true);
     const [inputState, setInputState] = useState({
         imageInput: { showInputMessage: false, highlightInput: false },
     });
@@ -36,13 +36,13 @@ export default function PerfilImageForm() {
                         ', ',
                     )}`,
                 },
-                // {
-                //     conditional: !inputAttributes.files,
-                //     message: `Image is required`,
-                // },
+                {
+                    conditional: !inputAttributes.files,
+                    message: `No image uploaded`,
+                },
             ],
-            required: 'No image uploaded',
-            attributes: { value: '', files: null },
+            required: { value: true, message: 'No image uploaded' },
+            attributes: { value: '' },
             errors: [],
         }),
     });
@@ -115,37 +115,36 @@ export default function PerfilImageForm() {
             }, 2750);
             return;
         }
-        const inputAttributes = inputs.imageInput.attributes;
-        handleButtonClick(false);
-        await onHandleApiResponses(inputAttributes.files as FileList);
-        setUserImageLoader(true);
-        setInputs((prev) => {
-            prev.imageInput.attributes.files = null;
-            prev.imageInput.attributes.value = '';
-            handleButtonClick(true);
-            return prev;
+        handleClickButton(false);
+        const response = await onHandleApiResponses(
+            inputs.imageInput.attributes.files as FileList,
+        );
+        handleClickButton(() => {
+            if (!response.success) {
+                setInputState((prev) => ({
+                    ...prev,
+                    imageInput: { ...prev.imageInput, showInputMessage: true },
+                }));
+                return true;
+            }
+            setInputs((prev) => ({
+                ...prev,
+                imageInput: {
+                    ...prev.imageInput,
+                    attributes: { value: '', files: null },
+                },
+            }));
+            setUserImageLoader(true);
+            setUserimage(response.data.value);
+            return true;
         });
     }
 
     async function onHandleApiResponses(files: FileList) {
         const APIResponse = await onSubmitImageToImageBB(files);
-        if (!APIResponse.success) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
-            return;
-        }
-        const imgUrl = APIResponse.data.url;
-        const DBResponse = await onSubmitImageToDB(imgUrl);
-        if (!DBResponse.success) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
-            return;
-        }
-        setUserimage(imgUrl);
+        if (!APIResponse.success) return APIResponse;
+        const DBResponse = await onSubmitImageToDB(APIResponse.data.url);
+        return DBResponse;
     }
 
     async function onSubmitImageToImageBB(files: FileList) {
@@ -172,7 +171,7 @@ export default function PerfilImageForm() {
             body: JSON.stringify({ value: img }),
         };
         const response = await fetch(API, options);
-        const parsedResponse: DBDefaultResponse = await response.json();
+        const parsedResponse: DBUpdateUserImageResponse = await response.json();
         return parsedResponse;
     }
 }

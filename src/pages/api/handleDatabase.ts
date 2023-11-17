@@ -11,12 +11,9 @@ export default async function handler(
     switch (req.method) {
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const resetDBControllerResponse = await resetDBController(
-                browserHash,
-            );
-            if (!resetDBControllerResponse.success)
-                return res.status(500).json(resetDBControllerResponse);
-            return res.status(200).json(resetDBControllerResponse);
+            const response = await resetDBController(browserHash);
+            if (!response.success) return res.status(500).json(response);
+            return res.status(200).json(response);
         }
         default: {
             return res

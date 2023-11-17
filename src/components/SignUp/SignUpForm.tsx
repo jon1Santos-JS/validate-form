@@ -5,6 +5,7 @@ import useValidate from '@/hooks/useValidate';
 import useInputHandler from '@/hooks/useInputHandler';
 import { useUser } from '../../context/UserContext';
 import useUtils from '@/hooks/useUtils';
+import { useRouter } from 'next/router';
 
 const API = 'api/signUp';
 const REQUIRED_MESSAGE = 'This field is required';
@@ -18,6 +19,7 @@ interface PropsType {
 
 type InputsType = 'confirmPassword' | 'password' | 'username';
 export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
+    const router = useRouter();
     const { setModalState } = ownProps;
     const {
         userState: { hasUser },
@@ -25,7 +27,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const { validateSingle, asyncValidateSingle, validateMany } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
-    const [isClickable, handleButtonClick] = useState(true);
+    const [isClickable, handleClickButton] = useState(true);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -49,7 +51,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                     message: 'Only characters',
                 },
             ],
-            required: REQUIRED_MESSAGE,
+            required: { value: true, message: REQUIRED_MESSAGE },
             attributes: { value: '' },
             errors: [],
         }),
@@ -67,7 +69,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         'This field has to be equal to the confirm password',
                 },
             ],
-            required: REQUIRED_MESSAGE,
+            required: { value: true, message: REQUIRED_MESSAGE },
             crossfields: ['confirmPassword'],
             attributes: { value: '' },
             errors: [],
@@ -80,7 +82,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                     message: 'This field has to be equal to the password',
                 },
             ],
-            required: REQUIRED_MESSAGE,
+            required: { value: true, message: REQUIRED_MESSAGE },
             crossfields: ['password'],
             attributes: { value: '' },
             errors: [],
@@ -173,7 +175,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     async function onChangeUsernameInput(
         e: React.ChangeEvent<HTMLInputElement>,
     ) {
-        handleButtonClick(false);
+        handleClickButton(false);
         setInputs((prev) => ({
             ...prev,
             username: {
@@ -203,7 +205,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 currentInputs,
             );
             setInputs((prev) => ({ ...prev, username: validateInput }));
-            handleButtonClick(true);
+            handleClickButton(true);
         }, 960);
     }
 
@@ -215,12 +217,16 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             onShowInputsMessages(true);
             return;
         }
-        handleButtonClick(false);
+        handleClickButton(false);
         const handledInputs = onHandleInputs(inputs);
-        const submitResponse = await onSubmitInputs(handledInputs);
-        handleButtonClick(() => {
-            onHandleResponse(submitResponse);
-            return true;
+        const response = await onSubmitInputs(handledInputs);
+        handleClickButton(() => {
+            if (!response.success) {
+                setModalState(true);
+                return true;
+            }
+            router.push('/dashboard-page');
+            return false;
         });
     }
 
@@ -241,14 +247,6 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         const response = await fetch(API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
-    }
-
-    function onHandleResponse(response: DBDefaultResponse) {
-        if (!response.success) {
-            setModalState(true);
-            return;
-        }
-        window.location.assign('/dashboard-page');
     }
 
     function onHilightInputs(value: boolean) {
