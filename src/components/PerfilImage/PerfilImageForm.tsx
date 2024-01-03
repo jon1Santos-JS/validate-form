@@ -20,7 +20,7 @@ export default function PerfilImageForm() {
     const { handledName, onCheckExtensions } = useString();
     const { onSetTimeOut } = useUtils();
     const { inputsFactory } = useInputHandler();
-    const [isClickable, handleClickButton] = useState(true);
+    const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         imageInput: { showInputMessage: false, highlightInput: false },
     });
@@ -84,6 +84,7 @@ export default function PerfilImageForm() {
         e: React.ChangeEvent<HTMLInputElement>,
         key: InputsType,
     ) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
             [key]: validateSingle(
@@ -101,7 +102,7 @@ export default function PerfilImageForm() {
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (!isClickable) return;
+        if (isRequesting) return;
         if (!validateMany(inputs)) {
             setInputState((prev) => ({
                 ...prev,
@@ -115,7 +116,8 @@ export default function PerfilImageForm() {
             }, 2750);
             return;
         }
-        handleClickButton(false);
+        setRequestState(true);
+        userImageState.onLoadingUserImage(true);
         const response = await onHandleApiResponses(
             inputs.imageInput.attributes.files as FileList,
         );
@@ -124,7 +126,7 @@ export default function PerfilImageForm() {
                 ...prev,
                 imageInput: { ...prev.imageInput, showInputMessage: true },
             }));
-            handleClickButton(true);
+            setRequestState(false);
             return;
         }
         setInputs((prev) => ({
@@ -134,10 +136,8 @@ export default function PerfilImageForm() {
                 attributes: { value: '', files: null },
             },
         }));
-        userImageState.onLoadingUserImage(true);
-        // setUserImageLoader(true);
         setUserimage(response.data.value);
-        handleClickButton(true);
+        setRequestState(false);
     }
 
     async function onHandleApiResponses(files: FileList) {

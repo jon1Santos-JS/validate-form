@@ -16,7 +16,7 @@ export default function ChangePasswordForm() {
     const { validateSingle, validateMany } = useValidate();
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
-    const [isClickable, handleClickButton] = useState(true);
+    const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         password: { showInputMessage: false, highlightInput: false },
         newPassword: { showInputMessage: false, highlightInput: false },
@@ -140,37 +140,37 @@ export default function ChangePasswordForm() {
     }
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
-        handleClickButton(false);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
                 [key]: validateSingle({ ...prev[key] }, prev),
             }));
-            handleClickButton(true);
         }, 950);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (!isClickable) return;
+        if (isRequesting) return;
         if (!validateMany(inputs)) {
             onHilightInputs(true);
             onShowInputsMessages(true);
             return;
         }
         const handledInputs = onHandleInputs(inputs, user.username);
-        handleClickButton(false);
+        setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
         if (!response.success) {
             onHilightInputs(true);
             onShowInputsMessages(true);
-            handleClickButton(true);
+            setRequestState(false);
             return;
         }
+        setRequestState(false);
         router.reload();
     }
 
