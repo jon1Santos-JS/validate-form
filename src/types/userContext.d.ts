@@ -13,7 +13,7 @@ declare interface UserType {
     username: string;
     userImage: string;
     setUsername: (value: string) => void;
-    setUserimage: (value: string) => void;
+    setUserImage: (value: string) => void;
 }
 
 declare interface UserImageState {
