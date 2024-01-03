@@ -33,6 +33,8 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        onLoadingUserImage(false);
+        setTimeout(() => {
+            onLoadingUserImage(false);
+        }, 1000);
     }
 }
