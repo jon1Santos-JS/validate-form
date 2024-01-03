@@ -15,20 +15,21 @@ export default function PerfilImage() {
         if (isUserStateLoading) return null;
         return (
             <div className="o-perfil-image-container">
-                <LoadingSpinner isOpen={userImageState.isUserImageLoading} />
-                <Image
-                    src={userImage}
-                    alt="test image"
-                    priority
-                    onLoad={onLoadingImage}
-                    width={200}
-                    height={200}
-                    className={`${
-                        userImageState.isUserImageLoading
-                            ? 'is-image-not-display'
-                            : 'perfil-image'
-                    }`}
-                />
+                <LoadingSpinner isOpen={userImageState.isUserImageLoading}>
+                    <Image
+                        src={userImage}
+                        alt="test image"
+                        priority
+                        onLoad={onLoadingImage}
+                        width={200}
+                        height={200}
+                        className={`${
+                            userImageState.isUserImageLoading
+                                ? 'is-image-not-display'
+                                : 'perfil-image'
+                        }`}
+                    />
+                </LoadingSpinner>
             </div>
         );
     }
