@@ -34,6 +34,5 @@ export default function PerfilImage() {
 
     function onLoadingImage() {
         onLoadingUserImage(false);
-        console.log('hello from perfil image');
     }
 }

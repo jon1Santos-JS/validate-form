@@ -39,14 +39,6 @@ type UserProps = {
 };
 
 export function UserProvider({ children }: UserProps) {
-    const [user, setUser] = useState({
-        username: '',
-        userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
-        setUsername: (value: string) =>
-            setUser((prev) => ({ ...prev, username: value })),
-        setUserImage: (value: string) =>
-            setUser((prev) => ({ ...prev, userImage: value })),
-    });
     const [userImageState, setUserImageState] = useState({
         isUserImageLoading: false,
         onLoadingUserImage: (value: boolean) =>
@@ -62,6 +54,14 @@ export function UserProvider({ children }: UserProps) {
             setUserState((prev) => ({ ...prev, hasUser: value })),
         setUserStateLoading: (value: boolean) =>
             setUserState((prev) => ({ ...prev, isUserStateLoading: value })),
+    });
+    const [user, setUser] = useState({
+        username: '',
+        userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
+        setUsername: (value: string) =>
+            setUser((prev) => ({ ...prev, username: value })),
+        setUserImage: (value: string) =>
+            setUser((prev) => ({ ...prev, userImage: value })),
     });
 
     const onCheckUserState = useCallback(async () => {
