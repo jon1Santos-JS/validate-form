@@ -16,7 +16,7 @@ export default function ChangeUsernameForm() {
     const { asyncValidateSingle, validateMany, validateSingle } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
-    const [isClickable, handleClickButton] = useState(true);
+    const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         newUsername: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -116,11 +116,11 @@ export default function ChangeUsernameForm() {
         e: React.ChangeEvent<HTMLInputElement>,
         key: InputsType,
     ) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
-        handleClickButton(false);
         await onSetAsyncTimeOut(async () => {
             const validatedInput = await asyncValidateSingle({
                 ...inputs[key],
@@ -141,10 +141,10 @@ export default function ChangeUsernameForm() {
                 },
             }));
         }, 950);
-        handleClickButton(true);
     }
 
     function onChangePassword(e: React.ChangeEvent<HTMLInputElement>) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
             password: {
@@ -152,7 +152,6 @@ export default function ChangeUsernameForm() {
                 attributes: { value: e.target.value },
             },
         }));
-        handleClickButton(false);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
@@ -174,13 +173,12 @@ export default function ChangeUsernameForm() {
                     showInputMessage: true,
                 },
             }));
-            handleClickButton(true);
         }, 950);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (!isClickable) return;
+        if (isRequesting) return;
         if (!validateMany(inputs)) {
             setInputState((prev) => ({
                 ...prev,
@@ -197,8 +195,8 @@ export default function ChangeUsernameForm() {
             }));
             return;
         }
-        handleClickButton(false);
         const handledInputs = onHandleInputs(inputs, user.username);
+        setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
         if (!response.success) {
             setInputState((prev) => ({
@@ -213,7 +211,7 @@ export default function ChangeUsernameForm() {
                     showInputMessage: true,
                 },
             }));
-            handleClickButton(true);
+            setRequestState(false);
             return;
         }
         router.reload();

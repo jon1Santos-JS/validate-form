@@ -70,6 +70,7 @@ export default function DashBoardPage() {
             if (typeof parsedResponse === 'string') return;
             window.location.assign('/');
         }
+
         async function signOutUser() {
             await fetch(SIGN_IN_API, { method: 'DELETE' });
             setUsername('');

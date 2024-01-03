@@ -39,14 +39,6 @@ type UserProps = {
 };
 
 export function UserProvider({ children }: UserProps) {
-    const [userImageState, setUserImageState] = useState({
-        isUserImageLoading: false,
-        onLoadingUserImage: (value: boolean) =>
-            setUserImageState((prev) => ({
-                ...prev,
-                isUserImageLoading: value,
-            })),
-    });
     const [user, setUser] = useState({
         username: '',
         userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
@@ -54,6 +46,14 @@ export function UserProvider({ children }: UserProps) {
             setUser((prev) => ({ ...prev, username: value })),
         setUserimage: (value: string) =>
             setUser((prev) => ({ ...prev, userImage: value })),
+    });
+    const [userImageState, setUserImageState] = useState({
+        isUserImageLoading: false,
+        onLoadingUserImage: (value: boolean) =>
+            setUserImageState((prev) => ({
+                ...prev,
+                isUserImageLoading: value,
+            })),
     });
     const [userState, setUserState] = useState({
         hasUser: false,

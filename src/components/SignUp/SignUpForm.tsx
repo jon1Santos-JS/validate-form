@@ -28,7 +28,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const { validateSingle, asyncValidateSingle, validateMany } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
-    const [isClickable, handleClickButton] = useState(true);
+    const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -104,7 +104,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         ownProps={{
                             label: 'Username',
                             inputType: 'text',
-                            onChange: (e) => onChangeUsernameInput(e),
+                            onChange: (e) => onChangeInputUsername(e),
                         }}
                         inputStateProps={{
                             input: inputs.username,
@@ -156,6 +156,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         e: React.ChangeEvent<HTMLInputElement>,
         key: InputsType,
     ) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
@@ -168,19 +169,18 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 highlightInput: true,
             },
         }));
-        handleClickButton(false);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
                 [key]: validateSingle(prev[key], prev),
             }));
-            handleClickButton(true);
         }, 950);
     }
 
-    async function onChangeUsernameInput(
+    async function onChangeInputUsername(
         e: React.ChangeEvent<HTMLInputElement>,
     ) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
             username: {
@@ -196,8 +196,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 highlightInput: true,
             },
         }));
-        handleClickButton(false);
-        onSetAsyncTimeOut(async () => {
+        await onSetAsyncTimeOut(async () => {
             const input = {
                 ...inputs.username,
                 attributes: { value: e.target.value },
@@ -211,26 +210,23 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 currentInputs,
             );
             setInputs((prev) => ({ ...prev, username: validateInput }));
-            handleClickButton(true);
-        }, 960)
-            .then(() => handleClickButton(true))
-            .catch(() => handleClickButton(true));
+        }, 960);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (!isClickable) return;
+        if (isRequesting) return;
         if (!validateMany(inputs)) {
             onHilightInputs(true);
             onShowInputsMessages(true);
             return;
         }
-        handleClickButton(false);
         const handledInputs = onHandleInputs(inputs);
+        setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
         if (!response.success) {
             setModalState(true);
-            handleClickButton(true);
+            setRequestState(false);
             return;
         }
         router.push('/dashboard-page');
