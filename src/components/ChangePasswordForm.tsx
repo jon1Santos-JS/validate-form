@@ -1,11 +1,12 @@
 import Input from './Input';
 import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
-import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
+import useInputHandler from '@/hooks/useInputHandler';
 import { useState } from 'react';
 import { useUser } from '../context/UserContext';
+import useUtils from '@/hooks/useUtils';
 
-const API = 'api/changePassword';
+const API = 'api/updatePassword';
 
 type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 
@@ -13,8 +14,9 @@ export default function ChangePasswordForm() {
     const router = useRouter();
     const { user } = useUser();
     const { validateSingle, validateMany } = useValidate();
-    const { omitFields, inputsFactory, onSetTimeOut } = useInputHandler();
-    const [isClickable, handleButtonClick] = useState(true);
+    const { inputsFactory } = useInputHandler();
+    const { onSetTimeOut } = useUtils();
+    const [isClickable, handleClickButton] = useState(true);
     const [inputState, setInputState] = useState({
         password: { showInputMessage: false, highlightInput: false },
         newPassword: { showInputMessage: false, highlightInput: false },
@@ -22,45 +24,53 @@ export default function ChangePasswordForm() {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         password: inputsFactory({
-            validations: (currentInputValue) => [
+            validations: ({ value }) => [
                 {
-                    conditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !value.match(/.{6,}/),
                     message: 'Incorrect Password',
                 },
             ],
-            required: true,
+            required: { value: true },
+            attributes: { value: '' },
+            errors: [],
         }),
         newPassword: inputsFactory({
-            validations: (currentInputValue, inputs) => [
+            validations: ({ value }, currentInputs) => [
                 {
-                    conditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !value.match(/.{6,}/),
                     message: 'Password must has 6 characters at least',
                 },
                 {
-                    conditional: currentInputValue === inputs?.password.value,
+                    conditional:
+                        value === currentInputs?.password.attributes.value,
                     message:
                         'This field have to be different than the password',
                 },
                 {
                     conditional:
-                        currentInputValue !== inputs?.confirmNewPassword.value,
+                        value !==
+                        currentInputs?.confirmNewPassword.attributes.value,
                     message:
                         'This field has to be equal to the confirm new password',
                 },
             ],
             crossfields: ['password', 'confirmNewPassword'],
-            required: true,
+            required: { value: true },
+            attributes: { value: '' },
+            errors: [],
         }),
         confirmNewPassword: inputsFactory({
-            validations: (currentInputValue, hookInputs) => [
+            validations: ({ value }, currentInputs) => [
                 {
                     conditional:
-                        currentInputValue !== hookInputs?.newPassword.value,
+                        value !== currentInputs?.newPassword.attributes.value,
                     message: 'This field has to be equal to the new password',
                 },
             ],
             crossfields: ['newPassword'],
-            required: true,
+            required: { value: true },
+            attributes: { value: '' },
+            errors: [],
         }),
     });
 
@@ -132,13 +142,15 @@ export default function ChangePasswordForm() {
     function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
         setInputs((prev) => ({
             ...prev,
-            [key]: { ...prev[key], value: e.target.value },
+            [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
+        handleClickButton(false);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
                 [key]: validateSingle({ ...prev[key] }, prev),
             }));
+            handleClickButton(true);
         }, 950);
     }
 
@@ -150,30 +162,38 @@ export default function ChangePasswordForm() {
             onShowInputsMessages(true);
             return;
         }
-        handleButtonClick(false);
-        onHandleResponse(await onSubmitInputs());
-        handleButtonClick(true);
-    }
-
-    function onHandleResponse(response: ServerResponse) {
-        if (!response.serverResponse) return;
-        onHilightInputs(true);
-        onShowInputsMessages(true);
+        const handledInputs = onHandleInputs(inputs, user.username);
+        handleClickButton(false);
+        const response = await onSubmitInputs(handledInputs);
+        if (!response.success) {
+            onHilightInputs(true);
+            onShowInputsMessages(true);
+            handleClickButton(true);
+            return;
+        }
         router.reload();
     }
 
-    async function onSubmitInputs() {
-        const handledBody = {
-            username: { value: user.username },
-            ...omitFields(inputs, FIELDS_TO_OMIT),
+    function onHandleInputs(
+        inputsToHandle: InputsToValidateType<InputsType>,
+        username: string,
+    ) {
+        const { password, newPassword } = inputsToHandle;
+        return {
+            username: { value: username },
+            password: { value: password.attributes.value },
+            newPassword: { value: newPassword.attributes.value },
         };
+    }
+
+    async function onSubmitInputs(handledInputs: UserWithNewPassword) {
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(handledBody),
+            body: JSON.stringify(handledInputs),
         };
         const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
+        const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
     }
 

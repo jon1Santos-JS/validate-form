@@ -5,8 +5,7 @@ export default function PerfilImage() {
     const {
         user: { userImage },
         userState: { isUserStateLoading },
-        isUserImageLoading,
-        setUserImageLoader,
+        userImageState,
     } = useUser();
 
     return <>{renderImage()}</>;
@@ -17,12 +16,16 @@ export default function PerfilImage() {
             <div className="o-perfil-image-container">
                 <div
                     className={`${
-                        isUserImageLoading ? 'o-spinner-container' : ''
+                        userImageState.isUserImageLoading
+                            ? 'o-spinner-container'
+                            : ''
                     }`}
                 >
                     <div
                         className={`${
-                            isUserImageLoading ? 'spinner-element' : ''
+                            userImageState.isUserImageLoading
+                                ? 'spinner-element'
+                                : ''
                         }`}
                     >
                         <Image
@@ -33,7 +36,7 @@ export default function PerfilImage() {
                             width={200}
                             height={200}
                             className={`${
-                                isUserImageLoading
+                                userImageState.isUserImageLoading
                                     ? 'is-image-not-display'
                                     : 'perfil-image'
                             }`}
@@ -45,6 +48,6 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        setUserImageLoader(false);
+        userImageState.onLoadingUserImage(false);
     }
 }

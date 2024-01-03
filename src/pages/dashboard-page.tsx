@@ -6,6 +6,7 @@ import { useUser } from '@/context/UserContext';
 import { useRouter } from 'next/router';
 
 const HANDLE_DB_API = 'api/handleDatabase';
+const DELETE_API = 'api/deleteUser';
 const SIGN_IN_API = 'api/signIn';
 
 export default function DashBoardPage() {
@@ -14,7 +15,7 @@ export default function DashBoardPage() {
         userState: { hasUser, isUserStateLoading, setHasUser },
     } = useUser();
     const router = useRouter();
-    const adminCheck = username !== 'admins';
+    const adminCheck = username !== process.env.NEXT_PUBLIC_ADMINS_USERNAME;
 
     return <>{renderElement()}</>;
 
@@ -42,7 +43,6 @@ export default function DashBoardPage() {
                     {!adminCheck && (
                         <button onClick={onResetDB}>Reset Database</button>
                     )}
-
                     {hasUser && (
                         <button
                             className="c-button sign-out"
@@ -63,15 +63,14 @@ export default function DashBoardPage() {
         }
 
         async function onDeleteAccount() {
-            const body = username;
-            const response = await fetch(HANDLE_DB_API, {
-                body: body,
-                method: 'POST',
+            const response = await fetch(DELETE_API, {
+                method: 'GET',
             });
             const parsedResponse = await response.json();
             if (typeof parsedResponse === 'string') return;
             window.location.assign('/');
         }
+
         async function signOutUser() {
             await fetch(SIGN_IN_API, { method: 'DELETE' });
             setUsername('');

@@ -1,57 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import {
-    deleteAccountController,
-    getUserStateController,
-    resetDBController,
-} from '@/lib/controllers';
-import { USER_HASH_NAME, returnUserByHash } from '@/lib/hash';
-import Cookies from 'cookies';
+import { resetDBController } from '@/controllers/DBController';
+import CookiesAdapter from '@/lib/cookiesAdapter';
+import { USER_HASH_NAME } from '@/database/DBHandler/DBState';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
 ) {
-    const cookies = new Cookies(req, res);
+    const cookies = new CookiesAdapter(req, res);
     switch (req.method) {
-        case 'POST': {
-            const username = req.body;
-            const controllerResponse = await deleteAccountController(username);
-            if (!controllerResponse.serverResponse)
-                return res.status(500).json(controllerResponse);
-            cookies.set(USER_HASH_NAME);
-            return res.status(200).json(controllerResponse);
-        }
         case 'GET': {
             const browserHash = cookies.get(USER_HASH_NAME);
-            const getUsersControllerResponse = await getUserStateController();
-            if (typeof getUsersControllerResponse.body === 'string')
-                return res.status(200).json(getUsersControllerResponse);
-            const usersFromDB = getUsersControllerResponse.body;
-            const hashResponse = await returnUserByHash(
-                browserHash,
-                usersFromDB,
-            );
-            if (typeof hashResponse.body === 'string')
-                return res.status(500).json(hashResponse);
-            const resetDBControllerResponse = await resetDBController(
-                hashResponse.body.username,
-            );
-            if (!resetDBControllerResponse.serverResponse)
-                return res.status(500).json(resetDBControllerResponse);
-            return res.status(200).json(resetDBControllerResponse);
+            const response = await resetDBController(browserHash);
+            if (!response.success) return res.status(500).json(response);
+            return res.status(200).json(response);
         }
         default: {
             return res
                 .status(405)
-                .json({ serverResponse: 'Method Not Allowed' });
+                .json({ success: false, data: 'Method Not Allowed' });
         }
     }
 }
-
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '1mb',
-        },
-    },
-};

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import Input from '../Input';
-import { onOmitProps } from '@/lib/lodashAdapter';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
-import useInputHandler, { FIELDS_TO_OMIT } from '@/hooks/useInputHandler';
+import useInputHandler from '@/hooks/useInputHandler';
 import { useUser } from '../../context/UserContext';
+import useUtils from '@/hooks/useUtils';
+import { useRouter } from 'next/router';
 
-const API = 'api/signUp';
-const INPUTS_TO_OMIT: 'confirmPassword'[] = ['confirmPassword'];
+const SIGN_UP_API = 'api/signUp';
+const CHECK_USERNAME_API = 'api/checkUsername';
 const REQUIRED_MESSAGE = 'This field is required';
 
 interface SignUpFormPropsType {
@@ -19,14 +20,15 @@ interface PropsType {
 
 type InputsType = 'confirmPassword' | 'password' | 'username';
 export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
+    const router = useRouter();
     const { setModalState } = ownProps;
     const {
         userState: { hasUser },
     } = useUser();
     const { validateSingle, asyncValidateSingle, validateMany } = useValidate();
-    const { omitFields, onSetTimeOut, inputsFactory, onCheckUsername } =
-        useInputHandler();
-    const [isClickable, handleButtonClick] = useState(true);
+    const { inputsFactory, onCheckUsername } = useInputHandler();
+    const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
+    const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -34,49 +36,60 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: inputsFactory({
-            asyncValidations: async (currentInputValue) => [
+            asyncValidations: async ({ value }) => [
                 {
-                    conditional: await onCheckUsername(currentInputValue),
+                    conditional: await onCheckUsername(CHECK_USERNAME_API, {
+                        method: 'POST',
+                        body: value,
+                    }),
                     message: 'This username already exist',
                 },
             ],
-            validations: (currentInputValue) => [
+            validations: ({ value }) => [
                 {
-                    conditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !value.match(/.{6,}/),
                     message: 'Username must has 6 characters at least',
                 },
                 {
-                    conditional: !currentInputValue.match(/^[A-Za-zçÇ]+$/),
+                    conditional: !value.match(/^[A-Za-zçÇ]+$/),
                     message: 'Only characters',
                 },
             ],
-            required: REQUIRED_MESSAGE,
+            required: { value: true, message: REQUIRED_MESSAGE },
+            attributes: { value: '' },
+            errors: [],
         }),
         password: inputsFactory({
-            validations: (currentInputValue, inputs) => [
+            validations: ({ value }, currentInputs) => [
                 {
-                    conditional: !currentInputValue.match(/.{6,}/),
+                    conditional: !value.match(/.{6,}/),
                     message: 'Password must has 6 characters at least',
                 },
                 {
                     conditional:
-                        currentInputValue !== inputs?.confirmPassword.value,
+                        value !==
+                        currentInputs?.confirmPassword.attributes.value,
                     message:
                         'This field has to be equal to the confirm password',
                 },
             ],
-            required: REQUIRED_MESSAGE,
+            required: { value: true, message: REQUIRED_MESSAGE },
             crossfields: ['confirmPassword'],
+            attributes: { value: '' },
+            errors: [],
         }),
         confirmPassword: inputsFactory({
-            validations: (currentInputValue, inputs) => [
+            validations: ({ value }, currentInputs) => [
                 {
-                    conditional: currentInputValue !== inputs?.password.value,
+                    conditional:
+                        value !== currentInputs?.password.attributes.value,
                     message: 'This field has to be equal to the password',
                 },
             ],
-            required: REQUIRED_MESSAGE,
+            required: { value: true, message: REQUIRED_MESSAGE },
             crossfields: ['password'],
+            attributes: { value: '' },
+            errors: [],
         }),
     });
 
@@ -91,7 +104,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                         ownProps={{
                             label: 'Username',
                             inputType: 'text',
-                            onChange: (e) => onChangeUsernameInput(e),
+                            onChange: (e) => onChangeInputUsername(e),
                         }}
                         inputStateProps={{
                             input: inputs.username,
@@ -143,9 +156,10 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         e: React.ChangeEvent<HTMLInputElement>,
         key: InputsType,
     ) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
-            [key]: { ...prev[key], value: e.target.value },
+            [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
         setInputState((prev) => ({
             ...prev,
@@ -163,13 +177,16 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         }, 950);
     }
 
-    async function onChangeUsernameInput(
+    async function onChangeInputUsername(
         e: React.ChangeEvent<HTMLInputElement>,
     ) {
-        handleButtonClick(false);
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
-            username: { ...prev.username, value: e.target.value },
+            username: {
+                ...prev.username,
+                attributes: { value: e.target.value },
+            },
         }));
         setInputState((prev) => ({
             ...prev,
@@ -179,8 +196,11 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 highlightInput: true,
             },
         }));
-        onSetTimeOut(async () => {
-            const input = { ...inputs.username, value: e.target.value };
+        await onSetAsyncTimeOut(async () => {
+            const input = {
+                ...inputs.username,
+                attributes: { value: e.target.value },
+            };
             const currentInputs = {
                 ...inputs,
                 username: input,
@@ -190,50 +210,45 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 currentInputs,
             );
             setInputs((prev) => ({ ...prev, username: validateInput }));
-            handleButtonClick(true);
-        }, 950);
+        }, 960);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        if (!isClickable) return;
+        if (isRequesting) return;
         if (!validateMany(inputs)) {
             onHilightInputs(true);
             onShowInputsMessages(true);
             return;
         }
         const handledInputs = onHandleInputs(inputs);
-        handleButtonClick(false);
-        const submitResponse = await onSubmitInputs(handledInputs);
-        handleButtonClick(true);
-        onHandleResponse(submitResponse);
+        setRequestState(true);
+        const response = await onSubmitInputs(handledInputs);
+        if (!response.success) {
+            setModalState(true);
+            setRequestState(false);
+            return;
+        }
+        router.push('/dashboard-page');
     }
 
-    function onHandleInputs(inputs: InputsToValidateType<InputsType>) {
-        const handledInputs = onOmitProps(inputs, INPUTS_TO_OMIT);
-        const handledFields = omitFields(handledInputs, FIELDS_TO_OMIT);
-        return handledFields;
+    function onHandleInputs(inputsToHandle: InputsToValidateType<InputsType>) {
+        const { username, password } = inputsToHandle;
+        return {
+            username: { value: username.attributes.value },
+            password: { value: password.attributes.value },
+        };
     }
 
-    async function onSubmitInputs<T extends string>(
-        handledInputs: HandledInputsType<T>,
-    ) {
+    async function onSubmitInputs(handledInputs: UserFromClient) {
         const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(handledInputs),
         };
-        const response = await fetch(API, options);
-        const parsedResponse: ServerResponse = await response.json();
+        const response = await fetch(SIGN_UP_API, options);
+        const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
-    }
-
-    function onHandleResponse(response: ServerResponse) {
-        if (!response.serverResponse) {
-            setModalState(true);
-            return;
-        }
-        window.location.assign('/dashboard-page');
     }
 
     function onHilightInputs(value: boolean) {

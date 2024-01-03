@@ -1,50 +1,8 @@
-import { onOmitProps } from '@/lib/lodashAdapter';
-import { useEffect, useState } from 'react';
-
-export const FIELDS_TO_OMIT: (
-    | 'errors'
-    | 'validations'
-    | 'asyncValidations'
-    | 'required'
-    | 'crossfields'
-)[] = ['errors', 'asyncValidations', 'validations', 'required', 'crossfields'];
-
 export default function useInputHandler() {
-    const [timeoutToClear, onSetTimeoutToClear] =
-        useState<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        if (!timeoutToClear) return;
-        return () => clearTimeout(timeoutToClear);
-    }, [timeoutToClear]);
-
-    async function onSetTimeOut(cb: () => void, timer: number) {
-        const timeOut = setTimeout(() => {
-            cb();
-        }, timer);
-        onSetTimeoutToClear(timeOut);
-    }
-
-    function omitFields<T extends string>(
-        obj: HandledInputsType<T>,
-        fieldsToOmit: (keyof ValidateInputType<T>)[],
-    ) {
-        const handleInputs = { ...obj };
-        for (const i in handleInputs) {
-            const typedIndex = i as T;
-            handleInputs[typedIndex] = onOmitProps(
-                handleInputs[typedIndex],
-                fieldsToOmit,
-            );
-        }
-        return handleInputs;
-    }
-
-    async function onCheckUsername(username: string) {
-        const options = { method: 'POST', body: username };
-        const response = await fetch('api/checkUsername', options);
-        const parsedResponse: ServerResponse = await response.json();
-        return parsedResponse.serverResponse;
+    async function onCheckUsername(url: string, options: FetchOptionsType) {
+        const response = await fetch(url, options);
+        const parsedResponse: DBDefaultResponse = await response.json();
+        return parsedResponse.success;
     }
 
     function inputsFactory<T extends string, G extends T>({
@@ -52,28 +10,19 @@ export default function useInputHandler() {
         validations,
         required,
         crossfields,
-        files,
-    }: {
-        asyncValidations?: AsyncValidateFunctionType<T>;
-        validations?: ValidateFunctionType<T>;
-        required?: string | boolean;
-        crossfields?: G[];
-        files?: FileList | null;
-    }): ValidateInputType<T> {
+        attributes,
+    }: ValidateInputType<T, G>) {
         return {
             asyncValidations,
             validations,
-            value: '',
+            attributes,
             errors: [],
             required,
             crossfields,
-            files,
         };
     }
 
     return {
-        omitFields,
-        onSetTimeOut,
         inputsFactory,
         onCheckUsername,
     };

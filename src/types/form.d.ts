@@ -3,27 +3,31 @@ declare type HandledInputsType<T extends string> = {
 };
 
 declare type InputsToValidateType<T extends string> = {
-    [key in T]: ValidateInputType<T>;
+    [key in T]: ValidateInputType<T, T>;
 };
 
-declare interface ValidateInputType<T extends string> {
+declare interface ValidateInputType<T extends string, U extends T> {
     asyncValidations?: AsyncValidateFunctionType<T>;
     validations?: ValidateFunctionType<T>;
     errors: string[];
+    crossfields?: U[];
+    attributes: InputAttributes;
+    required?: { value: boolean; message?: string };
+}
+
+declare interface InputAttributes {
     value: string;
-    crossfields?: T[];
     files?: FileList | null;
-    required?: string | boolean;
 }
 
 declare type ValidateFunctionType<T extends string> = (
-    currentInputValue: string,
-    conditionalInputValue?: InputsToValidateType<T>,
+    inputAttributes: InputAttributes,
+    currentInputs?: InputsToValidateType<T>,
 ) => Validation[];
 
 declare type AsyncValidateFunctionType<T extends string> = (
-    currentInputValue: string,
-    conditionalInputValue?: InputsToValidateType<T>,
+    inputAttributes: InputAttributes,
+    currentInputs?: InputsToValidateType<T>,
 ) => Promise<Validation[]>;
 
 declare interface Validation {

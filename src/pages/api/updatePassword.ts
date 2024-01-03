@@ -1,5 +1,6 @@
 import type { NextApiResponse } from 'next';
-import { signUpController } from '@/controllers/RegisterUserController';
+import { createHash } from '@/lib/bcryptAdapter';
+import { updatePasswordController } from '@/controllers/UpdateUserController';
 import { IncomingMessage } from 'http';
 import CookiesAdapter from '@/lib/cookiesAdapter';
 import { USER_HASH_NAME } from '@/database/DBHandler/DBState';
@@ -9,15 +10,22 @@ interface NextApiRequest<T> extends IncomingMessage {
 }
 
 export default async function handler(
-    req: NextApiRequest<UserFromClient>,
+    req: NextApiRequest<UserWithNewPassword>,
     res: NextApiResponse,
 ) {
     const cookies = new CookiesAdapter(req, res);
     switch (req.method) {
         case 'POST': {
-            cookies.set(USER_HASH_NAME);
-            const response = await signUpController(req.body);
-            if (!response.success) return res.status(500).json(response);
+            const response = await updatePasswordController(req.body);
+            if (!response.success) {
+                return res.status(500).json(response);
+            }
+            const newAccount = {
+                username: req.body.username,
+                password: req.body.newPassword,
+            };
+            const hash = createHash(newAccount);
+            cookies.set(USER_HASH_NAME, hash);
             return res.status(200).json(response);
         }
         default: {

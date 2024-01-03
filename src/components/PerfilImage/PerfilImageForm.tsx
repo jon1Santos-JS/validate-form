@@ -4,40 +4,46 @@ import useValidate from '@/hooks/useValidate';
 import useString from '@/hooks/useString';
 import { useUser } from '../../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
+import useUtils from '@/hooks/useUtils';
 
-const API = 'api/changeUserImg';
+const API = 'api/updateUserImage';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 
 type InputsType = 'imageInput';
 
 export default function PerfilImageForm() {
     const {
-        user: { username, setUserimage },
-        setUserImageLoader,
+        user: { setUserimage },
+        userImageState,
     } = useUser();
     const { validateSingle, validateMany } = useValidate();
     const { handledName, onCheckExtensions } = useString();
+    const { onSetTimeOut } = useUtils();
     const { inputsFactory } = useInputHandler();
-    const [isClickable, handleButtonClick] = useState(true);
+    const [isClickable, handleClickButton] = useState(true);
     const [inputState, setInputState] = useState({
         imageInput: { showInputMessage: false, highlightInput: false },
     });
-
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         imageInput: inputsFactory({
-            validations: (currentInputValue: string) => [
+            validations: (inputAttributes) => [
                 {
                     conditional: !onCheckExtensions(
                         ALLOWED_EXTENSIONS,
-                        currentInputValue,
+                        inputAttributes.value,
                     ),
                     message: `Supported extensions: ${ALLOWED_EXTENSIONS.join(
                         ', ',
                     )}`,
                 },
+                {
+                    conditional: !inputAttributes.files,
+                    message: `No image uploaded`,
+                },
             ],
-            required: 'No image uploaded',
-            files: null,
+            required: { value: true, message: 'No image uploaded' },
+            attributes: { value: '' },
+            errors: [],
         }),
     });
 
@@ -78,15 +84,18 @@ export default function PerfilImageForm() {
         e: React.ChangeEvent<HTMLInputElement>,
         key: InputsType,
     ) {
-        const input = { ...inputs[key], value: e.target.value };
-        const currentInputs = { ...inputs, [key]: input };
-        const validateInput = validateSingle(input, currentInputs);
         setInputs((prev) => ({
             ...prev,
-            [key]: {
-                ...validateInput,
-                files: e.target.files,
-            },
+            [key]: validateSingle(
+                {
+                    ...prev[key],
+                    attributes: {
+                        value: e.target.value,
+                        files: e.target.files,
+                    },
+                },
+                prev,
+            ),
         }));
     }
 
@@ -98,17 +107,47 @@ export default function PerfilImageForm() {
                 ...prev,
                 imageInput: { ...prev.imageInput, showInputMessage: true },
             }));
+            onSetTimeOut(() => {
+                setInputState((prev) => ({
+                    ...prev,
+                    imageInput: { ...prev.imageInput, showInputMessage: false },
+                }));
+            }, 2750);
             return;
         }
-        setUserImageLoader(true);
-        handleButtonClick(false);
-        const APIResponse = await onSubmitImageToAPI(inputs.imageInput.files);
-        await onHandleAPIResponse(APIResponse);
-        handleButtonClick(true);
+        handleClickButton(false);
+        const response = await onHandleApiResponses(
+            inputs.imageInput.attributes.files as FileList,
+        );
+        if (!response.success) {
+            setInputState((prev) => ({
+                ...prev,
+                imageInput: { ...prev.imageInput, showInputMessage: true },
+            }));
+            handleClickButton(true);
+            return;
+        }
+        setInputs((prev) => ({
+            ...prev,
+            imageInput: {
+                ...prev.imageInput,
+                attributes: { value: '', files: null },
+            },
+        }));
+        userImageState.onLoadingUserImage(true);
+        // setUserImageLoader(true);
+        setUserimage(response.data.value);
+        handleClickButton(true);
     }
 
-    async function onSubmitImageToAPI(files: FileList | undefined | null) {
-        if (!files) return;
+    async function onHandleApiResponses(files: FileList) {
+        const APIResponse = await onSubmitImageToImageBB(files);
+        if (!APIResponse.success) return APIResponse;
+        const DBResponse = await onSubmitImageToDB(APIResponse.data.url);
+        return DBResponse;
+    }
+
+    async function onSubmitImageToImageBB(files: FileList) {
         const file = files[0];
         const fileName = handledName(file.name);
         const formData = new FormData(); // multipart/form-data format to send to API;
@@ -121,51 +160,18 @@ export default function PerfilImageForm() {
             process.env.NEXT_PUBLIC_IMGBB_API_LINK as string,
             fetchOptions,
         );
-        const parsedResponse: ImgBBResponse = await response.json();
+        const parsedResponse: ImgBBResponseType = await response.json();
         return parsedResponse;
     }
 
-    async function onHandleAPIResponse(response: ImgBBResponse | undefined) {
-        if (!response || !response.success) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
-            return;
-        }
-        const DBResponse = await onSubmitImageToDB(username, response);
-        onHandleDBResponse(DBResponse);
-    }
-
-    async function onSubmitImageToDB(name: string, APIResponse: ImgBBResponse) {
-        const handledUser = {
-            userName: name,
-            userImg: APIResponse.data.url,
-        };
+    async function onSubmitImageToDB(img: string) {
         const options: FetchOptionsType = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(handledUser),
+            body: JSON.stringify({ value: img }),
         };
         const response = await fetch(API, options);
-        const parsedResponse: ImageUpdateServerResponse = await response.json();
+        const parsedResponse: DBUpdateUserImageResponse = await response.json();
         return parsedResponse;
-    }
-
-    function onHandleDBResponse(
-        response: ImageUpdateServerResponse | undefined,
-    ) {
-        if (!response || !response.success) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
-            return;
-        }
-        setUserimage(response.data.userImg);
-        setInputs((prev) => ({
-            ...prev,
-            imageInput: { ...prev.imageInput, files: null, value: '' },
-        }));
     }
 }

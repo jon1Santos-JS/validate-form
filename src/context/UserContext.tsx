@@ -11,8 +11,8 @@ const API = 'api/signIn';
 type UserContextType = {
     user: UserType;
     userState: UserStateType;
-    isUserImageLoading: boolean;
-    setUserImageLoader: (value: boolean) => void;
+
+    userImageState: UserImageState;
 };
 
 export const UserContext = createContext<UserContextType>({
@@ -28,8 +28,10 @@ export const UserContext = createContext<UserContextType>({
         setHasUser: () => null,
         setUserStateLoading: () => null,
     },
-    isUserImageLoading: false,
-    setUserImageLoader: () => null,
+    userImageState: {
+        isUserImageLoading: false,
+        onLoadingUserImage: () => null,
+    },
 });
 
 type UserProps = {
@@ -37,7 +39,6 @@ type UserProps = {
 };
 
 export function UserProvider({ children }: UserProps) {
-    const [isUserImageLoading, setUserImageLoader] = useState(false);
     const [user, setUser] = useState({
         username: '',
         userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
@@ -45,6 +46,14 @@ export function UserProvider({ children }: UserProps) {
             setUser((prev) => ({ ...prev, username: value })),
         setUserimage: (value: string) =>
             setUser((prev) => ({ ...prev, userImage: value })),
+    });
+    const [userImageState, setUserImageState] = useState({
+        isUserImageLoading: false,
+        onLoadingUserImage: (value: boolean) =>
+            setUserImageState((prev) => ({
+                ...prev,
+                isUserImageLoading: value,
+            })),
     });
     const [userState, setUserState] = useState({
         hasUser: false,
@@ -59,14 +68,14 @@ export function UserProvider({ children }: UserProps) {
         const response = await fetch(API, {
             method: 'GET',
         });
-        const parsedResponse: ServerResponse = await response.json();
+        const parsedResponse: AuthUserResponse = await response.json();
         setUserState((prev) => ({
             ...prev,
-            hasUser: parsedResponse.serverResponse,
+            hasUser: parsedResponse.success,
             isUserStateLoading: false,
         }));
-        if (typeof parsedResponse.body !== 'string') {
-            const DBUser: UserType = parsedResponse.body;
+        if (parsedResponse.success) {
+            const DBUser = parsedResponse.data;
             setUser((prev) => ({
                 ...prev,
                 ...DBUser,
@@ -80,7 +89,11 @@ export function UserProvider({ children }: UserProps) {
 
     return (
         <UserContext.Provider
-            value={{ user, userState, isUserImageLoading, setUserImageLoader }}
+            value={{
+                user,
+                userState,
+                userImageState,
+            }}
         >
             {children}
         </UserContext.Provider>

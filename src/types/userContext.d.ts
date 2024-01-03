@@ -15,3 +15,8 @@ declare interface UserType {
     setUsername: (value: string) => void;
     setUserimage: (value: string) => void;
 }
+
+declare interface UserImageState {
+    isUserImageLoading: boolean;
+    onLoadingUserImage: (value: boolean) => void;
+}
