@@ -1,21 +1,22 @@
 import Image from 'next/image';
 import { useUser } from '../../context/UserContext';
 import LoadingSpinner from '../LoadingSpinner';
+import { useRef } from 'react';
 
 export default function PerfilImage() {
     const {
         user: { userImage },
         userState: { isUserStateLoading },
-        userImageState,
+        userImageState: { isUserImageLoading, onLoadingUserImage },
     } = useUser();
+    const image = useRef(userImage);
 
     return <>{renderImage()}</>;
-
     function renderImage() {
         if (isUserStateLoading) return null;
         return (
             <div className="o-perfil-image-container">
-                <LoadingSpinner isOpen={userImageState.isUserImageLoading}>
+                <LoadingSpinner isOpen={isUserImageLoading}>
                     <Image
                         src={userImage}
                         alt="test image"
@@ -24,7 +25,7 @@ export default function PerfilImage() {
                         width={200}
                         height={200}
                         className={`${
-                            userImageState.isUserImageLoading
+                            isUserImageLoading
                                 ? 'is-image-not-display'
                                 : 'perfil-image'
                         }`}
@@ -35,6 +36,6 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        userImageState.onLoadingUserImage(false);
+        if (image.current !== userImage) onLoadingUserImage(false);
     }
 }

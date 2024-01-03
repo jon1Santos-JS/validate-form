@@ -20,7 +20,7 @@ export const UserContext = createContext<UserContextType>({
         username: '',
         userImage: '',
         setUsername: () => null,
-        setUserimage: () => null,
+        setUserImage: () => null,
     },
     userState: {
         hasUser: false,
@@ -44,7 +44,7 @@ export function UserProvider({ children }: UserProps) {
         userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
         setUsername: (value: string) =>
             setUser((prev) => ({ ...prev, username: value })),
-        setUserimage: (value: string) =>
+        setUserImage: (value: string) =>
             setUser((prev) => ({ ...prev, userImage: value })),
     });
     const [userImageState, setUserImageState] = useState({
