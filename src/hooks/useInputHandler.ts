@@ -6,15 +6,15 @@ export default function useInputHandler() {
     }
 
     function inputsFactory<T extends string, G extends T>({
-        asyncValidations,
         validations,
+        validationsSync,
         required,
         crossfields,
         attributes,
     }: ValidateInputType<T, G>) {
         return {
-            asyncValidations,
             validations,
+            validationsSync,
             attributes,
             errors: [],
             required,

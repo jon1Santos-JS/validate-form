@@ -7,8 +7,8 @@ declare type InputsToValidateType<T extends string> = {
 };
 
 declare interface ValidateInputType<T extends string, U extends T> {
-    asyncValidations?: AsyncValidateFunctionType<T>;
-    validations?: ValidateFunctionType<T>;
+    validations?: AsyncValidateFunctionType<T>;
+    validationsSync?: ValidateFunctionType<T>;
     errors: string[];
     crossfields?: U[];
     attributes: InputAttributes;

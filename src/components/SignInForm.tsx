@@ -15,7 +15,7 @@ export default function SignInForm() {
     const {
         userState: { setHasUser, hasUser, setUserStateLoading },
     } = useUser();
-    const { validateSingle, validateMany } = useValidate();
+    const { validateSingleSync, validateMany } = useValidate();
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
     const [showMessage, onShowMessage] = useState<boolean>(false);
@@ -26,7 +26,7 @@ export default function SignInForm() {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: inputsFactory({
-            validations: ({ value }) => [
+            validationsSync: ({ value }) => [
                 {
                     conditional: !value,
                     message: '',
@@ -45,7 +45,7 @@ export default function SignInForm() {
             errors: [],
         }),
         password: inputsFactory({
-            validations: ({ value }) => [
+            validationsSync: ({ value }) => [
                 {
                     conditional: !value,
                     message: '',
@@ -121,7 +121,7 @@ export default function SignInForm() {
         }));
         setInputs((prev) => ({
             ...prev,
-            [name]: validateSingle({ ...prev[name] }),
+            [name]: validateSingleSync({ ...prev[name] }),
         }));
     }
 

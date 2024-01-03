@@ -13,7 +13,7 @@ type InputsType = 'newUsername' | 'password';
 export default function ChangeUsernameForm() {
     const router = useRouter();
     const { user } = useUser();
-    const { asyncValidateSingle, validateMany, validateSingle } = useValidate();
+    const { validateSingleSync, validateMany, validateSingle } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
     const [isRequesting, setRequestState] = useState(false);
@@ -23,7 +23,7 @@ export default function ChangeUsernameForm() {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         newUsername: inputsFactory({
-            asyncValidations: async ({ value }) => [
+            validations: async ({ value }) => [
                 {
                     conditional: await onCheckUsername(CHECK_USERNAME_API, {
                         method: 'POST',
@@ -32,7 +32,7 @@ export default function ChangeUsernameForm() {
                     message: 'This username already exist',
                 },
             ],
-            validations: ({ value }) => [
+            validationsSync: ({ value }) => [
                 {
                     conditional: !value.match(/.{6,}/),
                     message: 'Username must has 6 characters at least',
@@ -47,7 +47,7 @@ export default function ChangeUsernameForm() {
             errors: [],
         }),
         password: inputsFactory({
-            validations: ({ value }) => [
+            validationsSync: ({ value }) => [
                 {
                     conditional: !value.match(/.{6,}/),
                     message: 'Incorrect Password',
@@ -122,7 +122,7 @@ export default function ChangeUsernameForm() {
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
         await onSetAsyncTimeOut(async () => {
-            const validatedInput = await asyncValidateSingle({
+            const validatedInput = await validateSingle({
                 ...inputs[key],
                 attributes: { value: e.target.value },
             });
@@ -155,7 +155,7 @@ export default function ChangeUsernameForm() {
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
-                password: validateSingle({
+                password: validateSingleSync({
                     ...prev.password,
                     attributes: { value: e.target.value },
                 }),

@@ -16,7 +16,7 @@ export default function PerfilImageForm() {
         user: { setUserimage },
         userImageState,
     } = useUser();
-    const { validateSingle, validateMany } = useValidate();
+    const { validateSingleSync, validateMany } = useValidate();
     const { handledName, onCheckExtensions } = useString();
     const { onSetTimeOut } = useUtils();
     const { inputsFactory } = useInputHandler();
@@ -26,7 +26,7 @@ export default function PerfilImageForm() {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         imageInput: inputsFactory({
-            validations: (inputAttributes) => [
+            validationsSync: (inputAttributes) => [
                 {
                     conditional: !onCheckExtensions(
                         ALLOWED_EXTENSIONS,
@@ -87,7 +87,7 @@ export default function PerfilImageForm() {
         if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
-            [key]: validateSingle(
+            [key]: validateSingleSync(
                 {
                     ...prev[key],
                     attributes: {
