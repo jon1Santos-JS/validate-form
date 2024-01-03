@@ -27,7 +27,18 @@ export default function PerfilImage() {
                             : 'perfil-image'
                     }`}
                 />
-                <LoadingSpinner isOpen={isUserImageLoading} />
+                <div
+                    className={`${
+                        isUserImageLoading ? 'o-spinner-container' : ''
+                    }`}
+                >
+                    <div
+                        className={`${
+                            isUserImageLoading ? 'spinner-element' : ''
+                        }`}
+                    ></div>
+                </div>
+                {/* <LoadingSpinner isOpen={isUserImageLoading} /> */}
             </div>
         );
     }
