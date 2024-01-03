@@ -8,7 +8,16 @@ export default function useValidate() {
         return isValid;
     }
 
-    async function asyncValidateSingle<T extends string>(
+    function validateSingleSync<T extends string>(
+        input: ValidateInputType<T, T>,
+        inputs?: InputsToValidateType<T>,
+    ) {
+        validate(input, inputs);
+        crossfieldValidate(input, inputs);
+        return input;
+    }
+
+    async function validateSingle<T extends string>(
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
@@ -18,25 +27,39 @@ export default function useValidate() {
         return input;
     }
 
-    function validateSingle<T extends string>(
+    function validate<T extends string>(
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        validate(input, inputs);
-        crossfieldValidate(input, inputs);
-        return input;
+        const { attributes, validationsSync } = input;
+        const newErrors: string[] = [];
+
+        if (onCheckRequired(input)) return;
+        if (!validationsSync) return;
+        validationsSync(attributes, inputs && inputs).forEach(
+            ({ conditional, message }) => {
+                if (conditional) newErrors.push(message);
+            },
+        );
+        input.errors = [...newErrors];
     }
 
-    function validate<T extends string>(
+    async function asyncValidate<T extends string>(
+        input: ValidateInputType<T, T>,
+        inputs?: InputsToValidateType<T>,
+    ) {
+        if (input.errors.length > 0) return;
+        await asyncronizedValidate(input, inputs);
+    }
+
+    async function asyncronizedValidate<T extends string>(
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
         const { attributes, validations } = input;
         const newErrors: string[] = [];
-
-        if (onCheckRequired(input)) return;
         if (!validations) return;
-        validations(attributes, inputs && inputs).forEach(
+        (await validations(attributes, inputs && inputs)).forEach(
             ({ conditional, message }) => {
                 if (conditional) newErrors.push(message);
             },
@@ -56,29 +79,6 @@ export default function useValidate() {
         });
     }
 
-    async function asyncValidate<T extends string>(
-        input: ValidateInputType<T, T>,
-        inputs?: InputsToValidateType<T>,
-    ) {
-        if (input.errors.length > 0) return;
-        await asyncronizedValidate(input, inputs);
-    }
-
-    async function asyncronizedValidate<T extends string>(
-        input: ValidateInputType<T, T>,
-        inputs?: InputsToValidateType<T>,
-    ) {
-        const { attributes, asyncValidations } = input;
-        const newErrors: string[] = [];
-        if (!asyncValidations) return;
-        (await asyncValidations(attributes, inputs && inputs)).forEach(
-            ({ conditional, message }) => {
-                if (conditional) newErrors.push(message);
-            },
-        );
-        input.errors = [...newErrors];
-    }
-
     function onCheckRequired<T extends string>(input: ValidateInputType<T, T>) {
         const { attributes, required } = input;
         if (!attributes.value && required?.value) {
@@ -92,5 +92,9 @@ export default function useValidate() {
         return false;
     }
 
-    return { validateSingle, asyncValidateSingle, validateMany };
+    return {
+        validateSingleSync,
+        validateSingle,
+        validateMany,
+    };
 }

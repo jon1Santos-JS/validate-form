@@ -13,7 +13,7 @@ type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 export default function ChangePasswordForm() {
     const router = useRouter();
     const { user } = useUser();
-    const { validateSingle, validateMany } = useValidate();
+    const { validateSingleSync, validateMany } = useValidate();
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
     const [isRequesting, setRequestState] = useState(false);
@@ -24,7 +24,7 @@ export default function ChangePasswordForm() {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         password: inputsFactory({
-            validations: ({ value }) => [
+            validationsSync: ({ value }) => [
                 {
                     conditional: !value.match(/.{6,}/),
                     message: 'Incorrect Password',
@@ -35,7 +35,7 @@ export default function ChangePasswordForm() {
             errors: [],
         }),
         newPassword: inputsFactory({
-            validations: ({ value }, currentInputs) => [
+            validationsSync: ({ value }, currentInputs) => [
                 {
                     conditional: !value.match(/.{6,}/),
                     message: 'Password must has 6 characters at least',
@@ -60,7 +60,7 @@ export default function ChangePasswordForm() {
             errors: [],
         }),
         confirmNewPassword: inputsFactory({
-            validations: ({ value }, currentInputs) => [
+            validationsSync: ({ value }, currentInputs) => [
                 {
                     conditional:
                         value !== currentInputs?.newPassword.attributes.value,
@@ -148,7 +148,7 @@ export default function ChangePasswordForm() {
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
-                [key]: validateSingle({ ...prev[key] }, prev),
+                [key]: validateSingleSync({ ...prev[key] }, prev),
             }));
         }, 950);
     }

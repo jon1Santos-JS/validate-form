@@ -25,7 +25,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const {
         userState: { hasUser },
     } = useUser();
-    const { validateSingle, asyncValidateSingle, validateMany } = useValidate();
+    const { validateSingle, validateSingleSync, validateMany } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
     const [isRequesting, setRequestState] = useState(false);
@@ -36,7 +36,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: inputsFactory({
-            asyncValidations: async ({ value }) => [
+            validations: async ({ value }) => [
                 {
                     conditional: await onCheckUsername(CHECK_USERNAME_API, {
                         method: 'POST',
@@ -45,7 +45,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                     message: 'This username already exist',
                 },
             ],
-            validations: ({ value }) => [
+            validationsSync: ({ value }) => [
                 {
                     conditional: !value.match(/.{6,}/),
                     message: 'Username must has 6 characters at least',
@@ -60,7 +60,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             errors: [],
         }),
         password: inputsFactory({
-            validations: ({ value }, currentInputs) => [
+            validationsSync: ({ value }, currentInputs) => [
                 {
                     conditional: !value.match(/.{6,}/),
                     message: 'Password must has 6 characters at least',
@@ -79,7 +79,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             errors: [],
         }),
         confirmPassword: inputsFactory({
-            validations: ({ value }, currentInputs) => [
+            validationsSync: ({ value }, currentInputs) => [
                 {
                     conditional:
                         value !== currentInputs?.password.attributes.value,
@@ -172,7 +172,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
-                [key]: validateSingle(prev[key], prev),
+                [key]: validateSingleSync(prev[key], prev),
             }));
         }, 950);
     }
@@ -205,11 +205,8 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 ...inputs,
                 username: input,
             };
-            const validateInput = await asyncValidateSingle(
-                input,
-                currentInputs,
-            );
-            setInputs((prev) => ({ ...prev, username: validateInput }));
+            const validatedInput = await validateSingle(input, currentInputs);
+            setInputs((prev) => ({ ...prev, username: validatedInput }));
         }, 960);
     }
 
