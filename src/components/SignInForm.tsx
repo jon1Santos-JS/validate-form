@@ -19,7 +19,7 @@ export default function SignInForm() {
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
     const [showMessage, onShowMessage] = useState<boolean>(false);
-    const [isClickable, handleClickButton] = useState(true);
+    const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -114,6 +114,7 @@ export default function SignInForm() {
         e: React.ChangeEvent<HTMLInputElement>,
         name: keyof typeof inputs,
     ) {
+        if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
             [name]: { ...prev[name], attributes: { value: e.target.value } },
@@ -132,7 +133,7 @@ export default function SignInForm() {
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (showMessage) return;
-        if (!isClickable) return;
+        if (isRequesting) return;
         if (!validateMany(inputs)) {
             onShowMessage(true);
             onHilightInputs(true);
@@ -144,22 +145,20 @@ export default function SignInForm() {
             return;
         }
         const handledInputs = onHandleInputs(inputs);
-        handleClickButton(false);
+        setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
-        handleClickButton(() => {
-            setUserStateLoading(false);
-            setHasUser(response.success);
-            if (!response.success) {
-                onShowMessage(true);
-                onHilightInputs(true);
-                onSetTimeOut(() => {
-                    onShowMessage(false);
-                    onHilightInputs(false);
-                }, 2750);
-                return true;
-            }
-            return false;
-        });
+        setUserStateLoading(false);
+        setHasUser(response.success);
+        if (!response.success) {
+            onShowMessage(true);
+            onHilightInputs(true);
+            onSetTimeOut(() => {
+                onShowMessage(false);
+                onHilightInputs(false);
+            }, 2750);
+            setRequestState(false);
+            return;
+        }
     }
 
     function onHandleInputs(inputsTohandle: InputsToValidateType<InputsType>) {

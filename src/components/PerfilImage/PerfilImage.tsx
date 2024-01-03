@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { useUser } from '../../context/UserContext';
+import LoadingSpinner from '../LoadingSpinner';
 
 export default function PerfilImage() {
     const {
@@ -14,35 +15,20 @@ export default function PerfilImage() {
         if (isUserStateLoading) return null;
         return (
             <div className="o-perfil-image-container">
-                <div
+                <LoadingSpinner isOpen={userImageState.isUserImageLoading} />
+                <Image
+                    src={userImage}
+                    alt="test image"
+                    priority
+                    onLoad={onLoadingImage}
+                    width={200}
+                    height={200}
                     className={`${
                         userImageState.isUserImageLoading
-                            ? 'o-spinner-container'
-                            : ''
+                            ? 'is-image-not-display'
+                            : 'perfil-image'
                     }`}
-                >
-                    <div
-                        className={`${
-                            userImageState.isUserImageLoading
-                                ? 'spinner-element'
-                                : ''
-                        }`}
-                    >
-                        <Image
-                            src={userImage}
-                            alt="test image"
-                            priority
-                            onLoad={onLoadingImage}
-                            width={200}
-                            height={200}
-                            className={`${
-                                userImageState.isUserImageLoading
-                                    ? 'is-image-not-display'
-                                    : 'perfil-image'
-                            }`}
-                        />
-                    </div>
-                </div>
+                />
             </div>
         );
     }
