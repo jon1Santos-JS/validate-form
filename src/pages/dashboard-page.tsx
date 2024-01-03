@@ -31,8 +31,8 @@ export default function DashBoardPage() {
             <div className="o-dashboard-page">
                 <div>{message}</div>
                 <div>
-                    <PerfilImageForm />
                     <PerfilImage />
+                    <PerfilImageForm />
                     <ChangePasswordForm />
                     <ChangeUsernameForm />
                     {adminCheck && (

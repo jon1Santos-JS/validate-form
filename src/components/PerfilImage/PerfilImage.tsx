@@ -27,23 +27,13 @@ export default function PerfilImage() {
                             : 'perfil-image'
                     }`}
                 />
-                <div
-                    className={`${
-                        isUserImageLoading ? 'o-spinner-container' : ''
-                    }`}
-                >
-                    <div
-                        className={`${
-                            isUserImageLoading ? 'spinner-element' : ''
-                        }`}
-                    ></div>
-                </div>
-                {/* <LoadingSpinner isOpen={isUserImageLoading} /> */}
+                <LoadingSpinner onShow={isUserImageLoading} />
             </div>
         );
     }
 
     function onLoadingImage() {
         onLoadingUserImage(false);
+        console.log('hello from perfil image');
     }
 }

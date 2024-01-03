@@ -1,12 +1,12 @@
 type LoadingSpinnerProps = {
-    isOpen: boolean;
+    onShow: boolean;
 };
 
-export default function LoadingSpinner({ isOpen }: LoadingSpinnerProps) {
+export default function LoadingSpinner({ onShow }: LoadingSpinnerProps) {
     return (
         <>
-            <div className={`${isOpen ? 'o-spinner-container' : ''}`}>
-                <div className={`${isOpen ? 'spinner-element' : ''}`}></div>
+            <div className={`${onShow ? 'o-spinner-container' : ''}`}>
+                <div className={`${onShow ? 'spinner-element' : ''}`}></div>
             </div>
         </>
     );
