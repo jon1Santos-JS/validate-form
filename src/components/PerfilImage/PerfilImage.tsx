@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { useUser } from '../../context/UserContext';
 import LoadingSpinner from '../LoadingSpinner';
+import { useRef } from 'react';
 
 const IMAGE_LOADING_TIMER = 1000;
 
@@ -10,6 +11,7 @@ export default function PerfilImage() {
         userState: { isUserStateLoading },
         userImageState: { isUserImageLoading, onLoadingUserImage },
     } = useUser();
+    const oldImage = useRef(userImage);
 
     return <>{renderImage()}</>;
     function renderImage() {
@@ -35,8 +37,10 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        setTimeout(() => {
-            onLoadingUserImage(false);
-        }, IMAGE_LOADING_TIMER);
+        if (oldImage.current !== userImage) {
+            setTimeout(() => {
+                onLoadingUserImage(false);
+            }, IMAGE_LOADING_TIMER);
+        }
     }
 }
