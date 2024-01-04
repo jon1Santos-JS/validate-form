@@ -2,10 +2,7 @@ import UserAuthHandler from '@/database/AccountHandler/Auth';
 import DBHandler from '@/database/DBHandler/DBhandler';
 
 export async function signInController(userAccount: UserFromClient) {
-    const db = new DBHandler();
     const accountHandler = new UserAuthHandler();
-    const DBResponse = await db.checkDB('signin controller');
-    if (!DBResponse.success) return DBResponse;
     const response = await accountHandler.authAccount(userAccount);
     return response;
 }
