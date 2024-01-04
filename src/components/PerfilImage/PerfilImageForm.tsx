@@ -12,10 +12,7 @@ const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
 type InputsType = 'imageInput';
 
 export default function PerfilImageForm() {
-    const {
-        user: { setUserImage },
-        userImageState: { onLoadingUserImage },
-    } = useUser();
+    const { setUser, setUserImageState } = useUser();
     const { validateSingleSync, validateMany } = useValidate();
     const { handledName, onCheckExtensions } = useString();
     const { onSetTimeOut } = useUtils();
@@ -120,7 +117,7 @@ export default function PerfilImageForm() {
             return;
         }
         setRequestState(true);
-        onLoadingUserImage(true);
+        setUserImageState((prev) => ({ ...prev, isUserImageLoading: true }));
         const response = await onHandleApiResponses(
             inputs.imageInput.attributes.files as FileList,
         );
@@ -139,7 +136,7 @@ export default function PerfilImageForm() {
                 attributes: { value: '', files: null },
             },
         }));
-        setUserImage(response.data.value);
+        setUser((prev) => ({ ...prev, userImage: response.data.value }));
     }
 
     async function onHandleApiResponses(files: FileList) {

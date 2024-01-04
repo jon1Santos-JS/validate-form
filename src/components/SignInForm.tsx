@@ -13,7 +13,8 @@ type InputsType = 'username' | 'password';
 
 export default function SignInForm() {
     const {
-        userState: { setHasUser, hasUser, setUserStateLoading },
+        userState: { hasUser },
+        setUserState,
     } = useUser();
     const { validateSingleSync, validateMany } = useValidate();
     const { inputsFactory } = useInputHandler();
@@ -148,8 +149,8 @@ export default function SignInForm() {
         setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
         setRequestState(false);
-        setUserStateLoading(false);
-        setHasUser(response.success);
+        setUserState((prev) => ({ ...prev, isUserStateLoading: false }));
+        setUserState((prev) => ({ ...prev, hasUser: response.success }));
         if (!response.success) {
             onShowMessage(true);
             onHilightInputs(true);
