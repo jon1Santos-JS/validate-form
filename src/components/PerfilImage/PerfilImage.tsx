@@ -38,9 +38,10 @@ export default function PerfilImage() {
 
     function onLoadingImage() {
         if (oldImage.current !== userImage) {
-            setTimeout(() => {
-                onLoadingUserImage(false);
-            }, IMAGE_LOADING_TIMER);
+            // setTimeout(() => {
+            //     onLoadingUserImage(false);
+            // }, IMAGE_LOADING_TIMER);
+            onLoadingUserImage(false);
         }
     }
 }
