@@ -6,8 +6,8 @@ import { useUser } from '../../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
 import useUtils from '@/hooks/useUtils';
 
-const API = 'api/updateUserImage';
 const ALLOWED_EXTENSIONS = ['.jpg', '.png', '.jpeg'];
+const API = 'api/updateUserImage';
 
 type InputsType = 'imageInput';
 
