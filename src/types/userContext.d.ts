@@ -1,7 +1,3 @@
-declare type SetUserType = (user: UserType) => void;
-
-declare type IsUserStateLoadingType = () => boolean | undefined;
-
 declare interface UserStateType {
     hasUser: boolean;
     isUserStateLoading: boolean;
