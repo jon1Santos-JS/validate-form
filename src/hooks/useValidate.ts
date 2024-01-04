@@ -12,7 +12,7 @@ export default function useValidate() {
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        validate(input, inputs);
+        validateSync(input, inputs);
         crossfieldValidate(input, inputs);
         return input;
     }
@@ -21,13 +21,14 @@ export default function useValidate() {
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        validate(input, inputs);
+        validateSync(input, inputs);
         crossfieldValidate(input, inputs);
-        await asyncValidate(input, inputs);
+        if (input.errors.length > 0) return input; //IF INPUT HAS ERRORS IT DOESN'T JUMP TO THE NEXT STEP
+        await validate(input, inputs);
         return input;
     }
 
-    function validate<T extends string>(
+    function validateSync<T extends string>(
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
@@ -44,15 +45,7 @@ export default function useValidate() {
         input.errors = [...newErrors];
     }
 
-    async function asyncValidate<T extends string>(
-        input: ValidateInputType<T, T>,
-        inputs?: InputsToValidateType<T>,
-    ) {
-        if (input.errors.length > 0) return;
-        await asyncronizedValidate(input, inputs);
-    }
-
-    async function asyncronizedValidate<T extends string>(
+    async function validate<T extends string>(
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
@@ -71,8 +64,8 @@ export default function useValidate() {
         input: ValidateInputType<T, T>,
         inputs?: InputsToValidateType<T>,
     ) {
-        if (!input.crossfields || !inputs) return;
-        if (input.crossfields.length === 0) return;
+        if (!inputs) return;
+        if (!input.crossfields || input.crossfields.length === 0) return;
         input.crossfields.forEach((crossInput) => {
             if (!inputs[crossInput].attributes.value) return;
             validate(inputs[crossInput], inputs);
@@ -83,7 +76,7 @@ export default function useValidate() {
         const { attributes, required } = input;
         if (!attributes.value && required?.value) {
             if (!required.message) {
-                input.errors.push('');
+                input.errors.push(''); //PUTTING AN EMPTY STRING TO IDENTIFY THE INPUT AS REQUIRED
                 return true;
             }
             input.errors.push(required.message);

@@ -14,6 +14,7 @@ type PropsType = {
     label?: string;
     inputType: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onClick?: (e: React.MouseEvent<HTMLInputElement>) => void;
     inputAccept?: string;
 };
 
@@ -21,7 +22,7 @@ export default function Input<T extends string>({
     ownProps,
     inputStateProps,
 }: InputPropsTypes<T>) {
-    const { label, inputType, onChange, inputAccept } = ownProps;
+    const { label, inputType, onChange, onClick, inputAccept } = ownProps;
     const { input, inputState } = inputStateProps;
     const { attributes, errors } = input;
     const { showInputMessage, highlightInput } = inputState;
@@ -43,6 +44,7 @@ export default function Input<T extends string>({
                 placeholder={label}
                 accept={inputAccept && inputAccept}
                 onChange={onChange}
+                onClick={onClick}
                 value={attributes.value}
                 type={inputType}
             />

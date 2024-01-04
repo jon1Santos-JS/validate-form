@@ -2,6 +2,8 @@ import Image from 'next/image';
 import { useUser } from '../../context/UserContext';
 import LoadingSpinner from '../LoadingSpinner';
 
+const IMAGE_LOADING_TIMER = 1000;
+
 export default function PerfilImage() {
     const {
         user: { userImage },
@@ -35,6 +37,6 @@ export default function PerfilImage() {
     function onLoadingImage() {
         setTimeout(() => {
             onLoadingUserImage(false);
-        }, 1000);
+        }, IMAGE_LOADING_TIMER);
     }
 }
