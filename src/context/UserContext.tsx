@@ -1,4 +1,6 @@
 import {
+    Dispatch,
+    SetStateAction,
     createContext,
     useCallback,
     useContext,
@@ -10,28 +12,28 @@ const API = 'api/signIn';
 
 type UserContextType = {
     user: UserType;
+    setUser: Dispatch<SetStateAction<UserType>>;
     userState: UserStateType;
-
+    setUserState: Dispatch<SetStateAction<UserStateType>>;
     userImageState: UserImageState;
+    setUserImageState: Dispatch<SetStateAction<UserImageState>>;
 };
 
 export const UserContext = createContext<UserContextType>({
     user: {
         username: '',
         userImage: '',
-        setUsername: () => null,
-        setUserImage: () => null,
     },
+    setUser: () => null,
     userState: {
         hasUser: false,
         isUserStateLoading: true,
-        setHasUser: () => null,
-        setUserStateLoading: () => null,
     },
+    setUserState: () => null,
     userImageState: {
         isUserImageLoading: false,
-        onLoadingUserImage: () => null,
     },
+    setUserImageState: () => null,
 });
 
 type UserProps = {
@@ -41,27 +43,14 @@ type UserProps = {
 export function UserProvider({ children }: UserProps) {
     const [userImageState, setUserImageState] = useState({
         isUserImageLoading: false,
-        onLoadingUserImage: (value: boolean) =>
-            setUserImageState((prev) => ({
-                ...prev,
-                isUserImageLoading: value,
-            })),
     });
     const [userState, setUserState] = useState({
         hasUser: false,
         isUserStateLoading: true,
-        setHasUser: (value: boolean) =>
-            setUserState((prev) => ({ ...prev, hasUser: value })),
-        setUserStateLoading: (value: boolean) =>
-            setUserState((prev) => ({ ...prev, isUserStateLoading: value })),
     });
     const [user, setUser] = useState({
         username: '',
         userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
-        setUsername: (value: string) =>
-            setUser((prev) => ({ ...prev, username: value })),
-        setUserImage: (value: string) =>
-            setUser((prev) => ({ ...prev, userImage: value })),
     });
 
     const onCheckUserState = useCallback(async () => {
@@ -91,8 +80,11 @@ export function UserProvider({ children }: UserProps) {
         <UserContext.Provider
             value={{
                 user,
+                setUser,
                 userState,
+                setUserState,
                 userImageState,
+                setUserImageState,
             }}
         >
             {children}

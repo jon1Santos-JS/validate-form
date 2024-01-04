@@ -3,13 +3,15 @@ import { useUser } from '../../context/UserContext';
 import LoadingSpinner from '../LoadingSpinner';
 import { useRef } from 'react';
 
-const IMAGE_LOADING_TIMER = 1000;
+// const IMAGE_LOADING_TIMER = 1000;
 
 export default function PerfilImage() {
     const {
         user: { userImage },
+        setUser,
         userState: { isUserStateLoading },
-        userImageState: { isUserImageLoading, onLoadingUserImage },
+        userImageState: { isUserImageLoading },
+        setUserImageState,
     } = useUser();
     const oldImage = useRef(userImage);
 
@@ -37,11 +39,14 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        if (oldImage.current !== userImage) {
-            // setTimeout(() => {
-            //     onLoadingUserImage(false);
-            // }, IMAGE_LOADING_TIMER);
-            onLoadingUserImage(false);
-        }
+        setUser((prev) => {
+            if (prev.userImage === userImage) {
+                setUserImageState((prev) => ({
+                    ...prev,
+                    isUserImageLoading: false,
+                }));
+            }
+            return prev;
+        });
     }
 }
