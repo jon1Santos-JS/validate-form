@@ -221,9 +221,9 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         const handledInputs = onHandleInputs(inputs);
         setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
+        setRequestState(false);
         if (!response.success) {
             setModalState(true);
-            setRequestState(false);
             return;
         }
         router.push('/dashboard-page');

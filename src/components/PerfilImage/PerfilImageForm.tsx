@@ -59,6 +59,9 @@ export default function PerfilImageForm() {
                                 inputType: 'file',
                                 inputAccept: 'image/*',
                                 onChange: (e) => onChange(e, 'imageInput'),
+                                onClick: (e) => {
+                                    if (isRequesting) e.preventDefault();
+                                },
                             }}
                             inputStateProps={{
                                 input: inputs.imageInput,
@@ -121,12 +124,12 @@ export default function PerfilImageForm() {
         const response = await onHandleApiResponses(
             inputs.imageInput.attributes.files as FileList,
         );
+        setRequestState(false);
         if (!response.success) {
             setInputState((prev) => ({
                 ...prev,
                 imageInput: { ...prev.imageInput, showInputMessage: true },
             }));
-            setRequestState(false);
             return;
         }
         setInputs((prev) => ({
@@ -137,7 +140,6 @@ export default function PerfilImageForm() {
             },
         }));
         setUserImage(response.data.value);
-        setRequestState(false);
     }
 
     async function onHandleApiResponses(files: FileList) {

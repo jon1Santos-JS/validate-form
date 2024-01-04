@@ -164,13 +164,12 @@ export default function ChangePasswordForm() {
         const handledInputs = onHandleInputs(inputs, user.username);
         setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
+        setRequestState(false);
         if (!response.success) {
             onHilightInputs(true);
             onShowInputsMessages(true);
-            setRequestState(false);
             return;
         }
-        setRequestState(false);
         router.reload();
     }
 

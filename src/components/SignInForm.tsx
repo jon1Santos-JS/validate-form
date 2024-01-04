@@ -147,6 +147,7 @@ export default function SignInForm() {
         const handledInputs = onHandleInputs(inputs);
         setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
+        setRequestState(false);
         setUserStateLoading(false);
         setHasUser(response.success);
         if (!response.success) {
@@ -156,7 +157,6 @@ export default function SignInForm() {
                 onShowMessage(false);
                 onHilightInputs(false);
             }, 2750);
-            setRequestState(false);
             return;
         }
     }
