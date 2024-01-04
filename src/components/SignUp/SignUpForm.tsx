@@ -47,12 +47,12 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             ],
             validationsSync: ({ value }) => [
                 {
-                    conditional: !value.match(/.{6,}/),
-                    message: 'Username must has 6 characters at least',
+                    conditional: !value.match(/^[A-Za-z]*$/),
+                    message: 'No special characters',
                 },
                 {
-                    conditional: !value.match(/^[A-Za-zçÇ]+$/),
-                    message: 'Only characters',
+                    conditional: !value.match(/.{6,}/),
+                    message: 'Username must has 6 characters at least',
                 },
             ],
             required: { value: true, message: REQUIRED_MESSAGE },

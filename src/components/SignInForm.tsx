@@ -37,7 +37,7 @@ export default function SignInForm() {
                     message: '',
                 },
                 {
-                    conditional: !value.match(/^[A-Za-z]+$/),
+                    conditional: !value.match(/^[A-Za-z]*$/),
                     message: '',
                 },
             ],
