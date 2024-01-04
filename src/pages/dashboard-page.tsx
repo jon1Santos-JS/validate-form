@@ -11,8 +11,10 @@ const SIGN_IN_API = 'api/signIn';
 
 export default function DashBoardPage() {
     const {
-        user: { username, setUsername },
-        userState: { hasUser, isUserStateLoading, setHasUser },
+        user: { username },
+        setUser,
+        userState: { hasUser, isUserStateLoading },
+        setUserState,
     } = useUser();
     const router = useRouter();
     const adminCheck = username !== process.env.NEXT_PUBLIC_ADMINS_USERNAME;
@@ -73,8 +75,8 @@ export default function DashBoardPage() {
 
         async function signOutUser() {
             await fetch(SIGN_IN_API, { method: 'DELETE' });
-            setUsername('');
-            setHasUser(false);
+            setUser((prev) => ({ ...prev, username: '' }));
+            setUserState((prev) => ({ ...prev, hasUser: false }));
             if (!hasUser) {
                 window.location.assign('/');
             }
