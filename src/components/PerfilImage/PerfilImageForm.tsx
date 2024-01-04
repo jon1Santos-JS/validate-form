@@ -137,6 +137,7 @@ export default function PerfilImageForm() {
             },
         }));
         setUser((prev) => ({ ...prev, userImage: response.data.value }));
+        setUserImageState((prev) => ({ ...prev, isUserImageLoading: false }));
     }
 
     async function onHandleApiResponses(files: FileList) {
