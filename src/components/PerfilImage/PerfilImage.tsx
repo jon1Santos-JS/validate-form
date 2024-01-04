@@ -8,7 +8,6 @@ import LoadingSpinner from '../LoadingSpinner';
 export default function PerfilImage() {
     const {
         user: { userImage },
-        setUser,
         userState: { isUserStateLoading },
         userImageState: { isUserImageLoading },
         setUserImageState,
@@ -39,14 +38,9 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        setUser((prev) => {
-            if (prev.userImage === userImage) {
-                setUserImageState((prev) => ({
-                    ...prev,
-                    isUserImageLoading: false,
-                }));
-            }
-            return prev;
-        });
+        setUserImageState((prev) => ({
+            ...prev,
+            isUserImageLoading: false,
+        }));
     }
 }
