@@ -10,6 +10,7 @@ declare interface ValidateInputType<T extends string, U extends T> {
     validations?: AsyncValidateFunctionType<T>;
     validationsSync?: ValidateFunctionType<T>;
     errors: string[];
+    requestErrors?: string[];
     crossfields?: U[];
     attributes: InputAttributes;
     required?: { value: boolean; message?: string };

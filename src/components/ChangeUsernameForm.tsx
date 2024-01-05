@@ -56,6 +56,7 @@ export default function ChangeUsernameForm() {
             required: { value: true },
             attributes: { value: '' },
             errors: [],
+            requestErrors: [],
         }),
     });
 
@@ -160,19 +161,8 @@ export default function ChangeUsernameForm() {
                     attributes: { value: e.target.value },
                 }),
             }));
-            setInputState((prev) => ({
-                ...prev,
-                newUsername: {
-                    ...prev.newUsername,
-                    highlightInput: true,
-                    showInputMessage: true,
-                },
-                password: {
-                    ...prev.newUsername,
-                    highlightInput: true,
-                    showInputMessage: true,
-                },
-            }));
+            onHilightInputs(true);
+            onShowInputsMessages(true);
         }, 950);
     }
 
@@ -180,40 +170,21 @@ export default function ChangeUsernameForm() {
         e.preventDefault();
         if (isRequesting) return;
         if (!validateMany(inputs)) {
-            setInputState((prev) => ({
-                ...prev,
-                newUsername: {
-                    ...prev.newUsername,
-                    highlightInput: true,
-                    showInputMessage: true,
-                },
-                password: {
-                    ...prev.newUsername,
-                    highlightInput: true,
-                    showInputMessage: true,
-                },
-            }));
+            onHilightInputs(true);
+            onShowInputsMessages(true);
             return;
         }
         const handledInputs = onHandleInputs(inputs, user.username);
         setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
         if (!response.success) {
-            setInputState((prev) => ({
-                ...prev,
-                newUsername: {
-                    ...prev.newUsername,
-                    showInputMessage: true,
-                },
-                password: {
-                    ...prev.password,
-                    highlightInput: true,
-                    showInputMessage: true,
-                },
-            }));
+            onSetRequestMessage('password', response.data);
+            onHilightInputs(true);
+            onShowInputsMessages(true, 'password');
             setRequestState(false);
             return;
         }
+        onSetRequestMessage('password');
         router.reload();
     }
 
@@ -238,5 +209,67 @@ export default function ChangeUsernameForm() {
         const response = await fetch(UPDATE_USERNAME_API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
+    }
+
+    function onSetRequestMessage(key: InputsType, message?: string) {
+        if (!message) {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: { ...prev[key], requestErrors: [] },
+            }));
+            return;
+        }
+        setInputs((prev) => ({
+            ...prev,
+            [key]: { ...prev[key], requestErrors: [message] },
+        }));
+    }
+
+    function onHilightInputs(value: boolean, key?: InputsType) {
+        if (!key) {
+            setInputState((prev) => ({
+                ...prev,
+                newUsername: {
+                    ...prev.newUsername,
+                    highlightInput: value,
+                },
+                password: {
+                    ...prev.password,
+                    highlightInput: value,
+                },
+            }));
+            return;
+        }
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                highlightInput: value,
+            },
+        }));
+    }
+
+    function onShowInputsMessages(value: boolean, key?: InputsType) {
+        if (!key) {
+            setInputState((prev) => ({
+                ...prev,
+                newUsername: {
+                    ...prev.newUsername,
+                    showInputMessage: value,
+                },
+                password: {
+                    ...prev.password,
+                    showInputMessage: value,
+                },
+            }));
+            return;
+        }
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                showInputMessage: value,
+            },
+        }));
     }
 }

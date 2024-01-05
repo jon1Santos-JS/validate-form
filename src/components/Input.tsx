@@ -24,10 +24,11 @@ export default function Input<T extends string>({
 }: InputPropsTypes<T>) {
     const { label, inputType, onChange, onClick, inputAccept } = ownProps;
     const { input, inputState } = inputStateProps;
-    const { attributes, errors } = input;
+    const { attributes, errors, requestErrors } = input;
     const { showInputMessage, highlightInput } = inputState;
-    const highlightConditional = errors.length > 0;
     const inputID = useId();
+    const hilightConditional =
+        errors.length > 0 || (requestErrors && requestErrors.length > 0);
 
     return (
         <div className="field">
@@ -39,7 +40,7 @@ export default function Input<T extends string>({
             <input
                 id={inputID + label}
                 className={`input ${
-                    highlightConditional && highlightInput && 'has-error'
+                    hilightConditional && highlightInput && 'has-error'
                 }`}
                 placeholder={label}
                 accept={inputAccept && inputAccept}
@@ -56,6 +57,10 @@ export default function Input<T extends string>({
         return (
             <div className="input-error-message">
                 {errors.length > 0 && showInputMessage && errors[0]}
+                {requestErrors &&
+                    requestErrors.length > 0 &&
+                    showInputMessage &&
+                    requestErrors[0]}
             </div>
         );
     }

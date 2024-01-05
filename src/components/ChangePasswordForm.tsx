@@ -33,6 +33,7 @@ export default function ChangePasswordForm() {
             required: { value: true },
             attributes: { value: '' },
             errors: [],
+            requestErrors: [],
         }),
         newPassword: inputsFactory({
             validationsSync: ({ value }, currentInputs) => [
@@ -166,10 +167,12 @@ export default function ChangePasswordForm() {
         const response = await onSubmitInputs(handledInputs);
         setRequestState(false);
         if (!response.success) {
+            onSetRequestMessage('password', response.data);
             onHilightInputs(true);
             onShowInputsMessages(true);
             return;
         }
+        onSetRequestMessage('password');
         router.reload();
     }
 
@@ -196,37 +199,71 @@ export default function ChangePasswordForm() {
         return parsedResponse;
     }
 
-    function onHilightInputs(value: boolean) {
+    function onSetRequestMessage(key: InputsType, message?: string) {
+        if (!message) {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: { ...prev[key], requestErrors: [] },
+            }));
+            return;
+        }
+        setInputs((prev) => ({
+            ...prev,
+            [key]: { ...prev[key], requestErrors: [message] },
+        }));
+    }
+
+    function onHilightInputs(value: boolean, key?: InputsType) {
+        if (!key) {
+            setInputState((prev) => ({
+                ...prev,
+                password: {
+                    ...prev.password,
+                    highlightInput: value,
+                },
+                newPassword: {
+                    ...prev.password,
+                    highlightInput: value,
+                },
+                confirmNewPassword: {
+                    ...prev.confirmNewPassword,
+                    highlightInput: value,
+                },
+            }));
+            return;
+        }
         setInputState((prev) => ({
             ...prev,
-            password: {
-                ...prev.password,
-                highlightInput: value,
-            },
-            newPassword: {
-                ...prev.password,
-                highlightInput: value,
-            },
-            confirmNewPassword: {
-                ...prev.confirmNewPassword,
+            [key]: {
+                ...prev[key],
                 highlightInput: value,
             },
         }));
     }
 
-    function onShowInputsMessages(value: boolean) {
+    function onShowInputsMessages(value: boolean, key?: InputsType) {
+        if (!key) {
+            setInputState((prev) => ({
+                ...prev,
+                password: {
+                    ...prev.password,
+                    showInputMessage: value,
+                },
+                newPassword: {
+                    ...prev.newPassword,
+                    showInputMessage: value,
+                },
+                confirmNewPassword: {
+                    ...prev.confirmNewPassword,
+                    showInputMessage: value,
+                },
+            }));
+            return;
+        }
         setInputState((prev) => ({
             ...prev,
-            password: {
-                ...prev.password,
-                showInputMessage: value,
-            },
-            newPassword: {
-                ...prev.newPassword,
-                showInputMessage: value,
-            },
-            confirmNewPassword: {
-                ...prev.confirmNewPassword,
+            [key]: {
+                ...prev[key],
                 showInputMessage: value,
             },
         }));
