@@ -110,9 +110,9 @@ export default function PerfilImageForm() {
             }, 2750);
             return;
         }
+        const fileImage = inputs.imageInput.attributes.files as FileList;
         setRequestState(true);
         setUserImageState((prev) => ({ ...prev, isUserImageLoading: true }));
-        const fileImage = inputs.imageInput.attributes.files as FileList;
         const response = await onHandleApiResponses(fileImage);
         setInputs((prev) => ({
             ...prev,
