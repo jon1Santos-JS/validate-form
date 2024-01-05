@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { useUser } from '../../context/UserContext';
 import LoadingSpinner from '../LoadingSpinner';
+import useUtils from '@/hooks/useUtils';
 
 const IMAGE_LOADING_TIMER = 2000;
 
@@ -11,6 +12,7 @@ export default function PerfilImage() {
         userImageState: { isUserImageLoading },
         setUserImageState,
     } = useUser();
+    const { onSetTimeOut } = useUtils();
 
     return <>{renderImage()}</>;
     function renderImage() {
@@ -36,11 +38,7 @@ export default function PerfilImage() {
     }
 
     function onLoadingImage() {
-        let timeout: null | NodeJS.Timeout = null;
-
-        if (timeout) clearTimeout(timeout);
-
-        timeout = setTimeout(() => {
+        onSetTimeOut(() => {
             setUserImageState((prev) => ({
                 ...prev,
                 isUserImageLoading: false,

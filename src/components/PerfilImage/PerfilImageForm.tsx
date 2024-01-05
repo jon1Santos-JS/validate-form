@@ -104,31 +104,16 @@ export default function PerfilImageForm() {
         e.preventDefault();
         if (isRequesting) return;
         if (!validateMany(inputs)) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
+            onShowInputsMessages(true, 'imageInput');
             onSetTimeOut(() => {
-                setInputState((prev) => ({
-                    ...prev,
-                    imageInput: { ...prev.imageInput, showInputMessage: false },
-                }));
+                onShowInputsMessages(false, 'imageInput');
             }, 2750);
             return;
         }
         setRequestState(true);
         setUserImageState((prev) => ({ ...prev, isUserImageLoading: true }));
-        const response = await onHandleApiResponses(
-            inputs.imageInput.attributes.files as FileList,
-        );
-        setRequestState(false);
-        if (!response.success) {
-            setInputState((prev) => ({
-                ...prev,
-                imageInput: { ...prev.imageInput, showInputMessage: true },
-            }));
-            return;
-        }
+        const fileImage = inputs.imageInput.attributes.files as FileList;
+        const response = await onHandleApiResponses(fileImage);
         setInputs((prev) => ({
             ...prev,
             imageInput: {
@@ -136,6 +121,11 @@ export default function PerfilImageForm() {
                 attributes: { value: '', files: null },
             },
         }));
+        setRequestState(false);
+        if (!response.success) {
+            onShowInputsMessages(true, 'imageInput');
+            return;
+        }
         setUser((prev) => ({ ...prev, userImage: response.data.value }));
     }
 
@@ -172,5 +162,25 @@ export default function PerfilImageForm() {
         const response = await fetch(API, options);
         const parsedResponse: DBUpdateUserImageResponse = await response.json();
         return parsedResponse;
+    }
+
+    function onShowInputsMessages(value: boolean, key?: InputsType) {
+        if (!key) {
+            setInputState((prev) => ({
+                ...prev,
+                imageInput: {
+                    ...prev.imageInput,
+                    showInputMessage: value,
+                },
+            }));
+            return;
+        }
+        setInputState((prev) => ({
+            ...prev,
+            [key]: {
+                ...prev[key],
+                showInputMessage: value,
+            },
+        }));
     }
 }
