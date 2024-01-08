@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Input from './Input';
 import useValidate from '@/hooks/useValidate';
 import { useUser } from '../context/UserContext';
@@ -59,6 +59,14 @@ export default function ChangeUsernameForm() {
             requestErrors: [],
         }),
     });
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onHilightInputs(false);
+            onShowInputsMessages(false);
+        }, 2750);
+        return () => clearTimeout(timeout);
+    }, [inputState]);
 
     return <>{renderContent()}</>;
 
@@ -177,14 +185,15 @@ export default function ChangeUsernameForm() {
         const handledInputs = onHandleInputs(inputs, user.username);
         setRequestState(true);
         const response = await onSubmitInputs(handledInputs);
+        setRequestState(false);
         if (!response.success) {
-            onSetRequestMessage('password', response.data);
-            onHilightInputs(true);
+            if (response.data.toLowerCase().includes('account'))
+                onSetRequestErrorMessage('password', 'Incorrect password');
+            onHilightInputs(true, 'password');
             onShowInputsMessages(true, 'password');
-            setRequestState(false);
             return;
         }
-        onSetRequestMessage('password');
+        onSetRequestErrorMessage('password');
         router.reload();
     }
 
@@ -211,7 +220,7 @@ export default function ChangeUsernameForm() {
         return parsedResponse;
     }
 
-    function onSetRequestMessage(key: InputsType, message?: string) {
+    function onSetRequestErrorMessage(key: InputsType, message?: string) {
         if (!message) {
             setInputs((prev) => ({
                 ...prev,

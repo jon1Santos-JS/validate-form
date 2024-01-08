@@ -11,17 +11,9 @@ const SIGN_UP_API = 'api/signUp';
 const CHECK_USERNAME_API = 'api/checkUsername';
 const REQUIRED_MESSAGE = 'This field is required';
 
-interface SignUpFormPropsType {
-    ownProps: PropsType;
-}
-interface PropsType {
-    setModalState: (data: boolean) => void;
-}
-
 type InputsType = 'confirmPassword' | 'password' | 'username';
-export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
+export default function SignUpForm() {
     const router = useRouter();
-    const { setModalState } = ownProps;
     const {
         userState: { hasUser },
     } = useUser();
@@ -29,6 +21,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
     const [isRequesting, setRequestState] = useState(false);
+    const [isValidating, setIsValidating] = useState(false);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -57,6 +50,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             ],
             required: { value: true, message: REQUIRED_MESSAGE },
             attributes: { value: '' },
+            requestErrors: [],
             errors: [],
         }),
         password: inputsFactory({
@@ -169,11 +163,13 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
                 highlightInput: true,
             },
         }));
+        setIsValidating(true);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
                 [key]: validateSingleSync(prev[key], prev),
             }));
+            setIsValidating(false);
         }, 950);
     }
 
@@ -181,6 +177,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         e: React.ChangeEvent<HTMLInputElement>,
     ) {
         if (isRequesting) return;
+        setIsValidating(true);
         setInputs((prev) => ({
             ...prev,
             username: {
@@ -207,12 +204,14 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
             };
             const validatedInput = await validateSingle(input, currentInputs);
             setInputs((prev) => ({ ...prev, username: validatedInput }));
+            setIsValidating(false);
         }, 960);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (isRequesting) return;
+        if (isValidating) return;
         if (!validateMany(inputs)) {
             onHilightInputs(true);
             onShowInputsMessages(true);
@@ -223,7 +222,7 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         const response = await onSubmitInputs(handledInputs);
         setRequestState(false);
         if (!response.success) {
-            setModalState(true);
+            onSetRequestErrorMessage('username', response.data);
             return;
         }
         router.push('/dashboard-page');
@@ -246,6 +245,20 @@ export default function SignUpForm({ ownProps }: SignUpFormPropsType) {
         const response = await fetch(SIGN_UP_API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         return parsedResponse;
+    }
+
+    function onSetRequestErrorMessage(key: InputsType, message?: string) {
+        if (!message) {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: { ...prev[key], requestErrors: [] },
+            }));
+            return;
+        }
+        setInputs((prev) => ({
+            ...prev,
+            [key]: { ...prev[key], requestErrors: [message] },
+        }));
     }
 
     function onHilightInputs(value: boolean) {

@@ -19,8 +19,8 @@ export default function useUtils() {
     async function onSetTimeOut(cb: () => void, timer: number) {
         const timeOut = setTimeout(() => {
             cb();
+            onSetTimeoutToClear(timeOut);
         }, timer);
-        onSetTimeoutToClear(timeOut);
     }
 
     async function onSetAsyncTimeOut(cb: () => Promise<void>, timer: number) {
