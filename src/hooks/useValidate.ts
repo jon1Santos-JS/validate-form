@@ -68,7 +68,7 @@ export default function useValidate() {
         if (!input.crossfields || input.crossfields.length === 0) return;
         input.crossfields.forEach((crossInput) => {
             if (!inputs[crossInput].attributes.value) return;
-            validate(inputs[crossInput], inputs);
+            validateSync(inputs[crossInput], inputs);
         });
     }
 

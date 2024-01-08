@@ -54,13 +54,17 @@ export default function Input<T extends string>({
     );
 
     function renderErrors() {
+        const errorsConditional =
+            errors.length > 0 && showInputMessage && errors[0];
+        const requestErrorsConditional =
+            requestErrors &&
+            requestErrors.length > 0 &&
+            showInputMessage &&
+            requestErrors[0];
+
         return (
             <div className="input-error-message">
-                {errors.length > 0 && showInputMessage && errors[0]}
-                {requestErrors &&
-                    requestErrors.length > 0 &&
-                    showInputMessage &&
-                    requestErrors[0]}
+                {errorsConditional || requestErrorsConditional}
             </div>
         );
     }
