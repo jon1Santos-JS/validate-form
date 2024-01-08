@@ -1,38 +1,54 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# simple-website-template
 
-## Getting Started
+<hr>
 
-First, run the development server:
+[<img target=_blank height="50px" src="https://media0.giphy.com/media/5ABGt7KDXJ62zg7oI0/giphy.gif?cid=790b761123aba84c737efe59273d3d75b3dbaef458bf13a4&rid=giphy.gif&ct=s" />](https://validating-form.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+#
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Built With
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+* Next.js
+* Sass
+* Typescript
+* React
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+#
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### Style guide
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+#### Typescript
 
-## Learn More
+* SOLID
+* CLEAN CODE
 
-To learn more about Next.js, take a look at the following resources:
+#### Sass
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* SMACSS
+* OOCSS
+* NAMESPACES
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+#
 
-## Deploy on Vercel
+### Api Reference
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* ImageBB: To upload images (https://www.themealdb.com/](https://api.imgbb.com/)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+#
+
+### Data-Base
+
+* MongoDB: To handle users through the app (https://account.mongodb.com/account/login)
+
+#
+
+### Skilled
+
+#### React
+
+* Dynamic Validate Hook: To validate different forms through the app.
+
+#### NextJs
+
+* Nextjs Api: To persist users data in cookies.
+
