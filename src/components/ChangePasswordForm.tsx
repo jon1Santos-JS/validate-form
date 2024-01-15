@@ -153,7 +153,7 @@ export default function ChangePasswordForm({
                     <div>
                         <button
                             key={'submitButton'}
-                            className="c-button"
+                            className="c-button button"
                             onClick={onClick}
                         >
                             Submit

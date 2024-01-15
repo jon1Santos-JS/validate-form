@@ -124,7 +124,7 @@ export default function ChangeUsernameForm({
                     <div>
                         <button
                             key={'submitButton'}
-                            className="c-button"
+                            className="c-button button"
                             onClick={onClick}
                         >
                             Submit

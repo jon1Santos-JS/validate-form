@@ -41,5 +41,10 @@
     .buttons {
         display: flex;
         gap: calc(var(--app-base-measure) * 10);
+
+        .button {
+            padding: calc(var(--app-base-measure))
+                calc(var(--app-base-measure) * 2);
+        }
     }
 }

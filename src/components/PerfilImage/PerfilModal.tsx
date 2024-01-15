@@ -52,10 +52,10 @@ export default function PerfilFormModal() {
                     <LoadingSpinner onShow={imageState.preview.isLoading} />
                 </div>
                 <div className="buttons">
-                    <button className="c-button" onClick={onSubmit}>
+                    <button className="c-button button" onClick={onSubmit}>
                         Submit
                     </button>
-                    <button className="c-button" onClick={onClose}>
+                    <button className="c-button button" onClick={onClose}>
                         Cancel
                     </button>
                 </div>

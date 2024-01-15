@@ -34,5 +34,10 @@
                 min-height: calc(var(--app-base-measure) * 3);
             }
         }
+
+        .button {
+            padding: calc(var(--app-base-measure))
+                calc(var(--app-base-measure) * 2);
+        }
     }
 }
