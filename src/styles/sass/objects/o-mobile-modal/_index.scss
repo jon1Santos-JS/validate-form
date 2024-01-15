@@ -1,0 +1,15 @@
+.o-mobile-modal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transform: scale(0.75);
+    width: 100%;
+    z-index: var(--modal-index);
+
+    .exit-button {
+        align-self: flex-end;
+        border: 0;
+        max-width: calc(var(--app-base-measure) * 6);
+        min-height: calc(var(--app-base-measure) * 4.5);
+    }
+}

@@ -7,6 +7,8 @@ export async function resetDBController(browserHash: string | undefined) {
         'reset database controller',
     );
     if (!DBResponse.success) return DBResponse;
+    if (DBResponse.data.constraint !== 'admin')
+        return { success: false, data: 'Permission denied' };
     const userFromDB = DBResponse.data;
     const response = await DB.resetDB(
         userFromDB.constraint,

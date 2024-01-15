@@ -1,0 +1,31 @@
+.o-dashboard-page {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    padding: calc(var(--app-base-measure) * 4);
+    width: 100%;
+
+    .container {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--app-base-measure) * 4);
+        justify-content: center;
+
+        .username {
+            font-weight: bold;
+        }
+
+        .welcome-message {
+            line-height: calc(var(--app-base-measure) * 2.5);
+            text-align: center;
+        }
+
+        .button {
+            padding: calc(var(--app-base-measure))
+                calc(var(--app-base-measure) * 2);
+        }
+    }
+}

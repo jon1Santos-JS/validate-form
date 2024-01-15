@@ -1,0 +1,22 @@
+.o-input-image {
+    align-items: center;
+    bottom: 5%;
+    display: flex;
+    justify-content: center;
+    max-height: 5%;
+    max-width: 5%;
+    position: absolute;
+    right: 15%;
+    z-index: var(--component-index);
+
+    .image {
+        border-radius: 50%;
+        box-shadow: 1px 1px 5px 0 var(--primary-color);
+        padding: calc(var(--app-base-measure) / 2);
+        width: calc(var(--app-base-measure) * 5);
+    }
+
+    .input-to-hide {
+        display: none;
+    }
+}

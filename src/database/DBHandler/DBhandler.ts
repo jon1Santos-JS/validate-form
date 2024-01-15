@@ -9,6 +9,14 @@ const USER_HASH_ERROR = 'User was not found by hash';
 export default class DBHandler {
     #DB = process.env.IS_LOCALHOST === 'true' ? new JsonDB() : new MongoDB();
 
+    async connect(caller: string) {
+        const response = await this.#DB.accessState(caller);
+        if (!response.success) return response;
+        return {
+            success: true,
+        } as DBDefaultResponse;
+    }
+
     async refreshDB(caller: string) {
         const response = await this.#DB.refreshState(caller);
         if (!response.success) return response;

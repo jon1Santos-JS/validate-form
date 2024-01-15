@@ -1,0 +1,5 @@
+.is-input-disabled {
+    background-color: var(--disabled-primary-color);
+    color: var(--disabled-secondary-color);
+    user-select: none;
+}

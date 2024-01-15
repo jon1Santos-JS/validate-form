@@ -1,0 +1,24 @@
+.o-dashboard-modal {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--app-base-measure) * 2);
+    justify-content: center;
+    min-width: 80%;
+    padding: calc(var(--app-base-measure) * 5);
+    position: relative;
+
+    @media screen and (width >= 768px) {
+        min-height: 50%;
+        min-width: 50%;
+    }
+
+    .exit-button {
+        align-self: flex-end;
+        border: 0;
+        padding: calc(var(--app-base-measure)) calc(var(--app-base-measure) * 2);
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+}

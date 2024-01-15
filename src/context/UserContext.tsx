@@ -15,25 +15,18 @@ type UserContextType = {
     setUser: Dispatch<SetStateAction<UserType>>;
     userState: UserStateType;
     setUserState: Dispatch<SetStateAction<UserStateType>>;
-    userImageState: UserImageState;
-    setUserImageState: Dispatch<SetStateAction<UserImageState>>;
 };
 
 export const UserContext = createContext<UserContextType>({
     user: {
         username: '',
-        userImage: '',
     },
     setUser: () => null,
     userState: {
         hasUser: false,
-        isUserStateLoading: true,
+        isLoading: true,
     },
     setUserState: () => null,
-    userImageState: {
-        isUserImageLoading: false,
-    },
-    setUserImageState: () => null,
 });
 
 type UserProps = {
@@ -41,16 +34,12 @@ type UserProps = {
 };
 
 export function UserProvider({ children }: UserProps) {
-    const [userImageState, setUserImageState] = useState({
-        isUserImageLoading: false,
-    });
     const [userState, setUserState] = useState({
         hasUser: false,
-        isUserStateLoading: true,
+        isLoading: true,
     });
     const [user, setUser] = useState({
         username: '',
-        userImage: process.env.NEXT_PUBLIC_USER_PERFIL_DEFAULT_IMG as string,
     });
 
     const onCheckUserState = useCallback(async () => {
@@ -61,13 +50,13 @@ export function UserProvider({ children }: UserProps) {
         setUserState((prev) => ({
             ...prev,
             hasUser: parsedResponse.success,
-            isUserStateLoading: false,
+            isLoading: false,
         }));
         if (parsedResponse.success) {
-            const DBUser = parsedResponse.data;
+            const DBUser = parsedResponse.data.username;
             setUser((prev) => ({
                 ...prev,
-                ...DBUser,
+                username: DBUser,
             }));
         }
     }, []);
@@ -83,8 +72,6 @@ export function UserProvider({ children }: UserProps) {
                 setUser,
                 userState,
                 setUserState,
-                userImageState,
-                setUserImageState,
             }}
         >
             {children}
@@ -92,6 +79,6 @@ export function UserProvider({ children }: UserProps) {
     );
 }
 
-export const useUser = () => {
+export const useAuth = () => {
     return useContext(UserContext);
 };

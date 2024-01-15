@@ -1,0 +1,28 @@
+.o-question-modal {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--app-base-measure) * 8);
+    justify-content: center;
+    max-width: calc(var(--app-base-measure) * 20);
+
+    @media screen and (width >= 768px) {
+        max-width: 100%;
+    }
+
+    .question {
+        font-size: calc(var(--app-base-font-size) * 1.2);
+        line-height: calc(var(--app-base-measure) * 3);
+        text-align: center;
+    }
+
+    .buttons {
+        display: flex;
+        gap: calc(var(--app-base-measure) * 10);
+
+        .button {
+            padding: calc(var(--app-base-measure) * 1)
+                calc(var(--app-base-measure) * 4);
+        }
+    }
+}

@@ -1,0 +1,26 @@
+.o-modal-button {
+    animation: pulse 0.6s ease-in infinite alternate;
+    border: 0;
+    border-radius: 50%;
+    bottom: 10%;
+    font-weight: bold;
+    height: calc(var(--app-base-measure) * 7);
+    position: absolute;
+    right: 20%;
+    width: calc(var(--app-base-measure) * 7);
+    z-index: var(--navigation-index);
+
+    @media screen and (width >= 768px) {
+        display: none;
+    }
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(0.9);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}

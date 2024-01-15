@@ -2,21 +2,28 @@ import Input from './Input';
 import { useRouter } from 'next/router';
 import useValidate from '@/hooks/useValidate';
 import useInputHandler from '@/hooks/useInputHandler';
-import { useState } from 'react';
-import { useUser } from '../context/UserContext';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useAuth } from '../context/UserContext';
 import useUtils from '@/hooks/useUtils';
 
 const API = 'api/updatePassword';
 
 type InputsType = 'password' | 'newPassword' | 'confirmNewPassword';
 
-export default function ChangePasswordForm() {
+type ChangePasswordProps = {
+    isRequesting: boolean;
+    setRequestState: Dispatch<SetStateAction<boolean>>;
+};
+
+export default function ChangePasswordForm({
+    isRequesting,
+    setRequestState,
+}: ChangePasswordProps) {
     const router = useRouter();
-    const { user } = useUser();
-    const { validateSingleSync, validateMany } = useValidate();
+    const { user } = useAuth();
+    const { validateSingleSync, validateManySync } = useValidate();
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
-    const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         password: { showInputMessage: false, highlightInput: false },
         newPassword: { showInputMessage: false, highlightInput: false },
@@ -75,6 +82,14 @@ export default function ChangePasswordForm() {
         }),
     });
 
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onHilightInputs(false);
+            onShowInputsMessages(false);
+        }, 2750);
+        return () => clearTimeout(timeout);
+    }, [inputState]);
+
     return <>{renderContent()}</>;
 
     function renderContent() {
@@ -96,6 +111,9 @@ export default function ChangePasswordForm() {
                                 label: 'Password',
                                 inputType: 'password',
                                 onChange: (e) => onChange(e, 'password'),
+                                className: `${
+                                    isRequesting ? 'is-input-disabled' : ''
+                                }`,
                             }}
                             inputStateProps={{
                                 input: inputs.password,
@@ -107,6 +125,9 @@ export default function ChangePasswordForm() {
                                 label: 'New Password',
                                 inputType: 'password',
                                 onChange: (e) => onChange(e, 'newPassword'),
+                                className: `${
+                                    isRequesting ? 'is-input-disabled' : ''
+                                }`,
                             }}
                             inputStateProps={{
                                 input: inputs.newPassword,
@@ -119,6 +140,9 @@ export default function ChangePasswordForm() {
                                 inputType: 'password',
                                 onChange: (e) =>
                                     onChange(e, 'confirmNewPassword'),
+                                className: `${
+                                    isRequesting ? 'is-input-disabled' : ''
+                                }`,
                             }}
                             inputStateProps={{
                                 input: inputs.confirmNewPassword,
@@ -157,7 +181,8 @@ export default function ChangePasswordForm() {
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (isRequesting) return;
-        if (!validateMany(inputs)) {
+        if (areErrorsUp()) return;
+        if (!validateManySync(inputs)) {
             onHilightInputs(true);
             onShowInputsMessages(true);
             return;
@@ -174,6 +199,14 @@ export default function ChangePasswordForm() {
         }
         onSetRequestMessage('password');
         router.reload();
+    }
+
+    function areErrorsUp() {
+        let isValid = false;
+        for (const i in inputState) {
+            if (inputState[i as InputsType].showInputMessage) isValid = true;
+        }
+        return isValid;
     }
 
     function onHandleInputs(

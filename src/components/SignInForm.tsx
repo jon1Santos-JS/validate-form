@@ -3,7 +3,7 @@ import Input from './Input';
 import useInputHandler from '@/hooks/useInputHandler';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
-import { useUser } from '../context/UserContext';
+import { useAuth } from '../context/UserContext';
 import useUtils from '@/hooks/useUtils';
 
 const API = 'api/signIn';
@@ -15,8 +15,8 @@ export default function SignInForm() {
     const {
         userState: { hasUser },
         setUserState,
-    } = useUser();
-    const { validateSingleSync, validateMany } = useValidate();
+    } = useAuth();
+    const { validateSingleSync, validateManySync } = useValidate();
     const { inputsFactory } = useInputHandler();
     const { onSetTimeOut } = useUtils();
     const [showMessage, onShowMessage] = useState<boolean>(false);
@@ -25,6 +25,7 @@ export default function SignInForm() {
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
     });
+
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: inputsFactory({
             validationsSync: ({ value }) => [
@@ -74,6 +75,9 @@ export default function SignInForm() {
                             label: 'Username',
                             inputType: 'text',
                             onChange: (e) => onChange(e, 'username'),
+                            className: `${
+                                isRequesting ? 'is-input-disabled' : ''
+                            }`,
                         }}
                         inputStateProps={{
                             input: inputs.username,
@@ -85,6 +89,9 @@ export default function SignInForm() {
                             label: 'Password',
                             inputType: 'password',
                             onChange: (e) => onChange(e, 'password'),
+                            className: `${
+                                isRequesting ? 'is-input-disabled' : ''
+                            }`,
                         }}
                         inputStateProps={{
                             input: inputs.password,
@@ -96,14 +103,14 @@ export default function SignInForm() {
                 <div className="buttons">
                     <button
                         key={'submitButton'}
-                        className="c-button"
+                        className="c-button button"
                         onClick={onClick}
                     >
                         Submit
                     </button>
                     {!hasUser && (
                         <Link href="/sign-up-page">
-                            <button className="c-button">Sign up</button>
+                            <button className="c-button button">Sign up</button>
                         </Link>
                     )}
                 </div>
@@ -111,31 +118,31 @@ export default function SignInForm() {
         </form>
     );
 
-    function onChange(
-        e: React.ChangeEvent<HTMLInputElement>,
-        name: keyof typeof inputs,
-    ) {
+    function onChange(e: React.ChangeEvent<HTMLInputElement>, key: InputsType) {
         if (isRequesting) return;
         setInputs((prev) => ({
             ...prev,
-            [name]: { ...prev[name], attributes: { value: e.target.value } },
+            [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
         setInputs((prev) => ({
             ...prev,
-            [name]: validateSingleSync({ ...prev[name] }),
+            [key]: validateSingleSync({ ...prev[key] }),
         }));
     }
 
     function renderError() {
-        if (!showMessage) return <div className="form-error-message"></div>;
-        return <div className="form-error-message">{DEFAULT_MESSAGE}</div>;
+        return (
+            <div className="l-text--danger form-error">
+                {showMessage ? DEFAULT_MESSAGE : null}
+            </div>
+        );
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (showMessage) return;
         if (isRequesting) return;
-        if (!validateMany(inputs)) {
+        if (!validateManySync(inputs)) {
             onShowMessage(true);
             onHilightInputs(true);
             onSetTimeOut(() => {
@@ -147,19 +154,8 @@ export default function SignInForm() {
         }
         const handledInputs = onHandleInputs(inputs);
         setRequestState(true);
-        const response = await onSubmitInputs(handledInputs);
+        await onSubmitInputs(handledInputs);
         setRequestState(false);
-        setUserState((prev) => ({ ...prev, isUserStateLoading: false }));
-        setUserState((prev) => ({ ...prev, hasUser: response.success }));
-        if (!response.success) {
-            onShowMessage(true);
-            onHilightInputs(true);
-            onSetTimeOut(() => {
-                onShowMessage(false);
-                onHilightInputs(false);
-            }, 2750);
-            return;
-        }
     }
 
     function onHandleInputs(inputsTohandle: InputsToValidateType<InputsType>) {
@@ -178,7 +174,18 @@ export default function SignInForm() {
         };
         const response = await fetch(API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
-        return parsedResponse;
+        setUserState((prev) => ({ ...prev, isUserStateLoading: false }));
+        setUserState((prev) => ({ ...prev, hasUser: parsedResponse.success }));
+        if (!parsedResponse.success) {
+            onSetRequestErrorMessage(null, '');
+            onShowMessage(true);
+            onHilightInputs(true);
+            onSetTimeOut(() => {
+                onShowMessage(false);
+                onHilightInputs(false);
+            }, 2750);
+            return;
+        }
     }
 
     function onHilightInputs(value: boolean) {
@@ -207,5 +214,42 @@ export default function SignInForm() {
                 showInputMessage: value,
             },
         }));
+    }
+
+    function onSetRequestErrorMessage(
+        key?: InputsType | null,
+        message: string | null = '',
+    ) {
+        if (!key && message === null) {
+            setInputs((prev) => {
+                for (const i in prev) {
+                    prev[i as InputsType].requestErrors = [];
+                }
+                return prev;
+            });
+            return;
+        }
+        if (!key && message !== null) {
+            setInputs((prev) => {
+                for (const i in prev) {
+                    prev[i as InputsType].requestErrors = [message];
+                }
+                return prev;
+            });
+            return;
+        }
+        if (key && message === null) {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: { ...prev[key], requestErrors: [] },
+            }));
+            return;
+        }
+        if (key && message !== null) {
+            setInputs((prev) => ({
+                ...prev,
+                [key]: { ...prev[key], requestErrors: [message] },
+            }));
+        }
     }
 }

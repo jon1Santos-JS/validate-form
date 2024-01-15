@@ -1,8 +1,28 @@
 export default function useValidate() {
-    function validateMany<T extends string>(inputs: InputsToValidateType<T>) {
+    function validateManySync<T extends string>(
+        inputs: InputsToValidateType<T>,
+    ) {
         let isValid = true;
+        if (onCheckManyRequired(inputs)) return isValid;
         for (const i in inputs) {
-            onCheckRequired(inputs[i]);
+            validateSync(inputs[i], inputs);
+            if (inputs[i].errors.length > 0) isValid = false;
+        }
+        return isValid;
+    }
+
+    async function validateMany<T extends string>(
+        inputs: InputsToValidateType<T>,
+    ) {
+        let isValid = true;
+        if (onCheckManyRequired(inputs)) return isValid;
+        for (const i in inputs) {
+            validateSync(inputs[i], inputs);
+            if (inputs[i].errors.length > 0) isValid = false;
+        }
+        if (!isValid) return isValid;
+        for (const i in inputs) {
+            await validate(inputs[i], inputs);
             if (inputs[i].errors.length > 0) isValid = false;
         }
         return isValid;
@@ -85,9 +105,21 @@ export default function useValidate() {
         return false;
     }
 
+    function onCheckManyRequired<T extends string>(
+        inputs: InputsToValidateType<T>,
+    ) {
+        let isValid = true;
+        for (const i in inputs) {
+            onCheckRequired(inputs[i]);
+            if (inputs[i].errors.length > 0) isValid = false;
+        }
+        return isValid;
+    }
+
     return {
         validateSingleSync,
         validateSingle,
+        validateManySync,
         validateMany,
     };
 }
