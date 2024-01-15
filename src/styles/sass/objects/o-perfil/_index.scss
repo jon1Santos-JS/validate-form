@@ -1,0 +1,12 @@
+.o-perfil {
+    align-items: center;
+    border-radius: 50%;
+    box-shadow: 0 0 3px 0 var(--primary-color);
+    display: flex;
+    justify-content: center;
+    max-height: calc(var(--app-base-measure) * 25);
+    max-width: calc(var(--app-base-measure) * 25);
+    min-height: calc(var(--app-base-measure) * 25);
+    min-width: calc(var(--app-base-measure) * 25);
+    position: relative;
+}

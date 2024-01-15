@@ -1,0 +1,37 @@
+.l-bg {
+    &--primary {
+        // GRAY BG
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+    }
+
+    &--secondary {
+        // WHITE BG
+        background-color: var(--secondary-color);
+        color: var(--thirty-color);
+    }
+
+    &--thirty {
+        // BLACK BG
+        background-color: var(--thirty-color);
+        border-color: var(--secondary-color);
+        color: var(--secondary-color);
+    }
+
+    &--danger {
+        // DANGER BG
+        background-color: var(--danger-color);
+        color: var(--secondary-color);
+    }
+
+    &--success {
+        // SUCCESS BG
+        background-color: var(--success-color);
+        color: var(--secondary-color);
+    }
+
+    &--none {
+        // NONE BG
+        background-color: var(--secondary-color);
+    }
+}

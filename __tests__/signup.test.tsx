@@ -1,24 +1,38 @@
-import DBAccountHandler from '@/database/accountHandler';
-// import { MONGO_HANDLER } from './mongoAccess.test';
+/**
+ * @jest-environment node
+ */
 
+import UserRegisterHandler from '@/database/AccountHandler/Register';
+import { MongoDB } from '@/database/DBHandler/DBMongo';
+import { DATABASE } from '@/database/DBHandler/DBState';
+import '@testing-library/jest-dom';
 const AMOUNT_OF_ACCOUNTS = 9;
 
-// beforeAll(async () => {
-//     await MONGO_HANDLER.connect('test');
-//     await MONGO_HANDLER.accessState('test');
-// });
-
-test('sign up', async () => {
-    await testLoop(AMOUNT_OF_ACCOUNTS);
+beforeAll(async () => {
+    const db = new MongoDB();
+    await db.accessState('signup test');
 });
 
+afterAll(async () => {
+    const db = new MongoDB();
+    await db.refreshState('signup test');
+});
+
+test('max sign up test', async () => {
+    await testLoop(AMOUNT_OF_ACCOUNTS);
+}, 20000);
+
 export async function testLoop(limit: number) {
-    const DBAccountHandler = new DBAccountHandler();
+    const register = new UserRegisterHandler();
     const account = {
         username: { value: randomString() },
         password: { value: randomString() },
     };
-    await expect(DBAccountHandler.signUp(account)).resolve.toBe(undefined);
+    if (DATABASE.state.accounts.length === 10) return;
+    await expect(register.signUp(account)).resolves.toStrictEqual({
+        success: true,
+        data: 'Account has been created',
+    });
     limit--;
     if (limit === 0) return;
     testLoop(limit);

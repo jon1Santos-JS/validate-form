@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import Input from '../Input';
+import { useEffect, useState } from 'react';
+import Input from './Input';
 import Link from 'next/link';
 import useValidate from '@/hooks/useValidate';
 import useInputHandler from '@/hooks/useInputHandler';
-import { useUser } from '../../context/UserContext';
+import { useAuth } from '../context/UserContext';
 import useUtils from '@/hooks/useUtils';
 import { useRouter } from 'next/router';
 
@@ -12,16 +12,26 @@ const CHECK_USERNAME_API = 'api/checkUsername';
 const REQUIRED_MESSAGE = 'This field is required';
 
 type InputsType = 'confirmPassword' | 'password' | 'username';
-export default function SignUpForm() {
+
+type SignUpProps = {
+    setModalMessage: (message: string) => void;
+    onOpenDangerModal: () => void;
+    isDangerModalOpen: boolean;
+};
+export default function SignUpForm({
+    setModalMessage,
+    onOpenDangerModal,
+    isDangerModalOpen,
+}: SignUpProps) {
     const router = useRouter();
     const {
         userState: { hasUser },
-    } = useUser();
+    } = useAuth();
     const { validateSingle, validateSingleSync, validateMany } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
     const [isRequesting, setRequestState] = useState(false);
-    const [isValidating, setIsValidating] = useState(false);
+    const [isValidatingOnTyping, setIsValidatingOnTyping] = useState(false);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -87,6 +97,14 @@ export default function SignUpForm() {
         }),
     });
 
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onHilightInputs(false);
+            onShowInputsMessages(false);
+        }, 2750);
+        return () => clearTimeout(timeout);
+    }, [inputState]);
+
     return (
         <form className="o-sign-up-form">
             <fieldset className="container">
@@ -99,6 +117,11 @@ export default function SignUpForm() {
                             label: 'Username',
                             inputType: 'text',
                             onChange: (e) => onChangeInputUsername(e),
+                            className: `${
+                                isRequesting || isDangerModalOpen
+                                    ? 'is-input-disabled'
+                                    : ''
+                            }`,
                         }}
                         inputStateProps={{
                             input: inputs.username,
@@ -110,6 +133,11 @@ export default function SignUpForm() {
                             label: 'Password',
                             inputType: 'password',
                             onChange: (e) => onChange(e, 'password'),
+                            className: `${
+                                isRequesting || isDangerModalOpen
+                                    ? 'is-input-disabled'
+                                    : ''
+                            }`,
                         }}
                         inputStateProps={{
                             input: inputs.password,
@@ -121,6 +149,11 @@ export default function SignUpForm() {
                             label: 'Confirm Password',
                             inputType: 'password',
                             onChange: (e) => onChange(e, 'confirmPassword'),
+                            className: `${
+                                isRequesting || isDangerModalOpen
+                                    ? 'is-input-disabled'
+                                    : ''
+                            }`,
                         }}
                         inputStateProps={{
                             input: inputs.confirmPassword,
@@ -131,14 +164,14 @@ export default function SignUpForm() {
                 <div className="buttons">
                     <button
                         key={'submitButton'}
-                        className="c-button"
+                        className="c-button button"
                         onClick={onClick}
                     >
                         Submit
                     </button>
                     {!hasUser && (
                         <Link key={'signInButton'} href="/">
-                            <button className="c-button">Sign In</button>
+                            <button className="c-button button">Sign In</button>
                         </Link>
                     )}
                 </div>
@@ -151,33 +184,36 @@ export default function SignUpForm() {
         key: InputsType,
     ) {
         if (isRequesting) return;
+        if (isDangerModalOpen) return;
         setInputs((prev) => ({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
-        setInputState((prev) => ({
-            ...prev,
-            [key]: {
-                ...prev[key],
-                showInputMessage: true,
-                highlightInput: true,
-            },
-        }));
-        setIsValidating(true);
+
+        setIsValidatingOnTyping(true);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
                 [key]: validateSingleSync(prev[key], prev),
             }));
-            setIsValidating(false);
+            setInputState((prev) => ({
+                ...prev,
+                [key]: {
+                    ...prev[key],
+                    showInputMessage: true,
+                    highlightInput: true,
+                },
+            }));
+            setIsValidatingOnTyping(false);
         }, 950);
     }
 
     async function onChangeInputUsername(
         e: React.ChangeEvent<HTMLInputElement>,
     ) {
+        if (isDangerModalOpen) return;
         if (isRequesting) return;
-        setIsValidating(true);
+        setIsValidatingOnTyping(true);
         setInputs((prev) => ({
             ...prev,
             username: {
@@ -185,14 +221,7 @@ export default function SignUpForm() {
                 attributes: { value: e.target.value },
             },
         }));
-        setInputState((prev) => ({
-            ...prev,
-            username: {
-                ...prev.username,
-                showInputMessage: true,
-                highlightInput: true,
-            },
-        }));
+
         await onSetAsyncTimeOut(async () => {
             const input = {
                 ...inputs.username,
@@ -204,28 +233,34 @@ export default function SignUpForm() {
             };
             const validatedInput = await validateSingle(input, currentInputs);
             setInputs((prev) => ({ ...prev, username: validatedInput }));
-            setIsValidating(false);
+            setInputState((prev) => ({
+                ...prev,
+                username: {
+                    ...prev.username,
+                    showInputMessage: true,
+                    highlightInput: true,
+                },
+            }));
+            setIsValidatingOnTyping(false);
         }, 960);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
+        if (isDangerModalOpen) return;
+        if (areErrorsUp()) return;
         if (isRequesting) return;
-        if (isValidating) return;
-        if (!validateMany(inputs)) {
+        if (isValidatingOnTyping) return;
+        setRequestState(true);
+        if (!(await validateMany(inputs))) {
             onHilightInputs(true);
             onShowInputsMessages(true);
+            setRequestState(false);
             return;
         }
         const handledInputs = onHandleInputs(inputs);
         setRequestState(true);
-        const response = await onSubmitInputs(handledInputs);
-        setRequestState(false);
-        if (!response.success) {
-            onSetRequestErrorMessage('username', response.data);
-            return;
-        }
-        router.push('/dashboard-page');
+        await onSubmitInputs(handledInputs);
     }
 
     function onHandleInputs(inputsToHandle: InputsToValidateType<InputsType>) {
@@ -244,7 +279,25 @@ export default function SignUpForm() {
         };
         const response = await fetch(SIGN_UP_API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
-        return parsedResponse;
+        if (!parsedResponse.success) {
+            setRequestState(false);
+            if (parsedResponse.data.includes('limit')) {
+                setModalMessage(parsedResponse.data);
+                onOpenDangerModal();
+                return;
+            }
+            onSetRequestErrorMessage('username', parsedResponse.data);
+            return;
+        }
+        router.push('/dashboard-page');
+    }
+
+    function areErrorsUp() {
+        let isValid = false;
+        for (const i in inputState) {
+            if (inputState[i as InputsType].showInputMessage) isValid = true;
+        }
+        return isValid;
     }
 
     function onSetRequestErrorMessage(key: InputsType, message?: string) {

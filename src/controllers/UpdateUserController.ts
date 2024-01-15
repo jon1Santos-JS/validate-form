@@ -8,7 +8,7 @@ export async function updateUsernameController(
     const update = new UserUpdateHandler();
     const auth = new UserAuthHandler();
     const db = new DBHandler();
-    const checkDBResponse = await db.checkDB('update username controller');
+    const checkDBResponse = await db.connect('update username controller');
     if (!checkDBResponse.success) return checkDBResponse;
     const accountResponse = await auth.authAccount({
         username: userAccount.username,
@@ -34,7 +34,7 @@ export async function updatePasswordController(
     const update = new UserUpdateHandler();
     const auth = new UserAuthHandler();
     const db = new DBHandler();
-    const checkResponse = await db.checkDB('update password controller');
+    const checkResponse = await db.connect('update password controller');
     if (!checkResponse.success) return checkResponse;
     const authResponse = await auth.authAccount(userAccount);
     if (!authResponse.success) return authResponse;
@@ -50,7 +50,7 @@ export async function updateUserImageController(
 ) {
     const update = new UserUpdateHandler();
     const db = new DBHandler();
-    const checkResponse = await db.checkDB('update image controller');
+    const checkResponse = await db.connect('update image controller');
     if (!checkResponse.success) return checkResponse;
     const getUserResponse = await db.getUserByHash(
         browserHash,

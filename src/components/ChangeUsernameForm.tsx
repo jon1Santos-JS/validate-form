@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Input from './Input';
 import useValidate from '@/hooks/useValidate';
-import { useUser } from '../context/UserContext';
+import { useAuth } from '../context/UserContext';
 import useInputHandler from '@/hooks/useInputHandler';
 import useUtils from '@/hooks/useUtils';
 import { useRouter } from 'next/router';
@@ -10,13 +10,20 @@ const CHECK_USERNAME_API = 'api/checkUsername';
 
 type InputsType = 'newUsername' | 'password';
 
-export default function ChangeUsernameForm() {
+type ChangeUsernameProps = {
+    isRequesting: boolean;
+    setRequestState: Dispatch<SetStateAction<boolean>>;
+};
+
+export default function ChangeUsernameForm({
+    isRequesting,
+    setRequestState,
+}: ChangeUsernameProps) {
     const router = useRouter();
-    const { user } = useUser();
-    const { validateSingleSync, validateMany, validateSingle } = useValidate();
+    const { user } = useAuth();
+    const { validateSingleSync, validateMany } = useValidate();
     const { inputsFactory, onCheckUsername } = useInputHandler();
-    const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
-    const [isRequesting, setRequestState] = useState(false);
+    const { onSetTimeOut } = useUtils();
     const [inputState, setInputState] = useState({
         newUsername: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -29,7 +36,7 @@ export default function ChangeUsernameForm() {
                         method: 'POST',
                         body: value,
                     }),
-                    message: 'This username already exist',
+                    message: 'Username already exist',
                 },
             ],
             validationsSync: ({ value }) => [
@@ -38,8 +45,8 @@ export default function ChangeUsernameForm() {
                     message: 'Username must has 6 characters at least',
                 },
                 {
-                    conditional: !value.match(/^[A-Za-zçÇ]+$/),
-                    message: 'Only characters',
+                    conditional: !value.match(/^[A-Za-z]*$/),
+                    message: 'No special characters',
                 },
             ],
             required: { value: true },
@@ -63,6 +70,7 @@ export default function ChangeUsernameForm() {
     useEffect(() => {
         const timeout = setTimeout(() => {
             onHilightInputs(false);
+            onSetRequestErrorMessage('password');
             onShowInputsMessages(false);
         }, 2750);
         return () => clearTimeout(timeout);
@@ -80,15 +88,18 @@ export default function ChangeUsernameForm() {
         return (
             <form className="o-change-username-form">
                 <fieldset className="container">
-                    <div className="legend">
+                    <h3 className="legend">
                         <legend>Change Username</legend>
-                    </div>
+                    </h3>
                     <div className="inputs">
                         <Input
                             ownProps={{
                                 label: 'New Username',
                                 inputType: 'text',
                                 onChange: (e) => onChange(e, 'newUsername'),
+                                className: `${
+                                    isRequesting ? 'is-input-disabled' : ''
+                                }`,
                             }}
                             inputStateProps={{
                                 input: inputs.newUsername,
@@ -100,6 +111,9 @@ export default function ChangeUsernameForm() {
                                 label: 'Password',
                                 inputType: 'password',
                                 onChange: (e) => onChangePassword(e),
+                                className: `${
+                                    isRequesting ? 'is-input-disabled' : ''
+                                }`,
                             }}
                             inputStateProps={{
                                 input: inputs.password,
@@ -130,25 +144,12 @@ export default function ChangeUsernameForm() {
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
-        await onSetAsyncTimeOut(async () => {
-            const validatedInput = await validateSingle({
+        onSetTimeOut(() => {
+            const validatedInput = validateSingleSync({
                 ...inputs[key],
                 attributes: { value: e.target.value },
             });
             setInputs((prev) => ({ ...prev, [key]: validatedInput }));
-            setInputState((prev) => ({
-                ...prev,
-                newUsername: {
-                    ...prev.newUsername,
-                    highlightInput: true,
-                    showInputMessage: true,
-                },
-                password: {
-                    ...prev.newUsername,
-                    highlightInput: true,
-                    showInputMessage: true,
-                },
-            }));
         }, 950);
     }
 
@@ -169,32 +170,32 @@ export default function ChangeUsernameForm() {
                     attributes: { value: e.target.value },
                 }),
             }));
-            onHilightInputs(true);
-            onShowInputsMessages(true);
         }, 950);
     }
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
         if (isRequesting) return;
-        if (!validateMany(inputs)) {
+        if (areErrorsUp()) return;
+        setRequestState(true);
+        if (!(await validateMany(inputs))) {
             onHilightInputs(true);
             onShowInputsMessages(true);
+            setRequestState(false);
             return;
         }
         const handledInputs = onHandleInputs(inputs, user.username);
         setRequestState(true);
-        const response = await onSubmitInputs(handledInputs);
+        await onSubmitInputs(handledInputs);
         setRequestState(false);
-        if (!response.success) {
-            if (response.data.toLowerCase().includes('account'))
-                onSetRequestErrorMessage('password', 'Incorrect password');
-            onHilightInputs(true, 'password');
-            onShowInputsMessages(true, 'password');
-            return;
+    }
+
+    function areErrorsUp() {
+        let isValid = false;
+        for (const i in inputState) {
+            if (inputState[i as InputsType].showInputMessage) isValid = true;
         }
-        onSetRequestErrorMessage('password');
-        router.reload();
+        return isValid;
     }
 
     function onHandleInputs(
@@ -217,7 +218,21 @@ export default function ChangeUsernameForm() {
         };
         const response = await fetch(UPDATE_USERNAME_API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
-        return parsedResponse;
+        if (!parsedResponse.success) {
+            onHandleRequestErrorMessage(parsedResponse.data);
+            onHilightInputs(true, 'password');
+            onShowInputsMessages(true, 'password');
+            return;
+        }
+        onHilightInputs(false, 'password');
+        onShowInputsMessages(false, 'password');
+        onSetRequestErrorMessage('password');
+        router.reload();
+    }
+
+    function onHandleRequestErrorMessage(message: string) {
+        if (message.toLowerCase().includes('account'))
+            onSetRequestErrorMessage('password', 'Incorrect password');
     }
 
     function onSetRequestErrorMessage(key: InputsType, message?: string) {

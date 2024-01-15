@@ -2,6 +2,9 @@ import UserAuthHandler from '@/database/AccountHandler/Auth';
 import DBHandler from '@/database/DBHandler/DBhandler';
 
 export async function signInController(userAccount: UserFromClient) {
+    const DB = new DBHandler();
+    const DBResponse = await DB.connect('sign in controller');
+    if (!DBResponse.success) return DBResponse;
     const accountHandler = new UserAuthHandler();
     const response = await accountHandler.authAccount(userAccount);
     return response;
@@ -26,7 +29,7 @@ export async function authUserController(browserHash: string | undefined) {
 export async function checkUsernameController(username: string) {
     const db = new DBHandler();
     const auth = new UserAuthHandler();
-    const DBResponse = await db.checkDB('signup controller');
+    const DBResponse = await db.connect('signup controller');
     if (!DBResponse.success) return DBResponse;
     const authResponse = await auth.authUsername(username);
     return authResponse;

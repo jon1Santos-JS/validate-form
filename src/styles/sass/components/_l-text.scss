@@ -1,0 +1,9 @@
+.l-text {
+    &--danger {
+        color: var(--danger-color);
+    }
+
+    &--success {
+        color: var(--sucess-color);
+    }
+}

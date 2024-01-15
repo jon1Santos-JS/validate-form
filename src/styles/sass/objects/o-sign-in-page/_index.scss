@@ -1,0 +1,13 @@
+.o-sign-in-page {
+    display: flex;
+    height: 100%;
+    width: 100%;
+
+    .description-container {
+        display: none;
+
+        @media screen and (width >= 768px) {
+            display: block;
+        }
+    }
+}

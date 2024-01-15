@@ -9,6 +9,8 @@ export async function deleteAccountController(browserHash: string | undefined) {
         'delete account controller',
     );
     if (!DBResponse.success) return DBResponse;
+    if (DBResponse.data.constraint !== 'user')
+        return { success: false, data: 'Permission denied' };
     const checkResponse = await db.checkDB('delete account controller');
     if (!checkResponse.success) return checkResponse;
     const user = DBResponse.data;

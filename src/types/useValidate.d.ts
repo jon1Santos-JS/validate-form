@@ -35,10 +35,3 @@ declare interface Validation {
     conditional: boolean | RegExpMatchArray | null | Promise<boolean | string>;
     message: string;
 }
-
-declare type InputState<T extends string> = {
-    showInputMessage: boolean;
-    highlightInput: boolean;
-    onShowInputMessage?: (value: boolean, key: T) => void;
-    onHighlightInput?: (value: boolean, key: T) => void;
-};

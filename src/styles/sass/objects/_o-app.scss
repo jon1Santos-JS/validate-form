@@ -5,7 +5,8 @@
     font-size: var(--app-base-font-size);
     height: 100%;
     justify-content: center;
+    letter-spacing: calc(var(--app-base-measure) / 8);
     min-height: calc(var(--app-base-measure) * 63);
-    overflow: auto;
+    overflow: hidden;
     width: 100%;
 }

@@ -1,0 +1,28 @@
+.o-warning-modal {
+    align-items: center;
+    animation: open-close 0.2s ease;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 2%;
+    width: 100%;
+
+    .message {
+        align-items: center;
+        border-radius: 1rem;
+        display: flex;
+        height: calc(var(--app-base-measure) * 5);
+        justify-content: center;
+        width: 60%;
+    }
+}
+
+@keyframes open-close {
+    from {
+        transform: translate(0, -400%);
+    }
+
+    to {
+        transform: translate(0, 0);
+    }
+}
