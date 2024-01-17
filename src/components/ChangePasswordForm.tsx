@@ -189,16 +189,8 @@ export default function ChangePasswordForm({
         }
         const handledInputs = onHandleInputs(inputs, user.username);
         setRequestState(true);
-        const response = await onSubmitInputs(handledInputs);
+        await onSubmitInputs(handledInputs);
         setRequestState(false);
-        if (!response.success) {
-            onSetRequestMessage('password', response.data);
-            onHilightInputs(true);
-            onShowInputsMessages(true);
-            return;
-        }
-        onSetRequestMessage('password');
-        router.reload();
     }
 
     function areErrorsUp() {
@@ -229,7 +221,14 @@ export default function ChangePasswordForm({
         };
         const response = await fetch(API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
-        return parsedResponse;
+        if (!parsedResponse.success) {
+            onSetRequestMessage('password', parsedResponse.data);
+            onHilightInputs(true);
+            onShowInputsMessages(true);
+            return;
+        }
+        onSetRequestMessage('password');
+        router.reload();
     }
 
     function onSetRequestMessage(key: InputsType, message?: string) {

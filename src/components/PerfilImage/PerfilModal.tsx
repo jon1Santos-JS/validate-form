@@ -1,12 +1,9 @@
 import useValidate from '@/hooks/useValidate';
-import useUtils from '@/hooks/useUtils';
 import { useImage } from '@/context/UserPerfilImageContext';
 import Image from 'next/image';
 import LoadingSpinner from '../LoadingSpinner';
 
 const API = 'api/updateUserImage';
-
-const IMAGE_LOADING_TIMER = 2000;
 
 export default function PerfilFormModal() {
     const {
@@ -22,7 +19,6 @@ export default function PerfilFormModal() {
         setImageModalState,
     } = useImage();
     const { validateManySync } = useValidate();
-    const { onSetTimeOut } = useUtils();
 
     return (
         <div
@@ -137,13 +133,11 @@ export default function PerfilFormModal() {
     }
 
     function onLoadingImage() {
-        onSetTimeOut(() => {
-            setImageState((prev) => ({
-                ...prev,
-                preview: {
-                    isLoading: false,
-                },
-            }));
-        }, IMAGE_LOADING_TIMER);
+        setImageState((prev) => ({
+            ...prev,
+            preview: {
+                isLoading: false,
+            },
+        }));
     }
 }

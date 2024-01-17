@@ -12,9 +12,9 @@ import WarningModal from '@/components/WarningModal';
 const HANDLE_DB_API = 'api/handleDatabase';
 const DELETE_API = 'api/deleteUser';
 const SIGN_IN_API = 'api/signIn';
-const RESET_DATABASE_QUESTION = 'Are you sure you want to reset the database?';
-const RESET_DATABASE_SUCCESS = 'Database was reset successfully';
-const DELETE_ACCOUNT_QUESTION = 'Are you sure you want to delete your account?';
+const RESET_DB_MESSAGE = 'Are you sure you want to reset the database?';
+const RESET_DB_SUCCESS_MESSSAGE = 'Database was reset successfully';
+const DELETE_ACC_MESSAGE = 'Are you sure you want to delete your account?';
 
 export default function DashBoardPage() {
     const {
@@ -138,7 +138,7 @@ export default function DashBoardPage() {
                         >
                             <div className="o-question-modal">
                                 <div className="question">
-                                    {RESET_DATABASE_QUESTION}
+                                    {RESET_DB_MESSAGE}
                                 </div>
                                 <div className="buttons">
                                     <button
@@ -171,7 +171,7 @@ export default function DashBoardPage() {
                         >
                             <div className="o-question-modal">
                                 <div className="question">
-                                    {DELETE_ACCOUNT_QUESTION}
+                                    {DELETE_ACC_MESSAGE}
                                 </div>
                                 <div className="buttons">
                                     <button
@@ -200,7 +200,7 @@ export default function DashBoardPage() {
                         <WarningModal
                             isOpen={isWarningModalOpen}
                             onClose={() => onOpenWarningModal(false)}
-                            message={RESET_DATABASE_SUCCESS}
+                            message={RESET_DB_SUCCESS_MESSSAGE}
                             className="l-bg--success"
                         />
                     )}

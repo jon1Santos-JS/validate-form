@@ -1,7 +1,3 @@
-declare type HandledInputsType<T extends string> = {
-    [key in T]: Partial<ValidateInputType<T>>;
-};
-
 declare type InputsToValidateType<T extends string> = {
     [key in T]: ValidateInputType<T, T>;
 };
