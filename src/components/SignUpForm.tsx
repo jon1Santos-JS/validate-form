@@ -31,7 +31,6 @@ export default function SignUpForm({
     const { inputsFactory, onCheckUsername } = useInputHandler();
     const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
     const [isRequesting, setRequestState] = useState(false);
-    const [isValidatingOnTyping, setIsValidatingOnTyping] = useState(false);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
         password: { showInputMessage: false, highlightInput: false },
@@ -190,7 +189,6 @@ export default function SignUpForm({
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
 
-        setIsValidatingOnTyping(true);
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
@@ -204,7 +202,6 @@ export default function SignUpForm({
                     highlightInput: true,
                 },
             }));
-            setIsValidatingOnTyping(false);
         }, 950);
     }
 
@@ -213,7 +210,6 @@ export default function SignUpForm({
     ) {
         if (isDangerModalOpen) return;
         if (isRequesting) return;
-        setIsValidatingOnTyping(true);
         setInputs((prev) => ({
             ...prev,
             username: {
@@ -241,7 +237,6 @@ export default function SignUpForm({
                     highlightInput: true,
                 },
             }));
-            setIsValidatingOnTyping(false);
         }, 960);
     }
 
@@ -250,7 +245,6 @@ export default function SignUpForm({
         if (isDangerModalOpen) return;
         if (areErrorsUp()) return;
         if (isRequesting) return;
-        if (isValidatingOnTyping) return;
         setRequestState(true);
         if (!(await validateMany(inputs))) {
             onHilightInputs(true);
