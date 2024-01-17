@@ -24,6 +24,7 @@ export default class DBHandler {
             success: true,
         } as DBDefaultResponse;
     }
+
     async checkDB(caller: string) {
         const response = await this.#DB.accessState(caller);
         if (!response.success) return response;
@@ -41,6 +42,7 @@ export default class DBHandler {
             success: true,
         } as DBDefaultResponse;
     }
+
     async resetDB(constraint: Constraints, caller: string) {
         if (constraint !== 'admin')
             return {

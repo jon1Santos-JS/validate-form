@@ -8,7 +8,7 @@ export default class UserUpdateHandler {
                 : DBAccount,
         );
         console.log(
-            `user: ${userAccount.username.value} has been changed to ${userAccount.newUsername.value}`,
+            `User: ${userAccount.username.value} has been changed to ${userAccount.newUsername.value}`,
         );
         return {
             success: true,
