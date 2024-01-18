@@ -36,7 +36,6 @@ export class MongoDB {
 
     async createState(caller: string) {
         try {
-            await MONGODB.connect();
             const collection = MONGODB.db('accounts').collection('users');
             const initialState = {
                 accounts: INITIAL_STATE.accounts,

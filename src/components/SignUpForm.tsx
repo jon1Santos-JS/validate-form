@@ -243,18 +243,17 @@ export default function SignUpForm({
         e.preventDefault();
         controller.abort();
         if (isDangerModalOpen) return;
-        if (areErrorsUp('username')) return;
+        // if (areErrorsUp('username')) return;
         if (isRequesting) return;
-        setRequestState(true);
         if (!(await validateMany(inputs))) {
             onHilightInputs(true);
             onShowInputsMessages(true);
-            setRequestState(false);
             return;
         }
         const handledInputs = onHandleInputs(inputs);
         setRequestState(true);
         await onSubmitInputs(handledInputs);
+        setRequestState(false);
     }
 
     function onHandleInputs(inputsToHandle: InputsToValidateType<InputsType>) {
@@ -274,7 +273,6 @@ export default function SignUpForm({
         const response = await fetch(SIGN_UP_API, options);
         const parsedResponse: DBDefaultResponse = await response.json();
         if (!parsedResponse.success) {
-            setRequestState(false);
             if (parsedResponse.data.includes('limit')) {
                 setModalMessage(parsedResponse.data);
                 onOpenDangerModal();
