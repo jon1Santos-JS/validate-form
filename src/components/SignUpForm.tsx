@@ -23,6 +23,7 @@ export default function SignUpForm({
     onOpenDangerModal,
     isDangerModalOpen,
 }: SignUpProps) {
+    const controller = new AbortController();
     const router = useRouter();
     const {
         userState: { hasUser },
@@ -43,14 +44,15 @@ export default function SignUpForm({
                     conditional: await onCheckUsername(CHECK_USERNAME_API, {
                         method: 'POST',
                         body: value,
+                        signal: controller.signal,
                     }),
-                    message: 'This username already exist',
+                    message: 'Username already exist',
                 },
             ],
             validationsSync: ({ value }) => [
                 {
                     conditional: !value.match(/^[A-Za-z]*$/),
-                    message: 'No special characters',
+                    message: 'Do not use special characters or numbers',
                 },
                 {
                     conditional: !value.match(/.{6,}/),
@@ -188,7 +190,6 @@ export default function SignUpForm({
             ...prev,
             [key]: { ...prev[key], attributes: { value: e.target.value } },
         }));
-
         onSetTimeOut(() => {
             setInputs((prev) => ({
                 ...prev,
@@ -217,7 +218,6 @@ export default function SignUpForm({
                 attributes: { value: e.target.value },
             },
         }));
-
         await onSetAsyncTimeOut(async () => {
             const input = {
                 ...inputs.username,
@@ -233,7 +233,6 @@ export default function SignUpForm({
                 ...prev,
                 username: {
                     ...prev.username,
-                    showInputMessage: true,
                     highlightInput: true,
                 },
             }));
@@ -242,8 +241,9 @@ export default function SignUpForm({
 
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
+        controller.abort();
         if (isDangerModalOpen) return;
-        if (areErrorsUp()) return;
+        if (areErrorsUp('username')) return;
         if (isRequesting) return;
         setRequestState(true);
         if (!(await validateMany(inputs))) {
@@ -283,10 +283,15 @@ export default function SignUpForm({
             onSetRequestErrorMessage('username', parsedResponse.data);
             return;
         }
+        onSetRequestErrorMessage('username');
         router.push('/dashboard-page');
     }
 
-    function areErrorsUp() {
+    function areErrorsUp(key?: InputsType) {
+        if (key) {
+            if (inputState[key].showInputMessage) return true;
+            return false;
+        }
         let isValid = false;
         for (const i in inputState) {
             if (inputState[i as InputsType].showInputMessage) isValid = true;

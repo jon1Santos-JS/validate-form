@@ -86,14 +86,6 @@ export default function DashBoardPage() {
                             Delete Account
                         </button>
                     )}
-                    {userState.hasUser && (
-                        <button
-                            className="l-bg--thirty c-button button"
-                            onClick={signOutUser}
-                        >
-                            Sign out
-                        </button>
-                    )}
                     {isAdmin && (
                         <button
                             className="l-bg--thirty c-button button"
@@ -102,6 +94,15 @@ export default function DashBoardPage() {
                             Reset Database
                         </button>
                     )}
+                    {userState.hasUser && (
+                        <button
+                            className="l-bg--thirty c-button button"
+                            onClick={signOutUser}
+                        >
+                            Sign out
+                        </button>
+                    )}
+
                     {!isAdmin && (
                         <DashboardModal
                             isOpen={isUsernameModalOpen}

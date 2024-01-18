@@ -29,7 +29,7 @@ export async function authUserController(browserHash: string | undefined) {
 export async function checkUsernameController(username: string) {
     const db = new DBHandler();
     const auth = new UserAuthHandler();
-    const DBResponse = await db.connect('signup controller');
+    const DBResponse = await db.connect('check username controller');
     if (!DBResponse.success) return DBResponse;
     const authResponse = await auth.authUsername(username);
     return authResponse;

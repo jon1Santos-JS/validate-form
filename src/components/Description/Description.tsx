@@ -1,7 +1,7 @@
 const advice: { [key: string]: string } = {
     title: 'Welcome to the validate hook test',
     advise: "If the limit to create account reached, you can access the app using the admin's account, and reset the database:",
-    account: '[ username: admins / password: admins ]',
+    account: `[ username: ${process.env.NEXT_PUBLIC_ADMINS_USERNAME} / password: ${process.env.NEXT_PUBLIC_ADMINS_PASSWORD} ]`,
 };
 
 export default function Description() {

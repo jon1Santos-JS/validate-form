@@ -10,43 +10,52 @@ export const MONGODB = new MongoClient(process.env.MONGO_DB_URI as string, {
 });
 
 export class MongoDB {
-    async connect(caller: string) {
+    async accessState(caller: string) {
         try {
             await MONGODB.connect();
-            console.log('Connected to MongoDB by:', caller);
-            return { success: true } as DBDefaultResponse;
-        } catch {
-            console.log('Failed to connect to MongoDB by:', caller);
-            return {
-                success: false,
-                data: DEFAULT_ERROR,
-            } as DBDefaultResponse;
-        }
-    }
-    async accessState(caller: string) {
-        const connectionResponse = await this.connect(caller);
-        if (!connectionResponse.success) return connectionResponse;
-        try {
             const collection = MONGODB.db('accounts').collection('users');
             const mongoResponse: unknown | null = await collection.findOne({});
-            if (!mongoResponse) throw new Error('No state found');
+            if (!mongoResponse) throw 'No state found';
             const DBState = {
                 ...(mongoResponse as MiniDBState<null>),
                 _id: null,
             } as MiniDBState<null>;
             DATABASE.state = DBState;
             console.log('MongoDB state has been accessed by:', caller);
-            await MONGODB.close();
             return { success: true } as DBDefaultResponse;
         } catch (err: unknown) {
-            console.log('Failed to access MongoDB state by:', caller);
-            return this.createState(`${err}, state was created by: ${caller}`);
+            console.log(
+                'Failed to access MongoDB state by:',
+                caller,
+                'Error:',
+                err,
+            );
+            return await this.createState(caller);
         }
     }
-    async refreshState(caller: string) {
-        const connectionResponse = await this.connect(caller);
-        if (!connectionResponse.success) return connectionResponse;
+
+    async createState(caller: string) {
         try {
+            await MONGODB.connect();
+            const collection = MONGODB.db('accounts').collection('users');
+            const initialState = {
+                accounts: INITIAL_STATE.accounts,
+                limit: INITIAL_STATE.limit,
+            };
+            await collection.insertMany([initialState]);
+            console.log('MongoDB state has been created by:', caller);
+            return { success: true } as DBDefaultResponse;
+        } catch {
+            console.log('failed to create MongoDB state by:', caller);
+            return { success: false, data: DEFAULT_ERROR } as DBDefaultResponse;
+        } finally {
+            await MONGODB.close();
+        }
+    }
+
+    async refreshState(caller: string) {
+        try {
+            await MONGODB.connect();
             const collection = MONGODB.db('accounts').collection('users');
             const update = {
                 $set: {
@@ -58,23 +67,6 @@ export class MongoDB {
             return { success: true } as DBDefaultResponse;
         } catch {
             console.log('failed to refresh MongoDB state by:', caller);
-            return { success: false, data: DEFAULT_ERROR } as DBDefaultResponse;
-        } finally {
-            await MONGODB.close();
-        }
-    }
-    async createState(caller: string) {
-        try {
-            const collection = MONGODB.db('accounts').collection('users');
-            const initialState = {
-                accounts: INITIAL_STATE.accounts,
-                limit: INITIAL_STATE.limit,
-            };
-            await collection.insertMany([initialState]);
-            console.log('MongoDB state has been created by:', caller);
-            return { success: true } as DBDefaultResponse;
-        } catch {
-            console.log('failed to create MongoDB state by:', caller);
             return { success: false, data: DEFAULT_ERROR } as DBDefaultResponse;
         } finally {
             await MONGODB.close();

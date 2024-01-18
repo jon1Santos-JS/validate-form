@@ -34,7 +34,9 @@ export default function SignInForm() {
                     message: '',
                 },
                 {
-                    conditional: !value.match(/.{6,}/),
+                    conditional:
+                        value.length <= 5 &&
+                        value !== process.env.NEXT_PUBLIC_ADMINS_USERNAME,
                     message: '',
                 },
                 {
@@ -53,7 +55,9 @@ export default function SignInForm() {
                     message: '',
                 },
                 {
-                    conditional: !value.match(/.{6,}/),
+                    conditional:
+                        value.length <= 5 &&
+                        value !== process.env.NEXT_PUBLIC_ADMINS_PASSWORD,
                     message: '',
                 },
             ],

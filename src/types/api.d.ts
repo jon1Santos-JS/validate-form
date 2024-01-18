@@ -2,6 +2,7 @@ declare type FetchOptionsType = {
     method: MethodTypes;
     headers?: { [key: string]: string };
     body?: BodyInit | null;
+    signal?: AbortSignal | null;
 };
 
 declare type MethodTypes = 'GET' | 'DELETE' | 'POST';

@@ -46,7 +46,7 @@ export default function ChangeUsernameForm({
                 },
                 {
                     conditional: !value.match(/^[A-Za-z]*$/),
-                    message: 'No special characters',
+                    message: 'Do not use special characters or numbers',
                 },
             ],
             required: { value: true },

@@ -17,7 +17,7 @@ export default function DashboardModal({
             onClick={onClose}
         >
             <div
-                className="o-dashboard-modal l-bg--thirty"
+                className="o-dashboard-modal l-bg--primary"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button

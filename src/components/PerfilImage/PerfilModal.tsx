@@ -26,7 +26,7 @@ export default function PerfilFormModal() {
             onClick={onClose}
         >
             <div
-                className="container l-bg--thirty"
+                className="container l-bg--primary"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="image-container l-bg--secondary">
