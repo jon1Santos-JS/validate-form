@@ -243,7 +243,6 @@ export default function SignUpForm({
         e.preventDefault();
         controller.abort();
         if (isDangerModalOpen) return;
-        // if (areErrorsUp('username')) return;
         if (isRequesting) return;
         if (!(await validateMany(inputs))) {
             onHilightInputs(true);
@@ -283,18 +282,6 @@ export default function SignUpForm({
         }
         onSetRequestErrorMessage('username');
         router.push('/dashboard-page');
-    }
-
-    function areErrorsUp(key?: InputsType) {
-        if (key) {
-            if (inputState[key].showInputMessage) return true;
-            return false;
-        }
-        let isValid = false;
-        for (const i in inputState) {
-            if (inputState[i as InputsType].showInputMessage) isValid = true;
-        }
-        return isValid;
     }
 
     function onSetRequestErrorMessage(key: InputsType, message?: string) {
