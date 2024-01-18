@@ -256,7 +256,6 @@ export default function SignUpForm({
         setRequestState(true);
         await onSubmitInputs(handledInputs);
     }
-
     function onHandleInputs(inputsToHandle: InputsToValidateType<InputsType>) {
         const { username, password } = inputsToHandle;
         return {
