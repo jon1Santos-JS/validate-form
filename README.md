@@ -14,7 +14,7 @@
 #
 
 ### Porpuse
-This app was created to test and release the <a href="">validate hook app</a>. This hook aimed to validate forms on frontend in an easy and dynamic way, you can find more about its use on npm
+This app was created to test and release the <a href="https://www.npmjs.com/package/validate-hook?activeTab=readme">React Validate Hook</a> for forms. This hook aimed to validate forms on frontend in an easy and dynamic way, you can find more about its use on npm
 
 #
     
