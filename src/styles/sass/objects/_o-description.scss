@@ -16,6 +16,11 @@
 
     .title {
         align-self: center;
+
+        .link {
+            color: inherit;
+            text-decoration: underline;
+        }
     }
 
     .advise {

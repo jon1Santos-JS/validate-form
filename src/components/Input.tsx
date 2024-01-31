@@ -40,13 +40,13 @@ export default function Input<T extends string>({
     return (
         <div className="field">
             {label ? (
-                <label htmlFor={label} className="label">
+                <label htmlFor={label} className="label l-text--primary">
                     {label}
                 </label>
             ) : null}
             <input
                 id={inputID + label}
-                className={`input ${className} ${
+                className={`input l-text--primary ${className} ${
                     hilightConditional &&
                     inputState?.highlightInput &&
                     'has-error'

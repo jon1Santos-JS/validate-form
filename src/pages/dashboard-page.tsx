@@ -52,17 +52,19 @@ export default function DashBoardPage() {
                         </>
                     </PerfilImageProvider>
 
-                    <h2 className="username">
+                    <h2 className="username l-text--primary">
                         {username.replace(
                             username.charAt(0),
                             username.charAt(0).toUpperCase(),
                         )}
                     </h2>
-                    <h3 className="welcome-message">{welcomeMessage}</h3>
+                    <h3 className="welcome-message l-text--primary">
+                        {welcomeMessage}
+                    </h3>
 
                     {!isAdmin && (
                         <button
-                            className="l-bg--thirty c-button button"
+                            className="c-button--primary button"
                             onClick={() => onOpenUsernameModal(true)}
                         >
                             Change Username
@@ -71,7 +73,7 @@ export default function DashBoardPage() {
 
                     {!isAdmin && (
                         <button
-                            className="l-bg--thirty c-button button"
+                            className="c-button--primary button"
                             onClick={() => onOpenPasswordModal(true)}
                         >
                             Change Password
@@ -80,7 +82,7 @@ export default function DashBoardPage() {
 
                     {!isAdmin && (
                         <button
-                            className="l-bg--thirty c-button button"
+                            className="c-button--primary button"
                             onClick={() => onOpenDelAccountModal(true)}
                         >
                             Delete Account
@@ -88,7 +90,7 @@ export default function DashBoardPage() {
                     )}
                     {isAdmin && (
                         <button
-                            className="l-bg--thirty c-button button"
+                            className="c-button--primary button"
                             onClick={() => onOpenResetDBModal(true)}
                         >
                             Reset Database
@@ -96,7 +98,7 @@ export default function DashBoardPage() {
                     )}
                     {userState.hasUser && (
                         <button
-                            className="l-bg--thirty c-button button"
+                            className="c-button--primary button"
                             onClick={signOutUser}
                         >
                             Sign out

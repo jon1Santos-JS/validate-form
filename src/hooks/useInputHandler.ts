@@ -1,7 +1,7 @@
 export default function useInputHandler() {
     async function onCheckUsername(url: string, options: FetchOptionsType) {
         const response = await fetch(url, options);
-        const parsedResponse: DBDefaultResponse = await response.json();
+        const parsedResponse = await response.json();
         return parsedResponse.success;
     }
 

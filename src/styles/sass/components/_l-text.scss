@@ -1,4 +1,17 @@
 .l-text {
+    &--primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+
+        &:focus {
+            outline-color: var(--primary-color);
+        }
+
+        &::placeholder {
+            color: var(--primary-color);
+        }
+    }
+
     &--danger {
         color: var(--danger-color);
     }

@@ -1,4 +1,20 @@
-.c-button {
+%button {
     cursor: pointer;
     user-select: none;
+}
+
+.c-button {
+    @extend %button;
+
+    &--primary {
+        @extend %button;
+
+        background-color: var(--secondary-color);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+
+        &:hover {
+            background-color: var(--primary-hover-color);
+        }
+    }
 }

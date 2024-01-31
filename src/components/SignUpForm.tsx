@@ -8,7 +8,6 @@ import useUtils from '@/hooks/useUtils';
 import { useRouter } from 'next/router';
 
 const SIGN_UP_API = 'api/signUp';
-const CHECK_USERNAME_API = 'api/checkUsername';
 const REQUIRED_MESSAGE = 'This field is required';
 
 type InputsType = 'confirmPassword' | 'password' | 'username';
@@ -23,14 +22,13 @@ export default function SignUpForm({
     onOpenDangerModal,
     isDangerModalOpen,
 }: SignUpProps) {
-    const controller = new AbortController();
     const router = useRouter();
     const {
         userState: { hasUser },
     } = useAuth();
-    const { validateSingle, validateSingleSync, validateMany } = useValidate();
-    const { inputsFactory, onCheckUsername } = useInputHandler();
-    const { onSetTimeOut, onSetAsyncTimeOut } = useUtils();
+    const { validateSingleSync, validateMany } = useValidate();
+    const { inputsFactory } = useInputHandler();
+    const { onSetTimeOut } = useUtils();
     const [isRequesting, setRequestState] = useState(false);
     const [inputState, setInputState] = useState({
         username: { showInputMessage: false, highlightInput: false },
@@ -39,16 +37,6 @@ export default function SignUpForm({
     });
     const [inputs, setInputs] = useState<InputsToValidateType<InputsType>>({
         username: inputsFactory({
-            validations: async ({ value }) => [
-                {
-                    conditional: await onCheckUsername(CHECK_USERNAME_API, {
-                        method: 'POST',
-                        body: value,
-                        signal: controller.signal,
-                    }),
-                    message: 'Username already exist',
-                },
-            ],
             validationsSync: ({ value }) => [
                 {
                     conditional: !value.match(/^[A-Za-z]*$/),
@@ -109,7 +97,7 @@ export default function SignUpForm({
     return (
         <form className="o-sign-up-form">
             <fieldset className="container">
-                <div className="legend">
+                <div className="legend l-text--primary">
                     <legend>Sign up</legend>
                 </div>
                 <div className="inputs">
@@ -117,7 +105,7 @@ export default function SignUpForm({
                         ownProps={{
                             label: 'Username',
                             inputType: 'text',
-                            onChange: (e) => onChangeInputUsername(e),
+                            onChange: (e) => onChange(e, 'username'),
                             className: `${
                                 isRequesting || isDangerModalOpen
                                     ? 'is-input-disabled'
@@ -165,14 +153,16 @@ export default function SignUpForm({
                 <div className="buttons">
                     <button
                         key={'submitButton'}
-                        className="c-button button"
+                        className="c-button--primary button"
                         onClick={onClick}
                     >
                         Submit
                     </button>
                     {!hasUser && (
                         <Link key={'signInButton'} href="/">
-                            <button className="c-button button">Sign In</button>
+                            <button className="c-button--primary button">
+                                Sign In
+                            </button>
                         </Link>
                     )}
                 </div>
@@ -206,42 +196,8 @@ export default function SignUpForm({
         }, 950);
     }
 
-    async function onChangeInputUsername(
-        e: React.ChangeEvent<HTMLInputElement>,
-    ) {
-        if (isDangerModalOpen) return;
-        if (isRequesting) return;
-        setInputs((prev) => ({
-            ...prev,
-            username: {
-                ...prev.username,
-                attributes: { value: e.target.value },
-            },
-        }));
-        await onSetAsyncTimeOut(async () => {
-            const input = {
-                ...inputs.username,
-                attributes: { value: e.target.value },
-            };
-            const currentInputs = {
-                ...inputs,
-                username: input,
-            };
-            const validatedInput = await validateSingle(input, currentInputs);
-            setInputs((prev) => ({ ...prev, username: validatedInput }));
-            setInputState((prev) => ({
-                ...prev,
-                username: {
-                    ...prev.username,
-                    highlightInput: true,
-                },
-            }));
-        }, 960);
-    }
-
     async function onClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.preventDefault();
-        controller.abort();
         if (isDangerModalOpen) return;
         if (isRequesting) return;
         if (!(await validateMany(inputs))) {

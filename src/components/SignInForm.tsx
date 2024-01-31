@@ -70,7 +70,7 @@ export default function SignInForm() {
     return (
         <form className="o-sign-in-form">
             <fieldset className="container">
-                <div className="legend">
+                <div className="legend l-text--primary">
                     <legend>Sign in</legend>
                 </div>
                 <div className="inputs">
@@ -107,14 +107,16 @@ export default function SignInForm() {
                 <div className="buttons">
                     <button
                         key={'submitButton'}
-                        className="c-button button"
+                        className="c-button--primary button"
                         onClick={onClick}
                     >
                         Submit
                     </button>
                     {!hasUser && (
                         <Link href="/sign-up-page">
-                            <button className="c-button button">Sign up</button>
+                            <button className="c-button--primary button">
+                                Sign up
+                            </button>
                         </Link>
                     )}
                 </div>
