@@ -234,6 +234,14 @@ export default function SignUpForm({
                 return;
             }
             onSetRequestErrorMessage('username', parsedResponse.data);
+            setInputState((prev) => ({
+                ...prev,
+                username: {
+                    ...prev.username,
+                    highlightInput: true,
+                    showInputMessage: true,
+                },
+            }));
             return;
         }
         onSetRequestErrorMessage('username');
