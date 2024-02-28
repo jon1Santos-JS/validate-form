@@ -208,7 +208,6 @@ export default function SignUpForm({
         const handledInputs = onHandleInputs(inputs);
         setRequestState(true);
         await onSubmitInputs(handledInputs);
-        setRequestState(false);
     }
 
     function onHandleInputs(inputsToHandle: InputsToValidateType<InputsType>) {
@@ -242,6 +241,7 @@ export default function SignUpForm({
                     showInputMessage: true,
                 },
             }));
+            setRequestState(false);
             return;
         }
         onSetRequestErrorMessage('username');
